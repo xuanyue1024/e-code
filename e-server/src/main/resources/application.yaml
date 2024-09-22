@@ -15,3 +15,12 @@ mybatis-plus:
         db-config:
             id-type: auto # \u5168\u5C40id\u7C7B\u578B\u4E3A\u81EA\u589E\u957F
     mapper-locations: "classpath*:/mapper/**/*.xml" # Mapper.xml\u6587\u4EF6\u5730\u5740\uFF0C\u5F53\u524D\u8FD9\u4E2A\u662F\u9ED8\u8BA4\u503C\u3002
+
+ecode:
+    jwt:
+        # \u8BBE\u7F6Ejwt\u7B7E\u540D\u52A0\u5BC6\u65F6\u4F7F\u7528\u7684\u79D8\u94A5
+        user-secret-key: test
+        # \u8BBE\u7F6Ejwt\u8FC7\u671F\u65F6\u95F4ms
+        user-ttl: 7200000000
+        # \u8BBE\u7F6E\u524D\u7AEF\u4F20\u9012\u8FC7\u6765\u7684\u4EE4\u724C\u540D\u79F0
+        user-token-name: token

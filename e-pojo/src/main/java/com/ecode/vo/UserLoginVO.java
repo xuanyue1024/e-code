@@ -27,6 +27,9 @@ public class UserLoginVO implements Serializable {
     @ApiModelProperty("昵称")
     private String name;
 
+    @ApiModelProperty("角色")
+    private String role;
+
     @ApiModelProperty("jwt令牌")
     private String token;
 

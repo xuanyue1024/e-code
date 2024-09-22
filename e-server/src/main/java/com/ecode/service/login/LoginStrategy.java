@@ -1,7 +1,7 @@
 package com.ecode.service.login;
 
 import com.ecode.dto.UserLoginDTO;
-import com.ecode.vo.UserLoginVO;
+import com.ecode.entity.User;
 
 public interface LoginStrategy {
     /**
@@ -9,5 +9,5 @@ public interface LoginStrategy {
      * @param userLoginDTO 登录请求参数
      * @return 登录结果
      */
-    UserLoginVO login(UserLoginDTO userLoginDTO);
+    User login(UserLoginDTO userLoginDTO);
 }
