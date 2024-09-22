@@ -27,6 +27,8 @@
 
         <knife4j>3.0.2</knife4j>
         <docker-java>3.4.0</docker-java>
+        <jjwt>0.9.1</jjwt>
+        <mybatis-plus>3.5.3.1</mybatis-plus>
     </properties>
 
     <dependencies>
@@ -40,6 +42,25 @@
             <artifactId>knife4j-spring-boot-starter</artifactId>
             <version>${knife4j}</version>
         </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

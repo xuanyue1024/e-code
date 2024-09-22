@@ -1,0 +1,17 @@
+# \u670D\u52A1\u7AEF\u53E3
+server:
+    port: 8080
+
+spring:
+    datasource:
+        url: jdbc:mysql://127.0.0.1:3306/e_code?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: 123456
+
+mybatis-plus:
+    type-aliases-package: com.ecode.entity
+    global-config:
+        db-config:
+            id-type: auto # \u5168\u5C40id\u7C7B\u578B\u4E3A\u81EA\u589E\u957F
+    mapper-locations: "classpath*:/mapper/**/*.xml" # Mapper.xml\u6587\u4EF6\u5730\u5740\uFF0C\u5F53\u524D\u8FD9\u4E2A\u662F\u9ED8\u8BA4\u503C\u3002
