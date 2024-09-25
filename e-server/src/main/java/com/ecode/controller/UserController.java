@@ -2,9 +2,11 @@ package com.ecode.controller;
 
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.dto.UserLoginDTO;
+import com.ecode.dto.UserRegisterDTO;
 import com.ecode.entity.User;
 import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
+import com.ecode.service.UserService;
 import com.ecode.service.login.LoginStrategy;
 import com.ecode.service.login.LoginStrategyFactory;
 import com.ecode.utils.JwtUtil;
@@ -39,6 +41,9 @@ public class UserController {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * 登录
      *
@@ -69,5 +74,20 @@ public class UserController {
                 .token(token)
                 .build();
         return Result.success(userLoginVO);
+    }
+
+    /**
+     * 注册
+     *
+     * @param userRegisterDTO 用户注册dto
+     * @return 后端统一返回结果
+     */
+    @PostMapping("/register")
+    @ApiOperation("用户注册")
+    public Result register(@RequestBody UserRegisterDTO userRegisterDTO){
+
+        userService.save(userRegisterDTO);
+
+        return Result.success();
     }
 }

@@ -10,6 +10,8 @@ spring:
         password: 123456
 
 mybatis-plus:
+    configuration:
+        default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler #配置枚举处理器
     type-aliases-package: com.ecode.entity
     global-config:
         db-config:
@@ -24,3 +26,4 @@ ecode:
         user-ttl: 7200000000
         # \u8BBE\u7F6E\u524D\u7AEF\u4F20\u9012\u8FC7\u6765\u7684\u4EE4\u724C\u540D\u79F0
         user-token-name: token
+

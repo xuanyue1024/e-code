@@ -3,10 +3,11 @@ package com.ecode.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.ecode.enumeration.Sex;
+import com.ecode.enumeration.UserStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -15,13 +16,16 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 用户
+ * User对象
  * </p>
  *
  * @author 竹林听雨
- * @since 2024-09-22
+ * @since 2024-09-24
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("user")
@@ -47,7 +51,7 @@ public class User implements Serializable {
     private String email;
 
     @ApiModelProperty(value = "账号状态 0：禁用，1：启用")
-    private String status;
+    private UserStatus status;
 
     @ApiModelProperty(value = "昵称")
     private String name;
@@ -59,10 +63,13 @@ public class User implements Serializable {
     private String phone;
 
     @ApiModelProperty(value = "性别 0：男，1：女")
-    private String sex;
+    private Sex sex;
 
     @ApiModelProperty(value = "地址")
     private String address;
+
+    @ApiModelProperty(value = "积分")
+    private Long score;
 
     @ApiModelProperty(value = "出生日期")
     private LocalDate birthDate;
