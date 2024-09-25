@@ -46,6 +46,12 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
+        <!-- 邮件发送 https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>2.7.6</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -59,6 +65,11 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus}</version>
+            </dependency>
+            <!-- 邮件发送 https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-mail</artifactId>
             </dependency>
         </dependencies>
     </dependencyManagement>

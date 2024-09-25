@@ -22,5 +22,5 @@ public class UserRegisterDTO implements Serializable {
     private String email;
 
     @ApiModelProperty("邮箱验证码")
-    private String verificationCode;
+    private String emailCode;
 }

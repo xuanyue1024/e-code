@@ -1,11 +1,11 @@
 package com.ecode.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.entity.User;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.mapper.UserMapper;
 import com.ecode.service.UserService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +36,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .updateTime(LocalDateTime.now())
                 .score(0L)
                 .build();
+
 
         BeanUtils.copyProperties(userRegisterDTO, user);
         userMapper.insert(user);

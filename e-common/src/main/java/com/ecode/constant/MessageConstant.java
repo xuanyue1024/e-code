@@ -28,4 +28,10 @@ public class MessageConstant {
 
     public static final String INVALID_LOGIN_TYPE = "无效的登录类型";
 
+    //验证码
+    public static final String CAPTCHA_TRY_AGAIN_WITHIN24_HOURS = "验证码发送过于频繁,请24小时后再试";
+    public static final String CAPTCHA_TRY_AGAIN_WITHIN60_S = "验证码发送过于频繁,请在60秒后重试";
+    public static final String CAPTCHA_ERROR = "验证码发送出现错误,请联系管理员";
+
+
 }

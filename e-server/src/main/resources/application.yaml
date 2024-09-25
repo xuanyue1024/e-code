@@ -3,11 +3,25 @@ server:
     port: 8080
 
 spring:
+    profiles:
+        active: dev
     datasource:
         url: jdbc:mysql://127.0.0.1:3306/e_code?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
         driver-class-name: com.mysql.cj.jdbc.Driver
         username: root
         password: 123456
+    #邮件服务配置
+    mail:
+        host: ${ecode.mail.host} #邮件服务器地址
+        protocol: ${ecode.mail.protocol} #协议
+        username: ${ecode.mail.username} #发送邮件的邮箱也就是你开通服务的邮箱
+        password: ${ecode.mail.password} #开通服务后得到的授权码
+        default-encoding: ${ecode.mail.default-encoding} #邮件内容的编码
+    redis:
+        host: ${ecode.redis.host}
+        port: ${ecode.redis.port}
+        password: ${ecode.redis.password}
+        database: ${ecode.redis.database}
 
 mybatis-plus:
     configuration:
