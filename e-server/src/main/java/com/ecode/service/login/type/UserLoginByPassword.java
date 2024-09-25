@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecode.constant.MessageConstant;
 import com.ecode.dto.UserLoginDTO;
 import com.ecode.entity.User;
-import com.ecode.exception.LoginFailedException;
+import com.ecode.exception.LoginException;
 import com.ecode.mapper.UserMapper;
 import com.ecode.service.login.LoginStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class UserLoginByPassword implements LoginStrategy {
 
         User user = userMapper.selectOne(queryWrapper);
         if (user == null){
-            throw new LoginFailedException(MessageConstant.LOGIN_FAILED_USERNAME_OR_PASSWD);
+            throw new LoginException(MessageConstant.LOGIN_FAILED_USERNAME_OR_PASSWD);
         }
         return user;
     }

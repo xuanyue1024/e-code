@@ -24,7 +24,7 @@ public class MessageConstant {
     public static final String DISH_BE_RELATED_BY_SETMEAL = "当前菜品关联了套餐,不能删除";
     public static final String ORDER_STATUS_ERROR = "订单状态错误";
     public static final String ORDER_NOT_FOUND = "订单不存在";
-    public static final String ALREADY_EXISTS = "用户名已存在";
+    public static final String ALREADY_EXISTS = "已存在";
 
     public static final String INVALID_LOGIN_TYPE = "无效的登录类型";
 
@@ -32,6 +32,11 @@ public class MessageConstant {
     public static final String CAPTCHA_TRY_AGAIN_WITHIN24_HOURS = "验证码发送过于频繁,请24小时后再试";
     public static final String CAPTCHA_TRY_AGAIN_WITHIN60_S = "验证码发送过于频繁,请在60秒后重试";
     public static final String CAPTCHA_ERROR = "验证码发送出现错误,请联系管理员";
+
+    //注册
+    public static final String REGISTRATION_FAILED_CAPTCHA = "注册失败,验证码不正确";
+
+    public static final String REGISTRATION_FAILED = "注册失败";
 
 
 }
