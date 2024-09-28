@@ -41,12 +41,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java -->
-        <dependency>
-            <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java</artifactId>
-            <version>${docker-java}</version>
-        </dependency>
 <!--        redis数据库-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

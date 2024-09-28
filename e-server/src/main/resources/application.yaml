@@ -41,3 +41,8 @@ ecode:
         # \u8BBE\u7F6E\u524D\u7AEF\u4F20\u9012\u8FC7\u6765\u7684\u4EE4\u724C\u540D\u79F0
         user-token-name: token
 
+    docker:
+        url: ${ecode.docker.url}
+        timeout: ${ecode.docker.timeout}
+
+
