@@ -43,6 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!userRegisterDTO.getEmailCode().equals(captcha)){
             throw new RegisterException(MessageConstant.REGISTRATION_FAILED_CAPTCHA);
         }
+        redisTemplate.delete("email:captcha:" + userRegisterDTO.getEmail());
         User user = User.builder()
                 .status(UserStatus.ENABLE)
                 .name("默认用户")
