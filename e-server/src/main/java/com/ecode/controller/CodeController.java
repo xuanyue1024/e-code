@@ -1,5 +1,6 @@
 package com.ecode.controller;
 
+import com.ecode.dto.RunCodeDTO;
 import com.ecode.properties.DockerProperties;
 import com.ecode.result.Result;
 import com.ecode.utils.RunCodeUtil;
@@ -19,8 +20,8 @@ public class CodeController {
     @Autowired
     private DockerProperties dockerProperties;
     @PostMapping("/run")
-    public Result<String> run(@RequestBody String code){
-        String result = RunCodeUtil.runCode(dockerProperties.getUrl(),dockerProperties.getTimeout(),code);
+    public Result<String> run(@RequestBody RunCodeDTO runCodeDTO){
+        String result = RunCodeUtil.runCode(dockerProperties.getUrl(),dockerProperties.getTimeout(),runCodeDTO.getCode(),"12");
         return Result.success(result);
     }
 }

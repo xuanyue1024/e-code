@@ -58,6 +58,12 @@
             <artifactId>docker-java</artifactId>
             <version>${docker-java}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java-transport-httpclient5 -->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
+            <version>${docker-java}</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
