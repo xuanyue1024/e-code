@@ -21,7 +21,7 @@ public class CodeController {
     private DockerProperties dockerProperties;
     @PostMapping("/run")
     public Result<String> run(@RequestBody RunCodeDTO runCodeDTO){
-        String result = RunCodeUtil.runCode(dockerProperties.getUrl(),dockerProperties.getTimeout(),runCodeDTO.getCode(),"12");
+        String result = RunCodeUtil.runCode(dockerProperties.getUrl(),dockerProperties.getTimeout(),runCodeDTO.getCode(),runCodeDTO.getInput() + "\n");
         return Result.success(result);
     }
 }

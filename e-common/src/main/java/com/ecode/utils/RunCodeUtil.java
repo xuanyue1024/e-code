@@ -25,7 +25,7 @@ public class RunCodeUtil {
     public static String runCode(String url, int timeout, String codeStr, String input) {
         // 转义代码
         codeStr = codeStr.replace("\\","\\\\\\").replace("\"", "\\\"").replace("$", "\\$");
-        String createFileCmd = String.format("echo \"%s\" > %s", codeStr, "/root/Main.java");
+        String createFileCmd = String.format("echo \"%s\" > %s", codeStr, "/home/user/Main.java");
 
 
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
@@ -48,7 +48,7 @@ public class RunCodeUtil {
 //            DockerClient dockerClient = DockerClientBuilder.getInstance(url).build();
 
             // 创建一个带有 OpenJDK 的容器
-            CreateContainerResponse container = dockerClient.createContainerCmd("openjdk:11")
+            CreateContainerResponse container = dockerClient.createContainerCmd("run-java:1.0")
                     .withHostConfig(HostConfig.newHostConfig()
                             .withMemory(512 * 1024 * 1024L) // 限制内存为512MB
                             .withMemorySwap(512 * 1024 * 1024L) // 限制内存+交换区总共512MB
@@ -65,11 +65,11 @@ public class RunCodeUtil {
                 execInContainer(dockerClient, container.getId(), createFileCmd,null);
 
                 // 编译 Java 文件
-                result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), "javac /root/Main.java",null));
+                result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), "javac /home/user/Main.java",null));
                 log.debug("========编译输出: {}", result);
 
                 // 运行 Java 文件
-                result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), "java -cp /root Main",null));
+                result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), "java -cp /home/user Main",input));
                 log.debug("========运行输出: {}", result);
             }catch (Exception e){
                 throw new RunCodeException(e.getMessage());
