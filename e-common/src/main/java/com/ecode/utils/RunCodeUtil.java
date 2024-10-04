@@ -75,9 +75,18 @@ public class RunCodeUtil {
             }catch (Exception e){
                 throw new RunCodeException(e.getMessage());
             }finally {
-                // 停止并移除容器
-                dockerClient.stopContainerCmd(container.getId()).exec();
-                dockerClient.removeContainerCmd(container.getId()).exec();
+                // 在后台线程中执行停止和移除容器的操作
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        // 停止容器
+                        dockerClient.stopContainerCmd(container.getId()).exec();
+                        // 移除容器
+                        dockerClient.removeContainerCmd(container.getId()).exec();
+                        log.info("容器{}停止与移除成功", container.getId());
+                    } catch (Exception e) {
+                        e.printStackTrace();  // 捕获并打印异常
+                    }
+                });
             }
             return result;
     }
