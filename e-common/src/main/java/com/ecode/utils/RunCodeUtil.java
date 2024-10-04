@@ -3,6 +3,7 @@ package com.ecode.utils;
 import com.ecode.exception.RunCodeException;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.command.ExecStartCmd;
 import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.HostConfig;
@@ -91,13 +92,12 @@ public class RunCodeUtil {
      */
     private static String execInContainer(DockerClient dockerClient, String containerId, String command, String input) throws InterruptedException {
         String[] cmd = {"/bin/sh", "-c", command};
-        String execId = dockerClient.execCreateCmd(containerId)
+        ExecCreateCmdResponse execCreateCmdResponse = dockerClient.execCreateCmd(containerId)
                 .withCmd(cmd)
+                .withAttachStdin(true)
                 .withAttachStdout(true)
                 .withAttachStderr(true)
-                .withAttachStdin(input != null)  // 允许传入 stdin
-                .exec()
-                .getId();
+                .exec();
 
         // 使用 ByteArrayOutputStream 来捕获输出
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -109,7 +109,7 @@ public class RunCodeUtil {
             inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         }
 
-        ExecStartCmd execStartCmd = dockerClient.execStartCmd(execId);
+        ExecStartCmd execStartCmd = dockerClient.execStartCmd(execCreateCmdResponse.getId());
         log.info("input={}", input);
         if (inputStream != null) {
             execStartCmd.withStdIn(inputStream);  // 传入输入流
@@ -123,9 +123,9 @@ public class RunCodeUtil {
                 if (frame != null) {
                     String frameOutput = new String(frame.getPayload(), StandardCharsets.UTF_8);
                     if (frame.getStreamType() == StreamType.STDOUT) {
-                        log.info("STDOUT: {}", frameOutput);  // 实时标准输出
+                        log.info("标准输出: {}\n======", frameOutput);  // 实时标准输出
                     } else if (frame.getStreamType() == StreamType.STDERR) {
-                        log.error("STDERR: {}", frameOutput);  // 实时错误输出
+                        log.error("STDERR: {}\n======", frameOutput);  // 实时错误输出
                     }
                 }
                 super.onNext(frame);  // 保持原有的处理逻辑
@@ -164,10 +164,18 @@ public class RunCodeUtil {
         try {
             // 设定超时时间
             return future.get(timeoutSeconds, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (InterruptedException | TimeoutException e) {
             future.cancel(true);
             throw new RunCodeException("任务执行超时");
-        } finally {
+        } catch (ExecutionException e) {
+            // 解包 ExecutionException，抛出原始异常
+            Throwable cause = e.getCause();
+            if (cause instanceof RunCodeException) {
+                throw (RunCodeException) cause;  // 重新抛出原始的 RunCodeException
+            } else {
+                throw new RunCodeException("任务运行异常:" + e.getMessage());
+            }
+        }finally {
             executor.shutdownNow();
         }
     }
