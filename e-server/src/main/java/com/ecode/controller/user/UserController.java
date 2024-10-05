@@ -1,4 +1,4 @@
-package com.ecode.controller;
+package com.ecode.controller.user;
 
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.dto.UserLoginDTO;

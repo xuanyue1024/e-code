@@ -1,4 +1,4 @@
-package com.ecode.controller;
+package com.ecode.controller.open;
 
 import com.ecode.result.Result;
 import com.ecode.service.CaptchaService;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2024/09/25
  */
 @Slf4j
-@RestController("/captcha")
+@RestController("open/captcha")
 @Api(tags = "验证码")
 public class CaptchaController {
 

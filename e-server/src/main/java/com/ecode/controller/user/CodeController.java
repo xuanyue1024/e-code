@@ -1,4 +1,4 @@
-package com.ecode.controller;
+package com.ecode.controller.user;
 
 import com.ecode.dto.RunCodeDTO;
 import com.ecode.properties.DockerProperties;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @Api(tags = "代码管理")
-@RequestMapping("/code")
+@RequestMapping("user/code")
 public class CodeController {
     @Autowired
     private DockerProperties dockerProperties;
