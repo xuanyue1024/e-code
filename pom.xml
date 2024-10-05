@@ -29,6 +29,7 @@
         <docker-java>3.4.0</docker-java>
         <jjwt>0.9.1</jjwt>
         <mybatis-plus>3.5.3.1</mybatis-plus>
+        <fastjson>1.2.76</fastjson>
     </properties>
 
     <dependencies>
@@ -82,6 +83,11 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-mail</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
