@@ -40,7 +40,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         String lastSendTimestamp = hashOps.get("lastSendTimestamp");
         String sendCount = hashOps.get("sendCount");
 
-        if(StringUtils.isNotBlank(sendCount)&&Integer.parseInt(sendCount)>=5){
+        if(StringUtils.isNotBlank(sendCount) && Integer.parseInt(sendCount) >= 5){
             hashOps.expire(24, TimeUnit.HOURS);
             throw new MailCaptchaException(MessageConstant.CAPTCHA_TRY_AGAIN_WITHIN24_HOURS);
         }
@@ -49,7 +49,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             long currentTime = System.currentTimeMillis();
             long elapsedTime = currentTime - lastSendTime;
             if(elapsedTime < 60 * 1000){
-                throw new MailCaptchaException(MessageConstant.CAPTCHA_TRY_AGAIN_WITHIN60_S);
+                throw new MailCaptchaException(String.format(MessageConstant.CAPTCHA_TRY_AGAIN_WITHIN_Null_S, (60 - elapsedTime/1000)));
             }
         }
         int newSendCount = StringUtils.isNotBlank(sendCount) ? Integer.parseInt(sendCount) + 1 : 1;

@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler
     public Result exceptionHandler(BaseException ex){
-        log.error("异常信息：{}", ex.getMessage());
+        log.error("业务异常:{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
@@ -35,13 +35,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public Result exceptionHandler(SQLException ex){
         String message = ex.getMessage();
-        log.info("数据库出现异常,{}",ex);
+        log.error("数据库异常:{}",message);
         if (message.contains("Duplicate entry")){
             String username = message.split(" ")[2];
             return Result.error(username + MessageConstant.ALREADY_EXISTS);
         }else {
-            return Result.error(MessageConstant.UNKNOWN_ERROR);
+            return Result.error(MessageConstant.SQL_UNKNOWN_ERROR);
         }
     }
+
+    /*@ExceptionHandler
+    public Result exceptionHandler(Exception ex){
+        log.error("服务器异常:{}",ex.getMessage());
+        return Result.error("服务器异常");
+
+    }*/
 
 }

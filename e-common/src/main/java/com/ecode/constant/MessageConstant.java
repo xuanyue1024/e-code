@@ -8,7 +8,7 @@ public class MessageConstant {
     public static final String PASSWORD_ERROR = "密码错误";
     public static final String ACCOUNT_NOT_FOUND = "账号不存在";
     public static final String ACCOUNT_LOCKED = "账号被锁定";
-    public static final String UNKNOWN_ERROR = "未知错误";
+    public static final String SQL_UNKNOWN_ERROR = "数据库未知错误";
     public static final String USER_NOT_LOGIN = "用户未登录";
     public static final String CATEGORY_BE_RELATED_BY_SETMEAL = "当前分类关联了套餐,不能删除";
     public static final String CATEGORY_BE_RELATED_BY_DISH = "当前分类关联了菜品,不能删除";
@@ -25,13 +25,13 @@ public class MessageConstant {
     public static final String ORDER_STATUS_ERROR = "订单状态错误";
     public static final String ORDER_NOT_FOUND = "订单不存在";
     public static final String ALREADY_EXISTS = "已存在";
-    public static final String JWT_FAILS = "登录失败,令牌失效";
+    public static final String JWT_FAILS = "The login failed and the token became invalid";
 
     public static final String INVALID_LOGIN_TYPE = "无效的登录类型";
 
     //验证码
     public static final String CAPTCHA_TRY_AGAIN_WITHIN24_HOURS = "验证码发送过于频繁,请24小时后再试";
-    public static final String CAPTCHA_TRY_AGAIN_WITHIN60_S = "验证码发送过于频繁,请在60秒后重试";
+    public static final String CAPTCHA_TRY_AGAIN_WITHIN_Null_S = "验证码发送过于频繁,请在%s秒后重试";
     public static final String CAPTCHA_ERROR = "验证码发送出现错误,请联系管理员";
 
     //注册

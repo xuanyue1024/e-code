@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @Api(tags = "代码管理")
-@RequestMapping("user/code")
+@RequestMapping("/user/code")
 public class CodeController {
     @Autowired
     private DockerProperties dockerProperties;
