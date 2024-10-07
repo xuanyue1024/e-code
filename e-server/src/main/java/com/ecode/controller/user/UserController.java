@@ -1,9 +1,13 @@
 package com.ecode.controller.user;
 
 import com.ecode.constant.JwtClaimsConstant;
+import com.ecode.constant.MessageConstant;
 import com.ecode.dto.UserLoginDTO;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.entity.User;
+import com.ecode.enumeration.UserStatus;
+import com.ecode.exception.LoginException;
+import com.ecode.mapper.UserMapper;
 import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
 import com.ecode.service.UserService;
@@ -44,6 +48,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserMapper userMapper;
+
     /**
      * 登录
      *
@@ -55,6 +62,11 @@ public class UserController {
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
         LoginStrategy strategy = loginStrategyFactory.getStrategy(userLoginDTO.getLoginType());
         User user = strategy.login(userLoginDTO);
+
+        //判断账号是否被锁定
+        if (user.getStatus() == UserStatus.DISABLE){
+            throw new LoginException(MessageConstant.ACCOUNT_LOCKED);
+        }
 
         //登录成功后，生成jwt令牌
         Map<String, Object> claims = new HashMap<>();
@@ -89,5 +101,12 @@ public class UserController {
         userService.save(userRegisterDTO);
 
         return Result.success();
+    }
+
+    @PostMapping("/updateT")
+    @ApiOperation("用户更新测试")
+    public Result<Integer> update(@RequestBody User user){
+        int i = userMapper.updateById(user);
+        return Result.success(i);
     }
 }

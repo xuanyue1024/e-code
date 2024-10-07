@@ -11,7 +11,7 @@ import lombok.Getter;
  * @date 2024/09/24
  */
 @Getter
-public enum Sex {
+public enum UserSex {
     MALE(0, "男"),
     FEMALE(1, "女");
 
@@ -20,7 +20,7 @@ public enum Sex {
     @JsonValue
     private final String desc;
 
-    Sex(int value, String desc) {
+    UserSex(int value, String desc) {
         this.value = value;
         this.desc = desc;
     }

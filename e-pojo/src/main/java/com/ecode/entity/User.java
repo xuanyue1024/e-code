@@ -3,7 +3,7 @@ package com.ecode.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ecode.enumeration.Sex;
+import com.ecode.enumeration.UserSex;
 import com.ecode.enumeration.UserStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -63,7 +63,7 @@ public class User implements Serializable {
     private String phone;
 
     @ApiModelProperty(value = "性别 0：男，1：女")
-    private Sex sex;
+    private UserSex sex;
 
     @ApiModelProperty(value = "地址")
     private String address;

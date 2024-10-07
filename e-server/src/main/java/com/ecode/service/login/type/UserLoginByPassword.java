@@ -26,7 +26,7 @@ public class UserLoginByPassword implements LoginStrategy {
     public User login(UserLoginDTO userLoginDTO) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
-                .select(User::getId, User::getName, User::getUsername, User::getRole)
+                .select(User::getId, User::getName, User::getUsername, User::getRole, User::getStatus)
                 .eq(User::getUsername, userLoginDTO.getUsername())
                 .eq(User::getPassword, userLoginDTO.getPassword());
 
