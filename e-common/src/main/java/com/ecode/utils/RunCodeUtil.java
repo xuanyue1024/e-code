@@ -1,6 +1,7 @@
 package com.ecode.utils;
 
-import com.ecode.exception.RunCodeException;
+import com.ecode.constant.MessageConstant;
+import com.ecode.exception.DebugCodeException;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
@@ -19,14 +20,44 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.*;
 @Slf4j
 public class RunCodeUtil {
 
-    public static String runCode(String url, int timeout, String codeStr, String input) {
+    // 编程语言配置类
+    public static class CodeDockerOption {
+        public String env;           // Docker镜像
+        public String compileCmd;    // 编译命令
+        public String runCmd;        // 运行命令
+        public String fileSuffix;    // 源代码文件后缀
+        public boolean needsCompilation; // 是否需要编译
+
+        public CodeDockerOption(String env, String compileCmd, String runCmd, String fileSuffix, boolean needsCompilation) {
+            this.env = env;
+            this.compileCmd = compileCmd;
+            this.runCmd = runCmd;
+            this.fileSuffix = fileSuffix;
+            this.needsCompilation = needsCompilation;
+        }
+    }
+
+    // 语言配置映射
+    private static final Map<String, CodeDockerOption> imageMap = Map.of(
+            "cpp", new CodeDockerOption("cpp_image", "g++ code.cpp -o code.out", "./code.out", "cpp", true),
+            "java", new CodeDockerOption("run-java:1.0", "javac /home/user/Main.java", "java -cp /home/user Main", "java", true),
+            "python3", new CodeDockerOption("python:3.8", null, "python3 code.py", "py", false)
+    );
+
+    public static String runCode(String url, int timeout,String codeType, String codeStr, String input) {
+        CodeDockerOption codeDockerOption = imageMap.get(codeType);
+        if (codeDockerOption == null){
+            throw new DebugCodeException(MessageConstant.NO_LANGUAGE);
+        }
+
         // 转义代码
         codeStr = codeStr.replace("\\","\\\\\\").replace("\"", "\\\"").replace("$", "\\$");
-        String createFileCmd = String.format("echo \"%s\" > %s", codeStr, "/home/user/Main.java");
+        String createFileCmd = String.format("echo \"%s\" > %s", codeStr, "/home/user/Main." + codeDockerOption.fileSuffix);
 
 
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
@@ -49,7 +80,7 @@ public class RunCodeUtil {
 //            DockerClient dockerClient = DockerClientBuilder.getInstance(url).build();
 
             // 创建一个带有 OpenJDK 的容器
-            CreateContainerResponse container = dockerClient.createContainerCmd("run-java:1.0")
+            CreateContainerResponse container = dockerClient.createContainerCmd(codeDockerOption.env)
                     .withHostConfig(HostConfig.newHostConfig()
                             .withMemory(512 * 1024 * 1024L) // 限制内存为512MB
                             .withMemorySwap(512 * 1024 * 1024L) // 限制内存+交换区总共512MB
@@ -66,14 +97,16 @@ public class RunCodeUtil {
                 execInContainer(dockerClient, container.getId(), createFileCmd,null);
 
                 // 编译 Java 文件
-                result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), "javac /home/user/Main.java",null));
-                log.debug("========编译输出: {}", result);
+                if (codeDockerOption.needsCompilation){
+                    result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), codeDockerOption.compileCmd,null));
+                    //log.debug("========编译输出: {}", result);
+                }
 
                 // 运行 Java 文件
-                result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), "java -cp /home/user Main",input));
-                log.debug("========运行输出: {}", result);
+                result = execWithTimeout(timeout,() -> execInContainer(dockerClient, container.getId(), codeDockerOption.runCmd,input));
+                //log.debug("========运行输出: {}", result);
             }catch (Exception e){
-                throw new RunCodeException(e.getMessage());
+                throw new DebugCodeException(e.getMessage());
             }finally {
                 // 在后台线程中执行停止和移除容器的操作
                 CompletableFuture.runAsync(() -> {
@@ -82,7 +115,7 @@ public class RunCodeUtil {
                         dockerClient.stopContainerCmd(container.getId()).exec();
                         // 移除容器
                         dockerClient.removeContainerCmd(container.getId()).exec();
-                        log.info("容器{}停止与移除成功", container.getId());
+                        log.info("容器{}\\n停止与移除成功", container.getId());
                     } catch (Exception e) {
                         e.printStackTrace();  // 捕获并打印异常
                     }
@@ -149,7 +182,7 @@ public class RunCodeUtil {
 
         // 如果有错误输出，抛出异常
         if (!stderr.isEmpty()) {
-            throw new RunCodeException(stderr);
+            throw new DebugCodeException(stderr);
         }
 
         // 返回日志
@@ -175,14 +208,14 @@ public class RunCodeUtil {
             return future.get(timeoutSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException | TimeoutException e) {
             future.cancel(true);
-            throw new RunCodeException("任务执行超时");
+            throw new DebugCodeException("任务执行超时");
         } catch (ExecutionException e) {
             // 解包 ExecutionException，抛出原始异常
             Throwable cause = e.getCause();
-            if (cause instanceof RunCodeException) {
-                throw (RunCodeException) cause;  // 重新抛出原始的 RunCodeException
+            if (cause instanceof DebugCodeException) {
+                throw (DebugCodeException) cause;  // 重新抛出原始的 DebugCodeException
             } else {
-                throw new RunCodeException("任务运行异常:" + e.getMessage());
+                throw new DebugCodeException("任务运行异常:" + e.getMessage());
             }
         }finally {
             executor.shutdownNow();

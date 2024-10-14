@@ -39,5 +39,8 @@ public class MessageConstant {
 
     public static final String REGISTRATION_FAILED = "注册失败";
 
+    //代码调试
+    public static final String NO_LANGUAGE = "没有此类编程语言";
+
 
 }

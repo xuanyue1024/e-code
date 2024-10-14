@@ -1,10 +1,10 @@
 package com.ecode.controller.user;
 
-import com.ecode.dto.RunCodeDTO;
-import com.ecode.properties.DockerProperties;
+import com.ecode.dto.DebugCodeDTO;
 import com.ecode.result.Result;
-import com.ecode.utils.RunCodeUtil;
+import com.ecode.service.CodeService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "代码管理")
 @RequestMapping("/user/code")
 public class CodeController {
+
     @Autowired
-    private DockerProperties dockerProperties;
-    @PostMapping("/run")
-    public Result<String> run(@RequestBody RunCodeDTO runCodeDTO){
-        String result = RunCodeUtil.runCode(dockerProperties.getUrl(),dockerProperties.getTimeout(),runCodeDTO.getCode(),runCodeDTO.getInput() + "\n");
+    private CodeService codeService;
+    @PostMapping("/debug")
+    @ApiOperation("调试代码")
+    public Result<String> run(@RequestBody DebugCodeDTO debugCodeDTO){
+        String result = codeService.debugCode(debugCodeDTO);
         return Result.success(result);
     }
 }

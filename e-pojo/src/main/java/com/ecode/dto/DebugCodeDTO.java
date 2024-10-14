@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @ApiModel(description = "代码运行提交数据模型")
-public class RunCodeDTO implements Serializable {
+public class DebugCodeDTO implements Serializable {
 
     private static final long serialVersionUID = 4619556128447460185L;
 
