@@ -44,9 +44,9 @@ public class RunCodeUtil {
 
     // 语言配置映射
     private static final Map<String, CodeDockerOption> imageMap = Map.of(
-            "cpp", new CodeDockerOption("cpp_image", "g++ code.cpp -o code.out", "./code.out", "cpp", true),
+            "cpp", new CodeDockerOption("run-cpp:1.0", "g++ /home/user/Main.cpp -o Main.out", "/home/user/Main.out", "cpp", true),
             "java", new CodeDockerOption("run-java:1.0", "javac /home/user/Main.java", "java -cp /home/user Main", "java", true),
-            "python3", new CodeDockerOption("python:3.8", null, "python3 code.py", "py", false)
+            "python3", new CodeDockerOption("run-python3:1.0", null, "python3 /home/user/Main.py", "py", false)
     );
 
     public static String runCode(String url, int timeout,String codeType, String codeStr, String input) {
