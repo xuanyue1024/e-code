@@ -37,7 +37,7 @@ ecode:
         # \u8BBE\u7F6Ejwt\u7B7E\u540D\u52A0\u5BC6\u65F6\u4F7F\u7528\u7684\u79D8\u94A5
         user-secret-key: test34274279472346239432
         # \u8BBE\u7F6Ejwt\u8FC7\u671F\u65F6\u95F4ms
-        user-ttl: 7200000000
+        user-ttl: 172800000
         # \u8BBE\u7F6E\u524D\u7AEF\u4F20\u9012\u8FC7\u6765\u7684\u4EE4\u724C\u540D\u79F0
         user-token-name: token
 

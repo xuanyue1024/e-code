@@ -115,7 +115,7 @@ public class RunCodeUtil {
                         dockerClient.stopContainerCmd(container.getId()).exec();
                         // 移除容器
                         dockerClient.removeContainerCmd(container.getId()).exec();
-                        log.info("容器{}\\n停止与移除成功", container.getId());
+                        log.info("容器{}\n停止与移除成功", container.getId());
                     } catch (Exception e) {
                         e.printStackTrace();  // 捕获并打印异常
                     }

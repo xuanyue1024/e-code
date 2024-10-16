@@ -17,6 +17,6 @@ public class CodeServiceImpl implements CodeService {
     public String debugCode(DebugCodeDTO debugCodeDTO) {
         return RunCodeUtil.runCode(dockerProperties.getUrl(),
                 dockerProperties.getTimeout(), debugCodeDTO.getType(),
-                debugCodeDTO.getCode(), debugCodeDTO.getInput());
+                debugCodeDTO.getCode(), debugCodeDTO.getInput() + "\n");
     }
 }
