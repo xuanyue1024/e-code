@@ -105,8 +105,8 @@ public class UserController {
 
     @PostMapping("/updateT")
     @ApiOperation("用户更新测试")
-    public Result<Integer> update(@RequestBody User user){
+    public Result update(@RequestBody User user){
         int i = userMapper.updateById(user);
-        return Result.success(i);
+        return Result.success(userMapper.selectById(user.getId()));
     }
 }

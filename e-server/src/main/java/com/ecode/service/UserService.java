@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * <p>
- *  服务类
+ *  用户服务类
  * </p>
  *
  * @author 竹林听雨

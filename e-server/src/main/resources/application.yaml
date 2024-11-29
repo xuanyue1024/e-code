@@ -26,6 +26,7 @@ spring:
 mybatis-plus:
     configuration:
         default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler #配置枚举处理器
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启日志输出
     type-aliases-package: com.ecode.entity
     global-config:
         db-config:

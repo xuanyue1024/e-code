@@ -3,6 +3,7 @@ package com.ecode.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.ecode.enumeration.UserRole;
 import com.ecode.enumeration.UserSex;
 import com.ecode.enumeration.UserStatus;
 import io.swagger.annotations.ApiModel;
@@ -29,14 +30,14 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("user")
-@ApiModel(value="User对象", description="")
+@ApiModel(value="User数据库对象", description="")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "身份id")
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty(value = "用户名")
     private String username;
@@ -45,7 +46,7 @@ public class User implements Serializable {
     private String password;
 
     @ApiModelProperty(value = "角色")
-    private String role;
+    private UserRole role;
 
     @ApiModelProperty(value = "邮箱")
     private String email;
