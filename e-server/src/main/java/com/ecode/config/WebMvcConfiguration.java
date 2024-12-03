@@ -11,6 +11,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -19,6 +20,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * 配置类，注册web层相关组件
@@ -28,6 +30,11 @@ import java.util.List;
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Autowired
     private JwtTokenUserInterceptor jwtTokenUserInterceptor;
+
+    // 创建谓词，用于排除特定的包
+    private final Predicate<RequestHandler> basePackageSelector = RequestHandlerSelectors.basePackage("com.ecode.controller");
+    private final Predicate<RequestHandler> teacherPackageSelector = RequestHandlerSelectors.basePackage("com.ecode.controller.user.teacher");
+    private final Predicate<RequestHandler> studentPackageSelector = RequestHandlerSelectors.basePackage("com.ecode.controller.user.student");
 
     /**
      * 注册自定义拦截器
@@ -47,6 +54,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * 通过knife4j生成接口文档
      * @return
      */
+    //老师端
     @Bean
     public Docket docket1() {
         ApiInfo apiInfo = new ApiInfoBuilder()
@@ -54,10 +62,29 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .version("1.0")
                 .description("ecode算法练习平台项目接口文档")
                 .build();
+
         return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("学生端接口")
                 .apiInfo(apiInfo)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.ecode.controller"))
+                .apis(basePackageSelector.and(Predicate.not(teacherPackageSelector)))
+                .paths(PathSelectors.any())
+                .build();
+    }
+    //学生端
+    @Bean
+    public Docket docket2() {
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("ecode接口文档")
+                .version("1.0")
+                .description("ecode算法练习平台项目接口文档")
+                .build();
+
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("教师端接口")
+                .apiInfo(apiInfo)
+                .select()
+                .apis(basePackageSelector.and(Predicate.not(studentPackageSelector)))
                 .paths(PathSelectors.any())
                 .build();
     }

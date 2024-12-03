@@ -9,14 +9,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
-@Api(tags = "班级管理-老师")
+@Api(tags = "班级管理")
 @RestController
 @RequestMapping("/teacher/class")
+@Component("teacherClassController")
 public class ClassController {
 
     @Autowired
