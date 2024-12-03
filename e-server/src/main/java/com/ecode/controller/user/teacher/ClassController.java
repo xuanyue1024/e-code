@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @Api(tags = "班级管理-老师")
 @RestController
@@ -20,9 +22,9 @@ public class ClassController {
     @Autowired
     private ClassService classService;
 
-    @PostMapping("/add")
+    @PostMapping
     @ApiOperation("增加班级")
-    public Result addClass(String name){
+    public Result add(String name){
         classService.addClass(name);
         return Result.success();
     }
@@ -34,5 +36,10 @@ public class ClassController {
         return Result.success(pv);
     }
 
-
+    @DeleteMapping
+    @ApiOperation("批量删除班级")
+    public Result delete(@RequestParam List<Integer> ids){
+        classService.deleteBatch(ids);
+        return Result.success();
+    }
 }

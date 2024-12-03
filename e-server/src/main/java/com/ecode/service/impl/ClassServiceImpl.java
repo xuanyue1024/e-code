@@ -81,4 +81,14 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         // 5.封装返回
         return new PageVO<ClassVO>(page.getTotal(), page.getPages(), list);
     }
+
+    @Override
+    public void deleteBatch(List<Integer> ids) {
+        QueryWrapper<Class> wrapper = new QueryWrapper<>();
+        //判断教师id是否符合且ids符合
+        wrapper.lambda()
+                .in(Class::getId, ids)
+                .eq(Class::getTeacherId, BaseContext.getCurrentId());
+        classMapper.delete(wrapper);
+    }
 }

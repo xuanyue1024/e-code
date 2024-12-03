@@ -6,6 +6,8 @@ import com.ecode.entity.Class;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
 
+import java.util.List;
+
 /**
  * 班级服务类
  *
@@ -27,4 +29,11 @@ public interface ClassService extends IService<Class> {
      * @return Page vo< class vo>
      */
     PageVO<ClassVO> pageQuery(ClassPageQueryDTO classPageQueryDTO);
+
+    /**
+     * 班级删除批处理
+     *
+     * @param ids id
+     */
+    void deleteBatch(List<Integer> ids);
 }
