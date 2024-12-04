@@ -28,6 +28,7 @@ public class MessageConstant {
     public static final String JWT_FAILS = "The login failed and the token became invalid";
 
     public static final String INVALID_LOGIN_TYPE = "无效的登录类型";
+    public static final String UPDATE_FAILED = "修改失败";
 
     //验证码
     public static final String CAPTCHA_TRY_AGAIN_WITHIN24_HOURS = "验证码发送过于频繁,请24小时后再试";

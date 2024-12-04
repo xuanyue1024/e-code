@@ -45,5 +45,6 @@ ecode:
     docker:
         url: ${ecode.docker.url}
         timeout: ${ecode.docker.timeout}
-
+knife4j:
+    enable: true
 

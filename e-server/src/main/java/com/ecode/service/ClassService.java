@@ -36,4 +36,13 @@ public interface ClassService extends IService<Class> {
      * @param ids id
      */
     void deleteBatch(List<Integer> ids);
+
+    /**
+     * 按教师id,班级id更新班级名称
+     *
+     * @param id        班级id
+     * @param teacherId 老师id
+     * @param name      班级名称
+     */
+    void updateNameByIdAndTeacherId(Integer id, Integer teacherId, String name);
 }
