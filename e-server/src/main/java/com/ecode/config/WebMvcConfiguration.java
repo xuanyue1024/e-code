@@ -1,5 +1,6 @@
 package com.ecode.config;
 
+import com.ecode.interceptor.JwtTokenTeacherInterceptor;
 import com.ecode.interceptor.JwtTokenUserInterceptor;
 import com.ecode.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +31,19 @@ import java.util.function.Predicate;
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Autowired
     private JwtTokenUserInterceptor jwtTokenUserInterceptor;
+    @Autowired
+    private JwtTokenTeacherInterceptor jwtTokenTeacherInterceptor;
 
     // 创建谓词，用于排除特定的包
     private final Predicate<RequestHandler> basePackageSelector = RequestHandlerSelectors.basePackage("com.ecode.controller");
     private final Predicate<RequestHandler> teacherPackageSelector = RequestHandlerSelectors.basePackage("com.ecode.controller.user.teacher");
     private final Predicate<RequestHandler> studentPackageSelector = RequestHandlerSelectors.basePackage("com.ecode.controller.user.student");
+    //开发文档配置
+    private final ApiInfo apiInfo = new ApiInfoBuilder()
+            .title("ecode接口文档")
+            .version("1.0")
+            .description("ecode算法练习平台项目接口文档")
+            .build();
 
     /**
      * 注册自定义拦截器
@@ -43,11 +52,15 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      */
     protected void addInterceptors(InterceptorRegistry registry) {
         log.info("开始注册自定义拦截器...");
+        //登录要求拦截
         registry.addInterceptor(jwtTokenUserInterceptor)
-                .addPathPatterns("/user/**")
-                .addPathPatterns("/teacher/**")//测试
-                .excludePathPatterns("/user/login")
-                .excludePathPatterns("/user/register");
+                .addPathPatterns("/user/code/**");
+        //教师请求拦截
+        registry.addInterceptor(jwtTokenTeacherInterceptor)
+                .addPathPatterns("/teacher/**");
+        //学生请求拦截
+        registry.addInterceptor(jwtTokenTeacherInterceptor)
+                .addPathPatterns("/student/**");
     }
 
     /**
@@ -57,12 +70,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     //老师端
     @Bean
     public Docket docket1() {
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("ecode接口文档")
-                .version("1.0")
-                .description("ecode算法练习平台项目接口文档")
-                .build();
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("学生端接口")
                 .apiInfo(apiInfo)
@@ -74,12 +81,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     //学生端
     @Bean
     public Docket docket2() {
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("ecode接口文档")
-                .version("1.0")
-                .description("ecode算法练习平台项目接口文档")
-                .build();
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("教师端接口")
                 .apiInfo(apiInfo)

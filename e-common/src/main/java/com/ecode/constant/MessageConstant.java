@@ -43,5 +43,7 @@ public class MessageConstant {
     //代码调试
     public static final String NO_LANGUAGE = "没有此类编程语言";
 
+    //权限问题
+    public static final String ACCESS_DENIED = "你没有权限访问此接口";
 
 }
