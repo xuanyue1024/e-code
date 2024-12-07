@@ -2,8 +2,6 @@ package com.ecode.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
@@ -17,14 +15,13 @@ import com.ecode.service.ClassService;
 import com.ecode.utils.InvitationCodeUtil;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
-import org.springframework.beans.BeanUtils;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 班级service实现类
@@ -57,37 +54,19 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
     }
 
     @Override
-    public PageVO<ClassVO> pageQuery(ClassPageQueryDTO classPageQueryDTO) {
-        Page<Class> page = Page.of(classPageQueryDTO.getPageNo(), classPageQueryDTO.getPageSize());
-        // 1.2.排序条件
-        if (classPageQueryDTO.getSortBy() != null && !classPageQueryDTO.getSortBy().isBlank()) {
-            page.addOrder(new OrderItem(classPageQueryDTO.getSortBy(), classPageQueryDTO.getIsAsc()));
-        }else{
-            // 默认按照更新时间排序
-            page.addOrder(new OrderItem("update_time", false));
-        }
-        //1.3 查询条件
-        QueryWrapper<Class> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda()
-                .like(classPageQueryDTO.getName() != null,Class::getName, classPageQueryDTO.getName())
-                .eq(Class::getTeacherId, BaseContext.getCurrentId());
-        // 2.查询
-        this.page(page, queryWrapper);
-        // 3.数据非空校验
-        List<Class> records = page.getRecords();
-        if (records == null || records.size() <= 0) {
-            // 无数据，返回空结果
-            return new PageVO<>(page.getTotal(), page.getPages(), Collections.emptyList());
-        }
-        // 4.有数据，转换
-        List<ClassVO> list = records.stream().map(c -> {
-            ClassVO cv = new ClassVO();
-            BeanUtils.copyProperties(c, cv);
-            return cv;
-        }).collect(Collectors.toList());
+    public PageVO<ClassVO> pageQuery(Integer teacherId, Integer studentId, ClassPageQueryDTO classPageQueryDTO) {
 
-        // 5.封装返回
-        return new PageVO<ClassVO>(page.getTotal(), page.getPages(), list);
+        PageHelper.startPage(Math.toIntExact(classPageQueryDTO.getPageNo()), Math.toIntExact(classPageQueryDTO.getPageSize()));
+        //1.3 查询条件
+        List<ClassVO> classVOList = classMapper.pageQueryByName(
+                classPageQueryDTO.getName(),
+                teacherId, studentId,
+                classPageQueryDTO.getSortBy(),
+                classPageQueryDTO.getIsAsc());
+
+        Page<ClassVO> p = (Page<ClassVO>) classVOList;
+
+        return new PageVO<ClassVO>(p.getTotal(), (long) p.getPages(), p.getResult());
     }
 
     @Override

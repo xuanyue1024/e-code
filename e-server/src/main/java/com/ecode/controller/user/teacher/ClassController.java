@@ -36,7 +36,7 @@ public class ClassController {
     @GetMapping("/page")
     @ApiOperation("班级分页查询")
     public Result<PageVO<ClassVO>> page(ClassPageQueryDTO classPageQueryDTO){
-        PageVO<ClassVO> pv = classService.pageQuery(classPageQueryDTO);
+        PageVO<ClassVO> pv = classService.pageQuery(BaseContext.getCurrentId(), null, classPageQueryDTO);
         return Result.success(pv);
     }
 

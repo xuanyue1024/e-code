@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecode.mapper.ClassMapper">
+    <select id="pageQueryByName" resultType="com.ecode.vo.ClassVO">
+        SELECT u.`name` AS teacherName, c.*, COUNT(sc.id) AS joinNumber
+        FROM class c
+                 LEFT JOIN `user` u ON c.teacher_id = u.id
+                 LEFT JOIN student_class sc ON c.id = sc.class_id
+        <where>
+            <if test="name != null">
+                c.`name` LIKE concat('%',#{name},'%')
+            </if>
+            <if test="teacherId != null">
+                AND c.teacher_id = ${teacherId}
+            </if>
+            <if test="studentId != null">
+                AND sc.student_id = ${studentId}
+            </if>
+        </where>
+        GROUP BY c.id, u.`name`
+        <if test="order != null">
+            ORDER BY joinNumber
+            <if test="!isAsc">
+                DESC
+            </if>
+        </if>
+        <if test="order == null">
+            ORDER BY update_time
+        </if>
+    </select>
+</mapper>

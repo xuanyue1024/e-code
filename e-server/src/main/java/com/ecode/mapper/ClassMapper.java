@@ -2,6 +2,9 @@ package com.ecode.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ecode.entity.Class;
+import com.ecode.vo.ClassVO;
+
+import java.util.List;
 
 /**
  * 班级mapper接口
@@ -10,4 +13,5 @@ import com.ecode.entity.Class;
  * @date 2024/11/24
  */
 public interface ClassMapper extends BaseMapper<Class> {
+    List<ClassVO> pageQueryByName(String name,Integer teacherId,Integer studentId, String order, Boolean isAsc);
 }

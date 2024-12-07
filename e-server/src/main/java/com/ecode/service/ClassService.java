@@ -28,7 +28,7 @@ public interface ClassService extends IService<Class> {
      * @param classPageQueryDTO 类页面查询
      * @return Page vo< class vo>
      */
-    PageVO<ClassVO> pageQuery(ClassPageQueryDTO classPageQueryDTO);
+    PageVO<ClassVO> pageQuery(Integer teacherId, Integer studentId, ClassPageQueryDTO classPageQueryDTO);
 
     /**
      * 班级删除批处理
