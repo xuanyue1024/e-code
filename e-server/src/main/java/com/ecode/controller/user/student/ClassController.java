@@ -5,6 +5,7 @@ import com.ecode.result.Result;
 import com.ecode.service.ClassService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class ClassController {
 
     @GetMapping
     @ApiOperation("加入班级")
-    public Result join(String invitationCode){
+    public Result join(@ApiParam("邀请码") String invitationCode){
         classService.joinClass(BaseContext.getCurrentId(), invitationCode);
         return Result.success();
     }
