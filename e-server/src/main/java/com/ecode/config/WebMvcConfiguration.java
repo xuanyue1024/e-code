@@ -1,5 +1,6 @@
 package com.ecode.config;
 
+import com.ecode.interceptor.JwtTokenStudentInterceptor;
 import com.ecode.interceptor.JwtTokenTeacherInterceptor;
 import com.ecode.interceptor.JwtTokenUserInterceptor;
 import com.ecode.json.JacksonObjectMapper;
@@ -33,6 +34,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     private JwtTokenUserInterceptor jwtTokenUserInterceptor;
     @Autowired
     private JwtTokenTeacherInterceptor jwtTokenTeacherInterceptor;
+    @Autowired
+    private JwtTokenStudentInterceptor jwtTokenStudentInterceptor;
 
     // 创建谓词，用于排除特定的包
     private final Predicate<RequestHandler> basePackageSelector = RequestHandlerSelectors.basePackage("com.ecode.controller");
@@ -59,7 +62,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         registry.addInterceptor(jwtTokenTeacherInterceptor)
                 .addPathPatterns("/teacher/**");
         //学生请求拦截
-        registry.addInterceptor(jwtTokenTeacherInterceptor)
+        registry.addInterceptor(jwtTokenStudentInterceptor)
                 .addPathPatterns("/student/**");
     }
 
