@@ -100,6 +100,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         UpdateWrapper<Class> wrapper = new UpdateWrapper<>();
         wrapper.lambda()
                 .set(Class::getName, name)
+                .set(Class::getUpdateTime, LocalDateTime.now())
                 .eq( Class::getId, id)
                 .eq(Class::getTeacherId, teacherId);
         int i = classMapper.update(null, wrapper);
