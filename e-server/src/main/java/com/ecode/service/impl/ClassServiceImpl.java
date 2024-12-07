@@ -9,8 +9,10 @@ import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.ClassPageQueryDTO;
 import com.ecode.entity.Class;
+import com.ecode.entity.StudentClass;
 import com.ecode.exception.ClassException;
 import com.ecode.mapper.ClassMapper;
+import com.ecode.mapper.StudentClassMapper;
 import com.ecode.service.ClassService;
 import com.ecode.utils.InvitationCodeUtil;
 import com.ecode.vo.ClassVO;
@@ -35,6 +37,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
 
     @Autowired
     private ClassMapper classMapper;
+
+    @Autowired
+    private StudentClassMapper studentClassMapper;
 
     @Override
     public void addClass(String name) {
@@ -107,5 +112,22 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         if (i <= 0){
             throw new ClassException(MessageConstant.UPDATE_FAILED);
         }
+    }
+
+    @Override
+    public void joinClass(Integer studentId, String invitationCode) {
+        QueryWrapper<Class> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(Class::getInvitationCode, invitationCode);
+        Class c = classMapper.selectOne(wrapper);
+        if (c == null){
+            throw new ClassException(MessageConstant.INVITATIONCODE_NOT_FOUND);
+        }
+        //班级存在，插入班级学生信息
+        StudentClass sc = StudentClass.builder()
+                .classId(c.getId())
+                .studentId(studentId)
+                .joinTime(LocalDateTime.now())
+                .build();
+        studentClassMapper.insert(sc);
     }
 }

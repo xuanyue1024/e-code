@@ -45,4 +45,13 @@ public interface ClassService extends IService<Class> {
      * @param name      班级名称
      */
     void updateNameByIdAndTeacherId(Integer id, Integer teacherId, String name);
+
+
+    /**
+     * 加入班级方法
+     *
+     * @param studentId      学生id
+     * @param invitationCode 邀请码
+     */
+    void joinClass(Integer studentId, String invitationCode);
 }

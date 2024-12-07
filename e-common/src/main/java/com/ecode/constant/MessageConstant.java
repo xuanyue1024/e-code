@@ -46,4 +46,7 @@ public class MessageConstant {
     //权限问题
     public static final String ACCESS_DENIED = "你没有权限访问此接口";
 
+    //班级
+    public static final String INVITATIONCODE_NOT_FOUND = "班级邀请码不存在";
+
 }
