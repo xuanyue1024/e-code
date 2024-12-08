@@ -19,6 +19,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,6 +95,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
     }
 
     @Override
+    @Transactional
     public void joinClass(Integer studentId, String invitationCode) {
         QueryWrapper<Class> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(Class::getInvitationCode, invitationCode);
@@ -108,5 +110,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
                 .joinTime(LocalDateTime.now())
                 .build();
         studentClassMapper.insert(sc);
+
+        //更新班级人数
+        UpdateWrapper<Class> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda()
+                .setSql("join_number = join_number + 1")
+                .eq(Class::getId, c.getId());
+        this.update(updateWrapper);
     }
 }
