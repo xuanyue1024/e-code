@@ -54,4 +54,12 @@ public interface ClassService extends IService<Class> {
      * @param invitationCode 邀请码
      */
     void joinClass(Integer studentId, String invitationCode);
+
+    /**
+     * 批量退出班级
+     *
+     * @param studentId 学生id
+     * @param classIds  班级id
+     */
+    void exitBatch(Integer studentId, List<Integer> classIds);
 }

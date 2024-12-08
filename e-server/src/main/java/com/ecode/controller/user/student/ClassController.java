@@ -12,9 +12,9 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Api(tags = "班级管理")
@@ -37,6 +37,13 @@ public class ClassController {
     public Result<PageVO<ClassVO>> page(ClassPageQueryDTO classPageQueryDTO){
         PageVO<ClassVO> pv = classService.pageQuery(null, BaseContext.getCurrentId(), classPageQueryDTO);
         return Result.success(pv);
+    }
+
+    @DeleteMapping
+    @ApiOperation("批量退出班级")
+    public Result exit(@ApiParam("班级id集合") @RequestParam List<Integer> ids){
+        classService.exitBatch(BaseContext.getCurrentId(), ids);
+        return Result.success();
     }
 
 }

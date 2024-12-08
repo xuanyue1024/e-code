@@ -118,4 +118,24 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
                 .eq(Class::getId, c.getId());
         this.update(updateWrapper);
     }
+
+    @Override
+    @Transactional
+    public void exitBatch(Integer studentId, List<Integer> classIds) {
+        //删除学生id与班级id集合符合的信息
+        QueryWrapper<StudentClass> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .in(StudentClass::getClassId, classIds)
+                .eq(StudentClass::getStudentId, studentId);
+        int i = studentClassMapper.delete(queryWrapper);
+        if (i != classIds.size()){
+            throw new ClassException(MessageConstant.EXIT_FAILURE_NOT_EXIST_CLASS);
+        }
+        //修改班级人数
+        UpdateWrapper<Class> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda()
+                .setSql("join_number = join_number - 1")
+                .in(Class::getId, classIds);
+        classMapper.update(null, updateWrapper);
+    }
 }
