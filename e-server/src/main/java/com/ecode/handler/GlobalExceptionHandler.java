@@ -3,10 +3,13 @@ package com.ecode.handler;
 
 import com.ecode.constant.MessageConstant;
 import com.ecode.exception.BaseException;
+import com.ecode.exception.SSEException;
 import com.ecode.result.Result;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.sql.SQLException;
 
@@ -42,6 +45,36 @@ public class GlobalExceptionHandler {
         }else {
             return Result.error(MessageConstant.SQL_UNKNOWN_ERROR);
         }
+    }
+
+    /**
+     * 格式异常（主要针对注解）
+     *
+     * @param ife 异常项
+     * @return 后端统一返回结果
+     */
+    @ExceptionHandler
+    public Result exceptionHandler(InvalidFormatException ife){
+        String message = ife.getMessage();
+        log.error("格式异常:{}",message);
+
+        return Result.error(MessageConstant.INVALID_FORMAT_FAILURE);
+    }
+
+    @ExceptionHandler(SSEException.class)//todo 捕捉不到
+    public SseEmitter handleException(SSEException ex) {
+        SseEmitter emitter = new SseEmitter();
+
+        try {
+            // 发送 SSE 格式的错误消息
+            emitter.send(SseEmitter.event()
+                    .data(Result.error(ex.getMessage())));
+            emitter.completeWithError(ex);
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+
+        return emitter;
     }
 
     /*@ExceptionHandler

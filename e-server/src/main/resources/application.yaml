@@ -45,6 +45,9 @@ ecode:
     docker:
         url: ${ecode.docker.url}
         timeout: ${ecode.docker.timeout}
+    ai:
+        bailian-id: ${ecode.ai.bailian-id}
+        bailian-api-key: ${ecode.ai.bailian-api-key}
 knife4j:
     enable: true
 

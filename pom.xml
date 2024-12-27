@@ -32,6 +32,8 @@
         <fastjson>1.2.76</fastjson>
         <jackson>2.9.2</jackson>
         <pagehelper>1.4.2</pagehelper>
+        <rxjava>2.2.21</rxjava>
+        <dashscope-sdk>2.16.2</dashscope-sdk>
     </properties>
 
     <dependencies>
@@ -95,6 +97,27 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper}</version>
+            </dependency>
+
+            <!--阿里云百炼ai大模型 https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dashscope-sdk-java</artifactId>
+                <version>${dashscope-sdk}</version>
+                <!--与slf4j依赖重复-->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--实现流式输出-->
+            <!-- ai流支持 https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava -->
+            <dependency>
+                <groupId>io.reactivex.rxjava2</groupId>
+                <artifactId>rxjava</artifactId>
+                <version>${rxjava}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
