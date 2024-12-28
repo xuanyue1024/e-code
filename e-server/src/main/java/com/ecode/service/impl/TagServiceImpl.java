@@ -39,4 +39,15 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         }).collect(Collectors.toList());
 
     }
+
+    @Override
+    public List<TagVO> getByIds(List<Integer> ids) {
+        List<Tag> tags = tagMapper.selectBatchIds(ids);
+        return tags.stream().map(t -> TagVO
+                .builder()
+                .id(t.getId())
+                .name(t.getName())
+                .build()
+        ).collect(Collectors.toList());
+    }
 }

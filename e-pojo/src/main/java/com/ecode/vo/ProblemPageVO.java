@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -28,8 +29,8 @@ public class ProblemPageVO implements Serializable {
     @ApiModelProperty(value = "题目标题")
     private String title;
 
-    @ApiModelProperty(value = "标签组id")
-    private Integer problemTagId;
+    @ApiModelProperty(value = "标签组ids")
+    private List<Integer> tagIds;
 
     @ApiModelProperty(value = "题目等级（0简单，1一般，2困难）")
     private ProblemGrade grade;

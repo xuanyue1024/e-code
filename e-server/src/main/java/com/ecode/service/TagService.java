@@ -23,4 +23,12 @@ public interface TagService extends IService<Tag> {
      * @return 列表<tag vo>
      */
     List<TagVO> getByName(String name);
+
+    /**
+     * 按ids获取
+     *
+     * @param ids id
+     * @return 列表<tag vo>
+     */
+    List<TagVO> getByIds(List<Integer> ids);
 }

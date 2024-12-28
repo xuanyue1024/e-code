@@ -65,11 +65,12 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public PageVO<ProblemPageVO> pageQuery(GeneralPageQueryDTO generalPageQueryDTO) {
         Page<Problem> page = generalPageQueryDTO.nullToDefault();
-
+        //判断是否有name
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
         if (generalPageQueryDTO.getName() != null && !generalPageQueryDTO.getName().isEmpty()){
             queryWrapper.lambda().like(Problem::getTitle, generalPageQueryDTO.getName());
         }
+
 
         Page<Problem> problemPage = problemMapper.selectPage(page, queryWrapper);
         List<Problem> records = problemPage.getRecords();
@@ -81,6 +82,11 @@ public class ProblemServiceImpl implements ProblemService {
         List<ProblemPageVO> list = records.stream().map(r -> {
             ProblemPageVO pv = new ProblemPageVO();
             BeanUtils.copyProperties(r, pv);
+            //查询并设置单个题目的标签集合
+            //todo 性能可优化
+            List<ProblemTag> problemTags = problemTagMapper.selectList(new LambdaQueryWrapper<ProblemTag>().eq(ProblemTag::getProblemId, r.getId()));
+            pv.setTagIds(problemTags.stream().map(ProblemTag::getTagId).collect(Collectors.toList()));
+
             return pv;
         }).collect(Collectors.toList());
 
@@ -109,6 +115,10 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Override
     public void setTags(SetTagsDTO setTagsDTO) {
+        Problem p = problemMapper.selectById(setTagsDTO.getProblemId());
+        if (p == null){
+            throw new ProblemException(MessageConstant.PROBLEM_NOT_FOUND);
+        }
         //先删除所有
         problemTagMapper.delete(new LambdaQueryWrapper<ProblemTag>().eq(ProblemTag::getProblemId, setTagsDTO.getProblemId()));
         //增加

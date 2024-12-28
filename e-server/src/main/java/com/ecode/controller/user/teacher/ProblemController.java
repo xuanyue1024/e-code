@@ -96,7 +96,7 @@ public class ProblemController {
         return Result.success(pv);
     }
 
-    @PutMapping("/Tag")
+    @PutMapping("/tag")
     @ApiOperation(value = "为题目设置标签集合", notes = "用于为问题设置标签,如果原来有标签,会覆盖原有标签")
     public Result setTags(@RequestBody SetTagsDTO setTagsDTO){
         problemService.setTags(setTagsDTO);

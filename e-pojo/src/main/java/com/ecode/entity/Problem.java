@@ -46,6 +46,7 @@ public class Problem implements Serializable {
     private String require;
 
     @ApiModelProperty(value = "标签组id")
+    @Deprecated
     private Integer problemTagId;
 
     @ApiModelProperty(value = "题目等级（0简单，1一般，2困难）")

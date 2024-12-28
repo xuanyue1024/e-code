@@ -54,4 +54,7 @@ public class MessageConstant {
     public static final String INVALID_FORMAT_FAILURE = "输入格式有误";
     public static final String DATA_NOT_FOUND = "数据不存在";
 
+    //题目
+    public static final String PROBLEM_NOT_FOUND = "题目不存在";
+
 }

@@ -46,4 +46,11 @@ public class TagController {
         return Result.success(list);
     }
 
+    @GetMapping("/getByIds")
+    @ApiOperation(value = "通过获取标签集合", notes = "根据标签id集合返回标签集合,也可传入单个")
+    public Result<List<TagVO>> getByIds(@ApiParam("标签id集合") @RequestParam List<Integer> ids){
+        List<TagVO> list = tagService.getByIds(ids);
+        return Result.success(list);
+    }
+
 }
