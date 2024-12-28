@@ -1,7 +1,6 @@
 package com.ecode.enumeration;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,12 +14,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ProblemGrade {
     EASY(0, "简单"),
-    GENERAL(1, "困难"),
-    DIFFICULT(3, "一般");
+    GENERAL(1, "一般"),
+    DIFFICULT(2, "困难");
 
     @EnumValue
     private final int value;
-    @JsonValue
     private final String desc;
 
 }

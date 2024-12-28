@@ -1,7 +1,6 @@
 package com.ecode.enumeration;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -17,7 +16,6 @@ public enum UserSex {
 
     @EnumValue
     private final int value;
-    @JsonValue
     private final String desc;
 
     UserSex(int value, String desc) {
