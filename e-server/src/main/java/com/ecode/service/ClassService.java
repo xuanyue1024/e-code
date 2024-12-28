@@ -1,7 +1,7 @@
 package com.ecode.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ecode.dto.ClassPageQueryDTO;
+import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
@@ -25,10 +25,10 @@ public interface ClassService extends IService<Class> {
     /**
      * 班级分页查询
      *
-     * @param classPageQueryDTO 类页面查询
+     * @param generalPageQueryDTO 类页面查询
      * @return Page vo< class vo>
      */
-    PageVO<ClassVO> pageQuery(Integer teacherId, Integer studentId, ClassPageQueryDTO classPageQueryDTO);
+    PageVO<ClassVO> pageQuery(Integer teacherId, Integer studentId, GeneralPageQueryDTO generalPageQueryDTO);
 
     /**
      * 班级删除批处理

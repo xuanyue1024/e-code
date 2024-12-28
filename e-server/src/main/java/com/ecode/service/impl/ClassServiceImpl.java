@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
-import com.ecode.dto.ClassPageQueryDTO;
+import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.entity.StudentClass;
 import com.ecode.exception.ClassException;
@@ -55,15 +55,15 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
     }
 
     @Override
-    public PageVO<ClassVO> pageQuery(Integer teacherId, Integer studentId, ClassPageQueryDTO classPageQueryDTO) {
+    public PageVO<ClassVO> pageQuery(Integer teacherId, Integer studentId, GeneralPageQueryDTO generalPageQueryDTO) {
 
-        PageHelper.startPage(Math.toIntExact(classPageQueryDTO.getPageNo()), Math.toIntExact(classPageQueryDTO.getPageSize()));
+        PageHelper.startPage(Math.toIntExact(generalPageQueryDTO.getPageNo()), Math.toIntExact(generalPageQueryDTO.getPageSize()));
         //1.3 查询条件
         List<ClassVO> classVOList = classMapper.pageQueryByName(
-                classPageQueryDTO.getName(),
+                generalPageQueryDTO.getName(),
                 teacherId, studentId,
-                classPageQueryDTO.getSortBy(),
-                classPageQueryDTO.getIsAsc());
+                generalPageQueryDTO.getSortBy(),
+                generalPageQueryDTO.getIsAsc());
 
         Page<ClassVO> p = (Page<ClassVO>) classVOList;
 

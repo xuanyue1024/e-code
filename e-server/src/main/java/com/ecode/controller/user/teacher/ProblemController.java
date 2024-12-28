@@ -1,8 +1,11 @@
 package com.ecode.controller.user.teacher;
 
+import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ProblemService;
+import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -50,7 +53,20 @@ public class ProblemController {
         return Result.success();
     }
 
-
+    /**
+     * 处理题目分页查询请求
+     *
+     * @param generalPageQueryDTO 分页查询参数封装对象，包含页码、页面大小等信息
+     * @return 返回封装了分页查询结果的Result对象，其中包含ProblemVO类型的PageVO对象
+     */
+    @GetMapping("/page")
+    @ApiOperation("题目分页查询")
+    public Result<PageVO<ProblemVO>> page(GeneralPageQueryDTO generalPageQueryDTO){
+        // 调用problemService的分页查询方法，获取分页查询结果
+        PageVO<ProblemVO> pv = problemService.pageQuery(generalPageQueryDTO);
+        // 返回成功结果，包含分页查询结果
+        return Result.success(pv);
+    }
 
 
 }

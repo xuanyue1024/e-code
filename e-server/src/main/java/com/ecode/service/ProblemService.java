@@ -1,6 +1,9 @@
 package com.ecode.service;
 
+import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
+import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemVO;
 
 import java.util.List;
 
@@ -27,4 +30,13 @@ public interface ProblemService {
      * @param ids id
      */
     void deleteProblemBatch(List<Integer> ids);
+
+    /**
+     * 分页查询
+     *
+     * @param generalPageQueryDTO 一般页面查询
+     * @return 页vo<问题vo>
+     */
+    PageVO<ProblemVO> pageQuery(GeneralPageQueryDTO generalPageQueryDTO);
+
 }

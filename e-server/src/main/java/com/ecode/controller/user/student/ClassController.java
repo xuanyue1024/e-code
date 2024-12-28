@@ -1,7 +1,7 @@
 package com.ecode.controller.user.student;
 
 import com.ecode.context.BaseContext;
-import com.ecode.dto.ClassPageQueryDTO;
+import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ClassService;
 import com.ecode.vo.ClassVO;
@@ -34,7 +34,7 @@ public class ClassController {
 
     @GetMapping("/page")
     @ApiOperation("班级分页查询")
-    public Result<PageVO<ClassVO>> page(ClassPageQueryDTO classPageQueryDTO){
+    public Result<PageVO<ClassVO>> page(GeneralPageQueryDTO classPageQueryDTO){
         PageVO<ClassVO> pv = classService.pageQuery(null, BaseContext.getCurrentId(), classPageQueryDTO);
         return Result.success(pv);
     }
