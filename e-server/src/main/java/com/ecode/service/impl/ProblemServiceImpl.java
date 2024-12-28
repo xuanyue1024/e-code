@@ -3,13 +3,16 @@ package com.ecode.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ecode.constant.MessageConstant;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.entity.Problem;
+import com.ecode.exception.ProblemException;
 import com.ecode.mapper.ProblemMapper;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemPageVO;
 import com.ecode.vo.ProblemVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +57,7 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public PageVO<ProblemVO> pageQuery(GeneralPageQueryDTO generalPageQueryDTO) {
+    public PageVO<ProblemPageVO> pageQuery(GeneralPageQueryDTO generalPageQueryDTO) {
         Page<Problem> page = generalPageQueryDTO.nullToDefault();
 
         QueryWrapper<Problem> queryWrapper = new QueryWrapper<>();
@@ -69,8 +72,8 @@ public class ProblemServiceImpl implements ProblemService {
             return new PageVO<>(problemPage.getTotal(), problemPage.getPages(), Collections.emptyList());
         }
         //有数据，转换
-        List<ProblemVO> list = records.stream().map(r -> {
-            ProblemVO pv = new ProblemVO();
+        List<ProblemPageVO> list = records.stream().map(r -> {
+            ProblemPageVO pv = new ProblemPageVO();
             BeanUtils.copyProperties(r, pv);
             return pv;
         }).collect(Collectors.toList());
@@ -84,5 +87,17 @@ public class ProblemServiceImpl implements ProblemService {
         BeanUtils.copyProperties(problemUpdateDTO, p);
         p.setUpdateTime(LocalDateTime.now());
         problemMapper.updateById(p);
+    }
+
+    @Override
+    public ProblemVO getProblem(Integer id) {
+        Problem p = problemMapper.selectById(id);
+        if (p == null){
+            throw new ProblemException(MessageConstant.DATA_NOT_FOUND);
+        }
+
+        ProblemVO pv = new ProblemVO();
+        BeanUtils.copyProperties(p, pv);
+        return pv;
     }
 }

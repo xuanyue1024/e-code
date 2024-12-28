@@ -4,6 +4,7 @@ import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemPageVO;
 import com.ecode.vo.ProblemVO;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public interface ProblemService {
      * @param generalPageQueryDTO 一般页面查询
      * @return 页vo<问题vo>
      */
-    PageVO<ProblemVO> pageQuery(GeneralPageQueryDTO generalPageQueryDTO);
+    PageVO<ProblemPageVO> pageQuery(GeneralPageQueryDTO generalPageQueryDTO);
 
     /**
      * 更新题目
@@ -46,4 +47,12 @@ public interface ProblemService {
      * @param problemUpdateDTO 问题更新
      */
     void updateProblem(ProblemUpdateDTO problemUpdateDTO);
+
+    /**
+     * 获取问题
+     *
+     * @param id id
+     * @return 问题详细内容VO
+     */
+    ProblemVO getProblem(Integer id);
 }

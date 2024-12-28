@@ -16,7 +16,7 @@ import java.io.Serializable;
  * @since 2024-12-28
  */
 @Data
-@ApiModel(value="Problem对象", description="")
+@ApiModel(value="ProblemAddDTO对象", description="")
 public class ProblemAddDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;

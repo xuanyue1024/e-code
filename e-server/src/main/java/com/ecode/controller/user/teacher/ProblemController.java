@@ -6,6 +6,7 @@ import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemPageVO;
 import com.ecode.vo.ProblemVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,6 +56,32 @@ public class ProblemController {
     }
 
     /**
+     * 更新问题信息的接口方法
+     *
+     * @param problemUpdateDTO 包含要更新的问题信息的数据传输对象
+     * @return 返回操作结果，成功则返回成功结果
+     */
+    @PutMapping
+    @ApiOperation("修改题目信息")
+    public Result update(@RequestBody ProblemUpdateDTO problemUpdateDTO){
+        problemService.updateProblem(problemUpdateDTO);
+        return Result.success();
+    }
+
+    /**
+     * 根据ID获取题目详细信息
+     *
+     * @param id 题目ID，用于唯一标识一个题目
+     * @return 返回一个Result对象，其中包含ProblemVO类型的题目详细信息
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("获取题目详细信息")
+    public Result<ProblemVO> get(@PathVariable Integer id){
+        ProblemVO p = problemService.getProblem(id);
+        return Result.success(p);
+    }
+
+    /**
      * 处理题目分页查询请求
      *
      * @param generalPageQueryDTO 分页查询参数封装对象，包含页码、页面大小等信息
@@ -62,27 +89,10 @@ public class ProblemController {
      */
     @GetMapping("/page")
     @ApiOperation("题目分页查询")
-    public Result<PageVO<ProblemVO>> page(GeneralPageQueryDTO generalPageQueryDTO){
+    public Result<PageVO<ProblemPageVO>> page(GeneralPageQueryDTO generalPageQueryDTO){
         // 调用problemService的分页查询方法，获取分页查询结果
-        PageVO<ProblemVO> pv = problemService.pageQuery(generalPageQueryDTO);
-
+        PageVO<ProblemPageVO> pv = problemService.pageQuery(generalPageQueryDTO);
         return Result.success(pv);
     }
-
-    @PutMapping
-    @ApiOperation("修改题目信息")
-    /**
-     * 更新问题信息的接口方法
-     *
-     * @param problemUpdateDTO 包含要更新的问题信息的数据传输对象
-     * @return 返回操作结果，成功则返回成功结果
-     */
-    public Result update(@RequestBody ProblemUpdateDTO problemUpdateDTO){
-        problemService.updateProblem(problemUpdateDTO);
-        return Result.success();
-    }
-
-
-
 
 }
