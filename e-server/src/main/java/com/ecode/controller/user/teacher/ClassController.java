@@ -1,6 +1,7 @@
 package com.ecode.controller.user.teacher;
 
 import com.ecode.context.BaseContext;
+import com.ecode.dto.ClassAddProblemDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ClassService;
@@ -52,6 +53,19 @@ public class ClassController {
     public Result update(@ApiParam("班级id") Integer id,
                          @ApiParam("班级名称") String name){
         classService.updateNameByIdAndTeacherId(id, BaseContext.getCurrentId(), name);
+        return Result.success();
+    }
+
+    /**
+     * 为班级增加题目
+     *
+     * @param classAddProblemDTO 类添加问题
+     * @return 后端统一返回结果
+     */
+    @PostMapping("/problem")
+    @ApiOperation("班级增加题目")
+    public Result addProblem(@RequestBody ClassAddProblemDTO classAddProblemDTO){
+        classService.addProblem(classAddProblemDTO);
         return Result.success();
     }
 }
