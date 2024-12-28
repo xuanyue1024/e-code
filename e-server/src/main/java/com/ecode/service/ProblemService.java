@@ -3,6 +3,7 @@ package com.ecode.service;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.dto.ProblemUpdateDTO;
+import com.ecode.dto.SetTagsDTO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
 import com.ecode.vo.ProblemVO;
@@ -24,7 +25,7 @@ public interface ProblemService {
      *
      * @param problemAddDTO 问题加到
      */
-    void add(ProblemAddDTO problemAddDTO);
+    Integer add(ProblemAddDTO problemAddDTO);
 
     /**
      * 删除题目批量
@@ -55,4 +56,11 @@ public interface ProblemService {
      * @return 问题详细内容VO
      */
     ProblemVO getProblem(Integer id);
+
+    /**
+     * 设置标签s
+     *
+     * @param setTagsDTO 设置标签dto
+     */
+    void setTags(SetTagsDTO setTagsDTO);
 }

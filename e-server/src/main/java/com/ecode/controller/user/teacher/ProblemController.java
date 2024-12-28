@@ -3,6 +3,7 @@ package com.ecode.controller.user.teacher;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.dto.ProblemUpdateDTO;
+import com.ecode.dto.SetTagsDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
@@ -34,10 +35,10 @@ public class ProblemController {
      * @return 返回表示操作结果的Result对象，成功则返回成功信息
      */
     @PostMapping
-    @ApiOperation("增加题目")
-    public Result add(@RequestBody ProblemAddDTO problemAddDTO){
-        problemService.add(problemAddDTO);
-        return Result.success();
+    @ApiOperation(value = "增加题目",notes = "返回新增题目id,用于设置标签")
+    public Result<Integer> add(@RequestBody ProblemAddDTO problemAddDTO){
+        Integer id = problemService.add(problemAddDTO);
+        return Result.success(id);
     }
 
     /**
@@ -93,6 +94,13 @@ public class ProblemController {
         // 调用problemService的分页查询方法，获取分页查询结果
         PageVO<ProblemPageVO> pv = problemService.pageQuery(generalPageQueryDTO);
         return Result.success(pv);
+    }
+
+    @PutMapping("/Tag")
+    @ApiOperation(value = "为题目设置标签集合", notes = "用于为问题设置标签,如果原来有标签,会覆盖原有标签")
+    public Result setTags(@RequestBody SetTagsDTO setTagsDTO){
+        problemService.setTags(setTagsDTO);
+        return Result.success();
     }
 
 }

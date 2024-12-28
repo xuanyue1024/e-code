@@ -7,9 +7,12 @@ import com.ecode.constant.MessageConstant;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.dto.ProblemUpdateDTO;
+import com.ecode.dto.SetTagsDTO;
 import com.ecode.entity.Problem;
+import com.ecode.entity.ProblemTag;
 import com.ecode.exception.ProblemException;
 import com.ecode.mapper.ProblemMapper;
+import com.ecode.mapper.ProblemTagMapper;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
@@ -37,14 +40,17 @@ public class ProblemServiceImpl implements ProblemService {
 
     @Autowired
     private ProblemMapper problemMapper;
+    @Autowired
+    private ProblemTagMapper problemTagMapper;
 
     @Override
-    public void add(ProblemAddDTO problemAddDTO) {
+    public Integer add(ProblemAddDTO problemAddDTO) {
         Problem p = new Problem();
         BeanUtils.copyProperties(problemAddDTO, p);
         p.setCreateTime(LocalDateTime.now());
         p.setUpdateTime(LocalDateTime.now());
         problemMapper.insert(p);
+        return p.getId();
     }
 
     @Transactional
@@ -99,5 +105,20 @@ public class ProblemServiceImpl implements ProblemService {
         ProblemVO pv = new ProblemVO();
         BeanUtils.copyProperties(p, pv);
         return pv;
+    }
+
+    @Override
+    public void setTags(SetTagsDTO setTagsDTO) {
+        //先删除所有
+        problemTagMapper.delete(new LambdaQueryWrapper<ProblemTag>().eq(ProblemTag::getProblemId, setTagsDTO.getProblemId()));
+        //增加
+        List<Integer> tagIds = setTagsDTO.getTagIds();
+        tagIds.forEach(ts -> {
+            ProblemTag pt = ProblemTag.builder()
+                    .problemId(setTagsDTO.getProblemId())
+                    .tagId(ts)
+                    .build();
+            problemTagMapper.insert(pt);
+        });
     }
 }

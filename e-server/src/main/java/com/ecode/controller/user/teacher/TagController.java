@@ -39,9 +39,9 @@ public class TagController {
         return Result.success();
     }
 
-    @GetMapping("/{name}")
+    @GetMapping
     @ApiOperation("模糊查询标签")
-    public Result<List<TagVO>> getByName(@PathVariable String name){
+    public Result<List<TagVO>> getByName(String name){
         List<TagVO> list = tagService.getByName(name);
         return Result.success(list);
     }
