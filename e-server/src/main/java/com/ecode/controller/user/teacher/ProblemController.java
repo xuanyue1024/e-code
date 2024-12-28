@@ -2,6 +2,7 @@ package com.ecode.controller.user.teacher;
 
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
+import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
@@ -64,9 +65,24 @@ public class ProblemController {
     public Result<PageVO<ProblemVO>> page(GeneralPageQueryDTO generalPageQueryDTO){
         // 调用problemService的分页查询方法，获取分页查询结果
         PageVO<ProblemVO> pv = problemService.pageQuery(generalPageQueryDTO);
-        // 返回成功结果，包含分页查询结果
+
         return Result.success(pv);
     }
+
+    @PutMapping
+    @ApiOperation("修改题目信息")
+    /**
+     * 更新问题信息的接口方法
+     *
+     * @param problemUpdateDTO 包含要更新的问题信息的数据传输对象
+     * @return 返回操作结果，成功则返回成功结果
+     */
+    public Result update(@RequestBody ProblemUpdateDTO problemUpdateDTO){
+        problemService.updateProblem(problemUpdateDTO);
+        return Result.success();
+    }
+
+
 
 
 }

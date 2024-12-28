@@ -2,6 +2,7 @@ package com.ecode.service;
 
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
+import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemVO;
 
@@ -39,4 +40,10 @@ public interface ProblemService {
      */
     PageVO<ProblemVO> pageQuery(GeneralPageQueryDTO generalPageQueryDTO);
 
+    /**
+     * 更新题目
+     *
+     * @param problemUpdateDTO 问题更新
+     */
+    void updateProblem(ProblemUpdateDTO problemUpdateDTO);
 }

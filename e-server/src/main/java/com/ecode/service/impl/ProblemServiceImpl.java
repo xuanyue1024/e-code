@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
+import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.entity.Problem;
 import com.ecode.mapper.ProblemMapper;
 import com.ecode.service.ProblemService;
@@ -75,5 +76,13 @@ public class ProblemServiceImpl implements ProblemService {
         }).collect(Collectors.toList());
 
         return new PageVO<>(problemPage.getTotal(), problemPage.getPages(), list);
+    }
+
+    @Override
+    public void updateProblem(ProblemUpdateDTO problemUpdateDTO) {
+        Problem p = new Problem();
+        BeanUtils.copyProperties(problemUpdateDTO, p);
+        p.setUpdateTime(LocalDateTime.now());
+        problemMapper.updateById(p);
     }
 }
