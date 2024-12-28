@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @ApiModel(description = "班级增加题目DTO")
-public class ClassAddProblemDTO implements Serializable {
+public class ClassProblemDTO implements Serializable {
     private static final long serialVersionUID = -5160651629889698567L;
 
     @ApiModelProperty(value = "班级id")

@@ -1,7 +1,7 @@
 package com.ecode.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ecode.dto.ClassAddProblemDTO;
+import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.vo.ClassVO;
@@ -67,7 +67,15 @@ public interface ClassService extends IService<Class> {
     /**
      * 为班级增加题目
      *
-     * @param classAddProblemDTO 类添加问题
+     * @param classProblemDTO 类添加问题
      */
-    void addProblem(ClassAddProblemDTO classAddProblemDTO);
+    void addProblemBatch(ClassProblemDTO classProblemDTO);
+
+    /**
+     * 批量删除班级内题目
+     *
+     * @param classProblemDTO 类问题d
+     */
+    void deleteProblemBatch(ClassProblemDTO classProblemDTO);
+
 }

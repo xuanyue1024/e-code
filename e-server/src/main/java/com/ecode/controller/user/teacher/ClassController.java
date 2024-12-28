@@ -1,7 +1,7 @@
 package com.ecode.controller.user.teacher;
 
 import com.ecode.context.BaseContext;
-import com.ecode.dto.ClassAddProblemDTO;
+import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ClassService;
@@ -59,13 +59,26 @@ public class ClassController {
     /**
      * 为班级增加题目
      *
-     * @param classAddProblemDTO 类添加问题
+     * @param classProblemDTO 类添加问题
      * @return 后端统一返回结果
      */
     @PostMapping("/problem")
     @ApiOperation("班级增加题目")
-    public Result addProblem(@RequestBody ClassAddProblemDTO classAddProblemDTO){
-        classService.addProblem(classAddProblemDTO);
+    public Result addProblemBatch(@RequestBody ClassProblemDTO classProblemDTO){
+        classService.addProblemBatch(classProblemDTO);
+        return Result.success();
+    }
+
+    /**
+     * 批量删除班级题目
+     *
+     * @param classProblemDTO 类问题d
+     * @return 后端统一返回结果
+     */
+    @DeleteMapping("/problem")
+    @ApiOperation("批量移除班级题目")
+    public Result deleteProblemBatch(@RequestBody ClassProblemDTO classProblemDTO){
+        classService.deleteProblemBatch(classProblemDTO);
         return Result.success();
     }
 }

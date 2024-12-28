@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
-import com.ecode.dto.ClassAddProblemDTO;
+import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.entity.ClassProblem;
@@ -147,17 +147,30 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
     }
 
     @Override
-    public void addProblem(ClassAddProblemDTO classAddProblemDTO) {
-        verifyClassStudent(BaseContext.getCurrentId(), classAddProblemDTO.getClassId());
+    public void addProblemBatch(ClassProblemDTO classProblemDTO) {
+        verifyClassStudent(BaseContext.getCurrentId(), classProblemDTO.getClassId());
 
-        List<Integer> problemIds = classAddProblemDTO.getProblemIds();
+        List<Integer> problemIds = classProblemDTO.getProblemIds();
         problemIds.forEach(pi -> {
             ClassProblem cp = ClassProblem.builder()
-                    .classId(classAddProblemDTO.getClassId())
+                    .classId(classProblemDTO.getClassId())
                     .problemId(pi)
                     .build();
             classProblemMapper.insert(cp);
         });
+    }
+
+    @Transactional
+    @Override
+    public void deleteProblemBatch(ClassProblemDTO classProblemDTO) {
+        verifyClassStudent(BaseContext.getCurrentId(), classProblemDTO.getClassId());
+
+        QueryWrapper<ClassProblem> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .in(ClassProblem::getProblemId, classProblemDTO.getProblemIds())
+                .eq(ClassProblem::getClassId, classProblemDTO.getClassId());
+        classProblemMapper.delete(queryWrapper);
+
     }
 
     /**
