@@ -1,6 +1,7 @@
 package com.ecode.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ecode.enumeration.ProblemGrade;
@@ -41,6 +42,7 @@ public class Problem implements Serializable {
     private String content;
 
     @ApiModelProperty(value = "要求，为空按默认值（md格式）")
+    @TableField("`require`")
     private String require;
 
     @ApiModelProperty(value = "标签组id")

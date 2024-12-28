@@ -2,7 +2,6 @@ package com.ecode.enumeration;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,7 +21,6 @@ public enum ProblemGrade {
     @EnumValue
     private final int value;
     @JsonValue
-    @ApiModelProperty("难度")
     private final String desc;
 
 }
