@@ -23,6 +23,9 @@ public class ProblemPageVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "班级题库id")
+    private Integer classProblemId;
+
     @ApiModelProperty(value = "题库id")
     private Integer id;
 

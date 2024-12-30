@@ -81,7 +81,7 @@ public interface ClassService extends IService<Class> {
     void deleteProblemBatch(ClassProblemDTO classProblemDTO);
 
     /**
-     * 班级分页查询
+     * 班级问题分页查询
      *
      * @param classProblemPageQueryDTO 类问题页面查询dto
      * @return 页vo<问题页vo>
