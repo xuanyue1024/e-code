@@ -60,7 +60,7 @@ public class JwtTokenTeacherInterceptor implements HandlerInterceptor {
             return false;
         }
         Integer empId = Integer.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
-        UserRole role = UserRole.fromDesc((String) claims.get(JwtClaimsConstant.ROLE));
+        UserRole role = Enum.valueOf(UserRole.class, (String) claims.get(JwtClaimsConstant.ROLE));
         log.info("当前用户id：{}，角色:{}", empId, role.getDesc());
 
         if (role != UserRole.TEACHER) throw new PermissionException(MessageConstant.ACCESS_DENIED);
