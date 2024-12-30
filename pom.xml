@@ -34,6 +34,7 @@
         <pagehelper>1.4.2</pagehelper>
         <rxjava>2.2.21</rxjava>
         <dashscope-sdk>2.16.2</dashscope-sdk>
+        <java-diff-utils>4.12</java-diff-utils>
     </properties>
 
     <dependencies>
@@ -119,6 +120,13 @@
                 <artifactId>rxjava</artifactId>
                 <version>${rxjava}</version>
             </dependency>
+<!-- 文本差异对比 -->
+            <dependency>
+                <groupId>io.github.java-diff-utils</groupId>
+                <artifactId>java-diff-utils</artifactId>
+                <version>${java-diff-utils}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

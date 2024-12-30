@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
+import com.ecode.enumeration.UserRole;
 import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
 import com.ecode.utils.JwtUtil;
@@ -51,8 +52,10 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
             log.info("jwt普通user校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
             Integer empId = Integer.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
+            UserRole role = Enum.valueOf(UserRole.class, (String) claims.get(JwtClaimsConstant.ROLE));
             log.info("当前用户id：{}", empId);
             BaseContext.setCurrentId(empId);
+            BaseContext.setCurrentRole(role);
             //3、通过，放行
             return true;
         } catch (Exception ex) {

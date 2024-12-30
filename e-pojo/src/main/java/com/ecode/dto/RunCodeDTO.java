@@ -7,8 +7,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-@ApiModel(description = "代码调试提交数据模型")
-public class DebugCodeDTO implements Serializable {
+@ApiModel(description = "代码运行提交数据模型")
+public class RunCodeDTO implements Serializable {
 
     private static final long serialVersionUID = 4619556128447460185L;
 
@@ -18,6 +18,12 @@ public class DebugCodeDTO implements Serializable {
     @ApiModelProperty("类型")
     private String type;
 
-    @ApiModelProperty("输入内容")
-    private String input;
+    @ApiModelProperty("班级题目id")
+    private Integer classProblemId;
+
+    @ApiModelProperty("题目id")
+    private Integer problemId;
+
+    @ApiModelProperty("班级id")
+    private Integer classId;
 }

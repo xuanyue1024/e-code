@@ -35,7 +35,7 @@ public class ProblemController {
      * @return 返回表示操作结果的Result对象，成功则返回成功信息
      */
     @PostMapping
-    @ApiOperation(value = "增加题目",notes = "返回新增题目id,用于设置标签")
+    @ApiOperation(value = "增加题目",notes = "data内返回新增题目id,用于设置标签")
     public Result<Integer> add(@RequestBody ProblemAddDTO problemAddDTO){
         Integer id = problemService.add(problemAddDTO);
         return Result.success(id);
