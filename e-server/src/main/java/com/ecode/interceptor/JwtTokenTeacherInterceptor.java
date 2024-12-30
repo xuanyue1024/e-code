@@ -64,7 +64,7 @@ public class JwtTokenTeacherInterceptor implements HandlerInterceptor {
         log.info("当前用户id：{}，角色:{}", empId, role.getDesc());
 
         if (role != UserRole.TEACHER) throw new PermissionException(MessageConstant.ACCESS_DENIED);
-
+        BaseContext.setCurrentRole(role);
         BaseContext.setCurrentId(empId);
         //3、通过，放行
         return true;

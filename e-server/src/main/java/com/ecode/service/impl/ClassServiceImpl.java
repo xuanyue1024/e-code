@@ -7,26 +7,31 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.ClassProblemDTO;
+import com.ecode.dto.ClassProblemPageQueryDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
-import com.ecode.entity.ClassProblem;
-import com.ecode.entity.StudentClass;
+import com.ecode.entity.*;
+import com.ecode.enumeration.UserRole;
 import com.ecode.exception.ClassException;
 import com.ecode.mapper.ClassMapper;
 import com.ecode.mapper.ClassProblemMapper;
+import com.ecode.mapper.ProblemTagMapper;
 import com.ecode.mapper.StudentClassMapper;
 import com.ecode.service.ClassService;
 import com.ecode.utils.InvitationCodeUtil;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemPageVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 班级service实现类
@@ -45,6 +50,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
 
     @Autowired
     private ClassProblemMapper classProblemMapper;
+
+    @Autowired
+    private ProblemTagMapper problemTagMapper;
 
     @Override
     public void addClass(String name) {
@@ -148,7 +156,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
 
     @Override
     public void addProblemBatch(ClassProblemDTO classProblemDTO) {
-        verifyClassStudent(BaseContext.getCurrentId(), classProblemDTO.getClassId());
+        verifyClassStudent(classProblemDTO.getClassId());
 
         List<Integer> problemIds = classProblemDTO.getProblemIds();
         problemIds.forEach(pi -> {
@@ -163,7 +171,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
     @Transactional
     @Override
     public void deleteProblemBatch(ClassProblemDTO classProblemDTO) {
-        verifyClassStudent(BaseContext.getCurrentId(), classProblemDTO.getClassId());
+        verifyClassStudent(classProblemDTO.getClassId());
 
         QueryWrapper<ClassProblem> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
@@ -173,25 +181,73 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
 
     }
 
-    /**
-     * 验证教师是否在指定班级授课
-     * 此方法用于确保指定的教师与班级之间存在关联，防止教师对非自身班级的学生执行操作
-     *
-     * @param teacherId 教师ID
-     * @param classId 班级ID
-     * @throws ClassException 如果未找到指定教师与班级的关联，则抛出班级异常
-     */
-    private void verifyClassStudent(Integer teacherId, Integer classId){
-        // 查询指定班级ID和教师ID的班级信息，以验证教师与班级的关联
-        Class c = classMapper.selectOne(new LambdaQueryWrapper<Class>()
-                .eq(Class::getId, classId)
-                .eq(Class::getTeacherId, teacherId)
+    @Override
+    public PageVO<ProblemPageVO> problemPage(ClassProblemPageQueryDTO classProblemPageQueryDTO) {
+        verifyClassStudent(classProblemPageQueryDTO.getClassId());
+        // 设置分页参数
+        PageHelper.startPage(
+                Math.toIntExact(classProblemPageQueryDTO.getPageNo()),
+                Math.toIntExact(classProblemPageQueryDTO.getPageSize()));
+
+        // 执行分页查询
+        //todo 查询排序方式可优化
+        Page<Problem> page =(Page<Problem>) classProblemMapper.getClassProblem(
+                classProblemPageQueryDTO.getClassId(),
+                classProblemPageQueryDTO.getName()
         );
 
-        // 如果查询结果为空，说明指定的教师与班级关联不存在，抛出异常
-        if (c == null){
-            throw new ClassException(MessageConstant.CLASS_AND_TEACHER_NOT_FOUND);
+        List<ProblemPageVO> list = page.getResult().stream().map(p -> {
+            ProblemPageVO pv = new ProblemPageVO();
+            BeanUtils.copyProperties(p, pv);
+            //查询并设置单个题目的标签集合
+            //todo 性能可优化
+            List<ProblemTag> problemTags = problemTagMapper.selectList(new LambdaQueryWrapper<ProblemTag>().eq(ProblemTag::getProblemId, p.getId()));
+            pv.setTagIds(problemTags.stream().map(ProblemTag::getTagId).collect(Collectors.toList()));
+
+            return pv;
+        }).collect(Collectors.toList());
+
+        return new PageVO<>(page.getTotal(), (long) page.getPages(), list);
+    }
+
+    /**
+     * 验证教师是否在指定班级授课
+     * 验证学生是否在指定班级
+     *
+     * @param classId 班级ID
+     */
+    private void verifyClassStudent(Integer classId){
+        //获取当前用户id与用户角色
+        Integer currentId = BaseContext.getCurrentId();
+        UserRole currentRole = BaseContext.getCurrentRole();
+
+        switch (currentRole){
+            case STUDENT: {//学生
+                StudentClass studentClass = studentClassMapper.selectOne(new LambdaQueryWrapper<StudentClass>()
+                        .eq(StudentClass::getStudentId, currentId)
+                        .eq(StudentClass::getClassId, classId)
+                );
+                // 如果查询结果为空，说明指定的学生与班级关联不存在，抛出异常
+                if (studentClass == null){
+                    throw new ClassException(MessageConstant.CLASS_AND_STUDENT_NOT_FOUND);
+                }
+                break;
+            }
+            case TEACHER:{//老师
+                // 查询指定班级ID和教师ID的班级信息，以验证教师与班级的关联
+                Class c = classMapper.selectOne(new LambdaQueryWrapper<Class>()
+                        .eq(Class::getId, classId)
+                        .eq(Class::getTeacherId, currentId)
+                );
+
+                // 如果查询结果为空，说明指定的教师与班级关联不存在，抛出异常
+                if (c == null){
+                    throw new ClassException(MessageConstant.CLASS_AND_TEACHER_NOT_FOUND);
+                }
+                break;
+            }
         }
+
     }
 
 }

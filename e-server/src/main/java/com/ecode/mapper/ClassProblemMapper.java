@@ -1,7 +1,10 @@
 package com.ecode.mapper;
 
-import com.ecode.entity.ClassProblem;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ecode.entity.ClassProblem;
+import com.ecode.entity.Problem;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2024-12-28
  */
 public interface ClassProblemMapper extends BaseMapper<ClassProblem> {
-
+    List<Problem> getClassProblem(Integer classId, String name);
 }

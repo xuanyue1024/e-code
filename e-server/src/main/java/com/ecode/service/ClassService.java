@@ -2,10 +2,12 @@ package com.ecode.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ecode.dto.ClassProblemDTO;
+import com.ecode.dto.ClassProblemPageQueryDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemPageVO;
 
 import java.util.List;
 
@@ -78,4 +80,11 @@ public interface ClassService extends IService<Class> {
      */
     void deleteProblemBatch(ClassProblemDTO classProblemDTO);
 
+    /**
+     * 班级分页查询
+     *
+     * @param classProblemPageQueryDTO 类问题页面查询dto
+     * @return 页vo<问题页vo>
+     */
+    PageVO<ProblemPageVO> problemPage(ClassProblemPageQueryDTO classProblemPageQueryDTO);
 }

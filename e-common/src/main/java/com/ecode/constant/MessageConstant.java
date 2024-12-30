@@ -51,6 +51,7 @@ public class MessageConstant {
     public static final String INVITATIONCODE_NOT_FOUND = "班级邀请码不存在";
     public static final String EXIT_FAILURE_NOT_EXIST_CLASS = "退出班级失败，包含不存在的班级";
     public static final String CLASS_AND_TEACHER_NOT_FOUND = "当前老师班级内没有该班级";
+    public static final String CLASS_AND_STUDENT_NOT_FOUND = "当前学生不在该班级";
 
     public static final String INVALID_FORMAT_FAILURE = "输入格式有误";
     public static final String DATA_NOT_FOUND = "数据不存在";
