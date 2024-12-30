@@ -48,6 +48,11 @@ ecode:
     ai:
         bailian-id: ${ecode.ai.bailian-id}
         bailian-api-key: ${ecode.ai.bailian-api-key}
+    alioss:
+        endpoint: ${ecode.alioss.endpoint}
+        access-key-id: ${ecode.alioss.access-key-id}
+        access-key-secret: ${ecode.alioss.access-key-secret}
+        bucket-name: ${ecode.alioss.bucket-name}
 knife4j:
     enable: true
 
