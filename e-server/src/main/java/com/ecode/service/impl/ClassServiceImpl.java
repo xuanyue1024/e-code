@@ -8,29 +8,28 @@ import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.ClassProblemPageQueryDTO;
+import com.ecode.dto.ClassStudentDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
-import com.ecode.entity.ClassProblem;
-import com.ecode.entity.ProblemTag;
-import com.ecode.entity.StudentClass;
+import com.ecode.entity.*;
 import com.ecode.enumeration.UserRole;
 import com.ecode.exception.ClassException;
-import com.ecode.mapper.ClassMapper;
-import com.ecode.mapper.ClassProblemMapper;
-import com.ecode.mapper.ProblemTagMapper;
-import com.ecode.mapper.StudentClassMapper;
+import com.ecode.mapper.*;
 import com.ecode.service.ClassService;
 import com.ecode.utils.InvitationCodeUtil;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
+import com.ecode.vo.UserVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +53,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
 
     @Autowired
     private ProblemTagMapper problemTagMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private ClassScoreMapper classScoreMapper;
 
     @Override
     public void addClass(String name) {
@@ -205,6 +210,39 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         });
 
         return new PageVO<>(page.getTotal(), (long) page.getPages(), page.getResult());
+    }
+
+    @Override
+    public PageVO<UserVO> studentPage(ClassStudentDTO classStudentDTO) {
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<StudentClass> page = classStudentDTO.toMpPage("join_time",false);
+
+        //判断是否有name
+        /*QueryWrapper<StudentClass> queryWrapper = new QueryWrapper<>();
+        if (classStudentDTO.getName() != null && !classStudentDTO.getName().isEmpty()){
+            queryWrapper.lambda().like(studeget, generalPageQueryDTO.getName());
+        }*/
+        //todo 可优化
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<StudentClass> studentClassPage = studentClassMapper.selectPage(page, new QueryWrapper<StudentClass>().lambda().eq(StudentClass::getClassId, classStudentDTO.getClassId()));
+
+        List<StudentClass> records = studentClassPage.getRecords();
+
+        //没数据，返回空结果
+        if (records == null || records.isEmpty()){
+            return new PageVO<>(studentClassPage.getTotal(), studentClassPage.getPages(), Collections.emptyList());
+        }
+        //有数据，转换
+        List<UserVO> collect = records.stream().map(s -> {
+            UserVO uv = new UserVO();
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, s.getStudentId()));
+            BeanUtils.copyProperties(user, uv);
+            List<ClassScore> classScores = classScoreMapper.selectList(new LambdaQueryWrapper<ClassScore>().eq(ClassScore::getScId, s.getId()));
+
+            int sumScore = classScores.stream().mapToInt(ClassScore::getScore).sum();
+            uv.setTotalScore(sumScore);
+            return uv;
+        }).collect(Collectors.toList());
+
+        return new PageVO<>(studentClassPage.getTotal(), studentClassPage.getPages(), collect);
     }
 
     /**

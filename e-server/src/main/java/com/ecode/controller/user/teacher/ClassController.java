@@ -3,12 +3,14 @@ package com.ecode.controller.user.teacher;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.ClassProblemPageQueryDTO;
+import com.ecode.dto.ClassStudentDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ClassService;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
+import com.ecode.vo.UserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -95,5 +97,12 @@ public class ClassController {
     public Result<PageVO<ProblemPageVO>> problemPage(ClassProblemPageQueryDTO classProblemPageQueryDTO){
         PageVO<ProblemPageVO> pv = classService.problemPage(classProblemPageQueryDTO);
         return Result.success(pv);
+    }
+
+    @GetMapping("/members/page")
+    @ApiOperation("分页查询指定班级学生列表,含成绩")//todo 权限优化
+    public Result<PageVO<UserVO>> studentPage(ClassStudentDTO classStudentDTO){
+        PageVO<UserVO> uvs = classService.studentPage(classStudentDTO);
+        return Result.success(uvs);
     }
 }

@@ -3,11 +3,13 @@ package com.ecode.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.ClassProblemPageQueryDTO;
+import com.ecode.dto.ClassStudentDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.vo.ClassVO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
+import com.ecode.vo.UserVO;
 
 import java.util.List;
 
@@ -87,4 +89,12 @@ public interface ClassService extends IService<Class> {
      * @return 页vo<问题页vo>
      */
     PageVO<ProblemPageVO> problemPage(ClassProblemPageQueryDTO classProblemPageQueryDTO);
+
+    /**
+     * 班级学生列表
+     *
+     * @param classStudentDTO 班级学生d
+     * @return UserVO
+     */
+    PageVO<UserVO> studentPage(ClassStudentDTO classStudentDTO);
 }
