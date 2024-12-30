@@ -11,6 +11,7 @@ import com.ecode.service.AIService;
 import com.ecode.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -39,6 +40,7 @@ public class AIController {
      * @return Flux<Result < String>>返回流式聊天内容
      */
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ApiOperation("聊天")
     public Flux<Result<String>> chat(@RequestBody AiInputDTO aiInputDTO) {
         jwtVerify(aiInputDTO.getToken());
         return aiService.getChat(aiInputDTO);

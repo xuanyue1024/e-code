@@ -7,6 +7,6 @@ import lombok.Data;
 public class ClassProblemPageQueryDTO extends GeneralPageQueryDTO{
     private static final long serialVersionUID = -7888334063203599574L;
 
-    @ApiModelProperty("班级id")
+    @ApiModelProperty(value = "班级id", required = true)
     private Integer classId;
 }
