@@ -1,6 +1,7 @@
 package com.ecode.service;
 
 import com.ecode.dto.UserRegisterDTO;
+import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -20,5 +21,21 @@ public interface UserService extends IService<User> {
      * @param userRegisterDTO 用户注册dto
      */
     void save(UserRegisterDTO userRegisterDTO);
+
+    /**
+     * 更新用户
+     *
+     * @param userUpdateDTO 用户更新
+     * @param id            id
+     */
+    void updateUser(UserUpdateDTO userUpdateDTO, Integer id);
+
+    /**
+     * 获取用户信息
+     *
+     * @param currentId 当前id
+     * @return <p>
+     */
+    User getUserInfo(Integer currentId);
 
 }

@@ -2,12 +2,13 @@ package com.ecode.controller.user;
 
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.constant.MessageConstant;
+import com.ecode.context.BaseContext;
 import com.ecode.dto.UserLoginDTO;
 import com.ecode.dto.UserRegisterDTO;
+import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.LoginException;
-import com.ecode.mapper.UserMapper;
 import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
 import com.ecode.service.UserService;
@@ -19,10 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +46,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserMapper userMapper;
 
     /**
      * 登录
@@ -103,10 +99,17 @@ public class UserController {
         return Result.success();
     }
 
-    @PostMapping("/updateT")
-    @ApiOperation("用户更新测试")
-    public Result update(@RequestBody User user){
-        int i = userMapper.updateById(user);
-        return Result.success(userMapper.selectById(user.getId()));
+    @PutMapping()
+    @ApiOperation("修改用户信息")
+    public Result update(@RequestBody UserUpdateDTO userUpdateDTO){
+        userService.updateUser(userUpdateDTO, BaseContext.getCurrentId());
+        return Result.success();
+    }
+
+    @GetMapping
+    @ApiOperation("获取用户详细信息")
+    public Result<User> get(){
+        User u = userService.getUserInfo(BaseContext.getCurrentId());
+        return Result.success(u);
     }
 }

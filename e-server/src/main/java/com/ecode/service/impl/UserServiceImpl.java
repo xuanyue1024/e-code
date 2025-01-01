@@ -2,7 +2,9 @@ package com.ecode.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
+import com.ecode.context.BaseContext;
 import com.ecode.dto.UserRegisterDTO;
+import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.RegisterException;
@@ -56,5 +58,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         BeanUtils.copyProperties(userRegisterDTO, user);
         userMapper.insert(user);
 
+    }
+
+    @Override
+    public void updateUser(UserUpdateDTO userUpdateDTO, Integer id) {
+        User u = new User();
+        BeanUtils.copyProperties(userUpdateDTO, u);
+        u.setId(BaseContext.getCurrentId());
+
+        userMapper.updateById(u);
+    }
+
+    @Override
+    public User getUserInfo(Integer currentId) {
+        return userMapper.selectById(currentId);
     }
 }
