@@ -26,10 +26,11 @@ public class TagController {
     private TagService tagService;
 
     @PostMapping("/{name}")
-    @ApiOperation("增加标签")
-    public Result add(@ApiParam("标签名称") @PathVariable String name){
-        tagService.save(new Tag(null,name, LocalDateTime.now()));
-        return Result.success();
+    @ApiOperation(value = "增加标签",notes = "返回值data里存放添加的标签id")
+    public Result<Integer> add(@ApiParam("标签名称") @PathVariable String name){
+        Tag tag = new Tag(null, name, LocalDateTime.now());
+        tagService.save(tag);
+        return Result.success(tag.getId());
     }
 
     @DeleteMapping
