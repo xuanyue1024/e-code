@@ -2,4 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ecode.mapper.ClassScoreMapper">
 
+    <select id="problemStuInfo" resultType="com.ecode.entity.ClassScore">
+        SELECT cs.*  FROM class_score cs
+            JOIN student_class sc ON
+                cs.sc_id = sc.id
+                    AND cs.class_problem_id = ${classProblemId}
+                    AND sc.student_id = ${stuId}
+    </select>
 </mapper>

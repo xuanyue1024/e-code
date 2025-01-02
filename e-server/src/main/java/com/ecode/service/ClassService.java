@@ -6,10 +6,7 @@ import com.ecode.dto.ClassProblemPageQueryDTO;
 import com.ecode.dto.ClassStudentDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
-import com.ecode.vo.ClassVO;
-import com.ecode.vo.PageVO;
-import com.ecode.vo.ProblemPageVO;
-import com.ecode.vo.UserVO;
+import com.ecode.vo.*;
 
 import java.util.List;
 
@@ -97,4 +94,13 @@ public interface ClassService extends IService<Class> {
      * @return UserVO
      */
     PageVO<UserVO> studentPage(ClassStudentDTO classStudentDTO);
+
+    /**
+     * 获取指定学生指定班级题目的作答信息
+     *
+     * @param stuId          学生id
+     * @param classProblemId 班级问题id
+     * @return 问题信息
+     */
+    ProblemStuInfoVO problemStuInfo(Integer stuId, Integer classProblemId);
 }

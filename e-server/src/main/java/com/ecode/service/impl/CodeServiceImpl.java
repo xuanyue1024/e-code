@@ -1,6 +1,7 @@
 package com.ecode.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.DebugCodeDTO;
@@ -51,7 +52,9 @@ public class CodeServiceImpl implements CodeService {
     @Override
     public RunCodeVO runCode(RunCodeDTO runCodeDTO) {
 
+        //得分
         Integer score = 0;
+        //通过例题数
         Integer passCount = 0;
         //获取原始结果
         Problem problem = problemMapper.selectById(runCodeDTO.getProblemId());
@@ -91,14 +94,27 @@ public class CodeServiceImpl implements CodeService {
             if (sc == null){
                 throw new ClassException(MessageConstant.CLASS_AND_STUDENT_NOT_FOUND);
             }
-            //不管有没有，先删除，后增加，少走两年弯路
-            int i =classScoreMapper.delete(new LambdaQueryWrapper<ClassScore>().eq(ClassScore::getScId, sc.getId()));
-            log.info("删除个数:{}", i);
-            classScoreMapper.insert(ClassScore.builder()
+
+            int i = classScoreMapper.update(null, new LambdaUpdateWrapper<ClassScore>()
+                    .set(ClassScore::getScore, score)
+                    .setSql("submit_number = submit_number + 1")
+                    .setSql(passCount == 4, "pass_number = pass_number + 1")
+                    .eq(ClassScore::getScId, sc.getId())
+                    .eq(ClassScore::getClassProblemId, runCodeDTO.getClassProblemId())
+            );
+
+            if (i <= 0){
+                //如果没有过此成绩，就增加
+                classScoreMapper.insert(ClassScore.builder()
                         .classProblemId(runCodeDTO.getClassProblemId())
                         .scId(sc.getId())
                         .score(score)
+                        .passNumber(0)
+                        .submitNumber(0)
                         .build());
+            }
+
+
         }
         return RunCodeVO.builder()
                 .diff(list)
@@ -123,6 +139,6 @@ public class CodeServiceImpl implements CodeService {
                 dockerProperties.getTimeout(), type,
                 code, input + "\n");
 
-        return TextDiffUtil.generateUnifiedDiff(output,runResult);
+        return TextDiffUtil.generateUnifiedDiff(runResult,output);
     }
 }

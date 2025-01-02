@@ -48,4 +48,11 @@ public class ClassScore implements Serializable {
     private Integer score;
 
 
+    @ApiModelProperty(value = "提交次数")
+    @TableField("submit_number")
+    private Integer submitNumber;
+
+    @ApiModelProperty(value = "通过次数")
+    @TableField("pass_number")
+    private Integer passNumber;
 }

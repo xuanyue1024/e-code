@@ -17,10 +17,7 @@ import com.ecode.exception.ClassException;
 import com.ecode.mapper.*;
 import com.ecode.service.ClassService;
 import com.ecode.utils.InvitationCodeUtil;
-import com.ecode.vo.ClassVO;
-import com.ecode.vo.PageVO;
-import com.ecode.vo.ProblemPageVO;
-import com.ecode.vo.UserVO;
+import com.ecode.vo.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
@@ -243,6 +240,21 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         }).collect(Collectors.toList());
 
         return new PageVO<>(studentClassPage.getTotal(), studentClassPage.getPages(), collect);
+    }
+
+    @Override
+    public ProblemStuInfoVO problemStuInfo(Integer stuId, Integer classProblemId) {
+        ClassScore classScore = classScoreMapper.problemStuInfo(stuId,classProblemId);
+        if (classScore == null){
+            return ProblemStuInfoVO.builder()
+                    .score(0)
+                    .passNumber(0)
+                    .submitNumber(0)
+                    .build();
+        }
+        ProblemStuInfoVO psv = new ProblemStuInfoVO();
+        BeanUtils.copyProperties(classScore, psv);
+        return psv;
     }
 
     /**
