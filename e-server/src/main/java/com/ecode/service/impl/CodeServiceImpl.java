@@ -104,13 +104,16 @@ public class CodeServiceImpl implements CodeService {
             );
 
             if (i <= 0){
+
+                int passInt = 0;
+                if (passCount == 4) passInt = 1;
                 //如果没有过此成绩，就增加
                 classScoreMapper.insert(ClassScore.builder()
                         .classProblemId(runCodeDTO.getClassProblemId())
                         .scId(sc.getId())
                         .score(score)
-                        .passNumber(0)
-                        .submitNumber(0)
+                        .passNumber(passInt)
+                        .submitNumber(1)
                         .build());
             }
 
