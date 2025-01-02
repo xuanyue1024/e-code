@@ -8,9 +8,11 @@ import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.dto.SetTagsDTO;
+import com.ecode.entity.ClassProblem;
 import com.ecode.entity.Problem;
 import com.ecode.entity.ProblemTag;
 import com.ecode.exception.ProblemException;
+import com.ecode.mapper.ClassProblemMapper;
 import com.ecode.mapper.ProblemMapper;
 import com.ecode.mapper.ProblemTagMapper;
 import com.ecode.service.ProblemService;
@@ -42,6 +44,8 @@ public class ProblemServiceImpl implements ProblemService {
     private ProblemMapper problemMapper;
     @Autowired
     private ProblemTagMapper problemTagMapper;
+    @Autowired
+    private ClassProblemMapper classProblemMapper;
 
     @Override
     public Integer add(ProblemAddDTO problemAddDTO) {
@@ -60,6 +64,8 @@ public class ProblemServiceImpl implements ProblemService {
                 .lambda()
                 .in(Problem::getId, ids);
         problemMapper.delete(problemQueryWrapper);
+        //todo 班级问题得删除
+        classProblemMapper.delete(new QueryWrapper<ClassProblem>().lambda().in(ClassProblem::getProblemId, ids));
     }
 
     @Override
