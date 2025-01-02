@@ -7,10 +7,7 @@ import com.ecode.dto.ClassStudentDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ClassService;
-import com.ecode.vo.ClassVO;
-import com.ecode.vo.PageVO;
-import com.ecode.vo.ProblemPageVO;
-import com.ecode.vo.UserVO;
+import com.ecode.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -104,5 +101,13 @@ public class ClassController {
     public Result<PageVO<UserVO>> studentPage(ClassStudentDTO classStudentDTO){
         PageVO<UserVO> uvs = classService.studentPage(classStudentDTO);
         return Result.success(uvs);
+    }
+
+    @GetMapping("/problem/info/{classProblemId}/{studentId}")
+    @ApiOperation("获取班级单个题目的做题详细信息")
+    public Result<ProblemStuInfoVO> problemInfo(@PathVariable @ApiParam("班级题目id") Integer classProblemId,
+                                                @PathVariable @ApiParam("学生id") Integer studentId){
+        ProblemStuInfoVO psv = classService.problemStuInfo(studentId, classProblemId);
+        return Result.success(psv);
     }
 }
