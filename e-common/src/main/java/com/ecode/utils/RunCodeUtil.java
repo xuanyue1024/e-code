@@ -46,7 +46,14 @@ public class RunCodeUtil {
     private static final Map<String, CodeDockerOption> imageMap = Map.of(
             "cpp", new CodeDockerOption("run-cpp:1.0", "g++ /home/user/Main.cpp -o Main.out", "/home/user/Main.out", "cpp", true),
             "java", new CodeDockerOption("run-java:1.0", "javac /home/user/Main.java", "java -cp /home/user Main", "java", true),
-            "python3", new CodeDockerOption("run-python3:1.0", null, "python3 /home/user/Main.py", "py", false)
+            "python3", new CodeDockerOption("run-python3:1.0", null, "python3 /home/user/Main.py", "py", false),
+            "swift", new CodeDockerOption("run-swift:1.0", null, "swift /home/user/Main.swift", "swift", false),
+            "rust", new CodeDockerOption("run-rust:1.0", "rustc /home/user/Main.rs", "/home/user/Main", "rs", true),
+            "php", new CodeDockerOption("run-php:1.0", null, "php /home/user/Main.php", "php", false),
+            "nodejs", new CodeDockerOption("run-nodejs:1.0", null, "node /home/user/Main.js", "js", false),
+            "kotlin", new CodeDockerOption("run-kotlin:1.0", "kotlinc /home/user/Main.kt -include-runtime -d /home/user/Main.jar", "java -jar /home/user/Main.jar", "kt", true),
+            "go", new CodeDockerOption("run-go:1.0", "go build /home/user/Main.go", "./Main", "go", true),
+            ".net", new CodeDockerOption("run-net:1.0", "dotnet publish /home/user/Main.csproj -r linux-x64 -c Release --self-contained true", "dotnet /home/user/Main.dll", "cs", true)
     );
 
     public static String runCode(String url, int timeout,String codeType, String codeStr, String input) {
