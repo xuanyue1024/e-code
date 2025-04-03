@@ -53,6 +53,10 @@ ecode:
         access-key-id: ${ecode.alioss.access-key-id}
         access-key-secret: ${ecode.alioss.access-key-secret}
         bucket-name: ${ecode.alioss.bucket-name}
+    webauthn:
+        relying-party:
+            id: ${ecode.webauthn.relying-party.id}
+            name: ${ecode.webauthn.relying-party.name}
 knife4j:
     enable: true
 
