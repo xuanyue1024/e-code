@@ -47,7 +47,7 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
      * @return 返回用于创建密钥的选项对象。
      */
     @Override
-    public PublicKeyCredentialCreationOptions startPasskeyRegistration(Integer userId) throws JsonProcessingException {
+    public String startPasskeyRegistration(Integer userId) throws JsonProcessingException {
         User user = userMapper.selectById(userId);
 
         PublicKeyCredentialCreationOptions options = relyingParty.startRegistration(StartRegistrationOptions.builder()
@@ -69,7 +69,7 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
                 .build();
         template.opsForHash().put(REDIS_PASSKEY_REGISTRATION_KEY, String.valueOf(user.getId()), options.toJson());
 
-        return options;
+        return options.toCredentialsCreateJson();
     }
 
     /**
@@ -111,11 +111,11 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
      * @return 返回用于认证的 {@code AssertionRequest} 对象。
      */
     @Override
-    public AssertionRequest startPasskeyAssertion(String identifier) throws JsonProcessingException {
+    public String startPasskeyAssertion(String identifier) throws JsonProcessingException {
         AssertionRequest options = relyingParty.startAssertion(StartAssertionOptions.builder().build());
         template.opsForHash().put(REDIS_PASSKEY_ASSERTION_KEY, identifier, options.toJson());
 
-        return options;
+        return options.toCredentialsGetJson();
     }
 
     /**

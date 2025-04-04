@@ -1,11 +1,9 @@
 package com.ecode.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.yubico.webauthn.AssertionRequest;
 import com.yubico.webauthn.data.AuthenticatorAssertionResponse;
 import com.yubico.webauthn.data.ClientAssertionExtensionOutputs;
 import com.yubico.webauthn.data.PublicKeyCredential;
-import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import com.yubico.webauthn.exception.RegistrationFailedException;
 
@@ -19,11 +17,11 @@ import java.io.IOException;
  */
 public interface PasskeyAuthorizationService {
 
-        PublicKeyCredentialCreationOptions startPasskeyRegistration(Integer userId) throws JsonProcessingException;
+        String startPasskeyRegistration(Integer userId) throws JsonProcessingException;
 
         void finishPasskeyRegistration(Integer userId, String credential) throws IOException, RegistrationFailedException;
 
-        AssertionRequest startPasskeyAssertion(String identifier) throws JsonProcessingException;
+        String startPasskeyAssertion(String identifier) throws JsonProcessingException;
 
         Integer finishPasskeyAssertion(String identifier, PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> credential) throws IOException, AssertionFailedException;
 

@@ -18,7 +18,8 @@ import com.ecode.service.login.LoginStrategyFactory;
 import com.ecode.utils.JwtUtil;
 import com.ecode.vo.UserLoginVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import com.yubico.webauthn.exception.RegistrationFailedException;
 import io.swagger.annotations.Api;
@@ -122,11 +123,12 @@ public class UserController {
         return Result.success(u);
     }
 
-    @GetMapping("/auth/registration")
+    @GetMapping(path = "/auth/registration")
     @ApiOperation("获取注册凭证信息")
     public Result getPasskeyRegistrationOptions() throws JsonProcessingException {
-        PublicKeyCredentialCreationOptions options = passkeyAuthorizationService.startPasskeyRegistration(BaseContext.getCurrentId());
-        return Result.success(options);
+        String option = passkeyAuthorizationService.startPasskeyRegistration(BaseContext.getCurrentId());
+        JsonNode jsonNode = new ObjectMapper().readTree(option);//避免json字符串被转义
+        return Result.success(jsonNode);
     }
 
     @PostMapping("/auth/registration")
@@ -139,7 +141,9 @@ public class UserController {
     @GetMapping("/auth/assertion")
     @ApiOperation("登录凭证信息")
     public Result getPasskeyAssertionOptions(String identifier) throws JsonProcessingException {
-        return Result.success(passkeyAuthorizationService.startPasskeyAssertion(identifier));
+        String option = passkeyAuthorizationService.startPasskeyAssertion(identifier);
+        JsonNode jsonNode = new ObjectMapper().readTree(option);//避免json字符串被转义
+        return Result.success(jsonNode);
     }
 
 }

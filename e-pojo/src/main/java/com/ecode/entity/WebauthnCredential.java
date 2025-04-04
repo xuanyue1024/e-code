@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.GsonTypeHandler;
 import com.ecode.dto.CredentialRegistration;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -43,7 +43,7 @@ public class WebauthnCredential implements Serializable {
     private Integer userId;
 
     @ApiModelProperty(value = "注册凭据")
-    @TableField(value = "credential_registration", typeHandler = JacksonTypeHandler.class)
+    @TableField(value = "credential_registration", typeHandler = GsonTypeHandler.class)
     private CredentialRegistration credentialRegistration;
 
 
