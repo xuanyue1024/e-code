@@ -1,7 +1,7 @@
 package com.ecode.service.login.webauthn;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ecode.dto.CredentialRegistration;
+import com.ecode.entity.CredentialRegistration;
 import com.ecode.entity.User;
 import com.ecode.entity.WebauthnCredential;
 import com.ecode.mapper.UserMapper;
@@ -17,6 +17,13 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+/**
+ * 凭据存储库service,实现webauthn
+ *
+ * @author 竹林听雨
+ * @date 2025/04/04
+ */
 @Component
 public class CredentialRepositoryImpl  implements CredentialRepository {
     @Autowired
@@ -131,12 +138,21 @@ public class CredentialRepositoryImpl  implements CredentialRepository {
      * @return 集合<凭据注册>
      */
     private Collection<CredentialRegistration> getRegistrationsByEmail(String email){
-        return webauthnCredentialMapper.selectList(
-                new LambdaQueryWrapper<WebauthnCredential>()
-                        .eq(WebauthnCredential::getUserId, getUserIdByEmail(email))
-        ).stream().map(WebauthnCredential::getCredentialRegistration).collect(Collectors.toList());
+        return getRegistrationsByUserId(getUserIdByEmail(email));
     }
 
+    /**
+     * 通过用户id获取Registrations
+     *
+     * @param userId 用户id
+     * @return 集合<凭据注册>
+     */
+    private Collection<CredentialRegistration> getRegistrationsByUserId(Integer userId){
+        return webauthnCredentialMapper.selectList(
+                new LambdaQueryWrapper<WebauthnCredential>()
+                        .eq(WebauthnCredential::getUserId, userId)
+        ).stream().map(WebauthnCredential::getCredentialRegistration).collect(Collectors.toList());
+    }
     /**
      * 通过用户句柄获取Registrations
      *

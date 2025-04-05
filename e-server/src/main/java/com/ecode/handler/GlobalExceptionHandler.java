@@ -6,6 +6,7 @@ import com.ecode.exception.BaseException;
 import com.ecode.exception.SSEException;
 import com.ecode.result.Result;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.yubico.webauthn.exception.AssertionFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -75,6 +76,20 @@ public class GlobalExceptionHandler {
         }
 
         return emitter;
+    }
+
+    /**
+     * passkey验证异常
+     *
+     * @param afe afe
+     * @return 后端统一返回结果
+     */
+    @ExceptionHandler
+    public Result exceptionHandler(AssertionFailedException afe){
+        String message = afe.getMessage();
+        log.error("passkey验证异常:{}",message);
+
+        return Result.error(MessageConstant.PASSKEY_VERIFY_FAILED);
     }
 
     /*@ExceptionHandler

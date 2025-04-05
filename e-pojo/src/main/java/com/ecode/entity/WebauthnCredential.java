@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.GsonTypeHandler;
-import com.ecode.dto.CredentialRegistration;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ * 数据表webauthn_credential实体类
  * </p>
  *
  * @author 竹林听雨

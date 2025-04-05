@@ -2,7 +2,7 @@ package com.ecode.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ecode.constant.MessageConstant;
-import com.ecode.dto.CredentialRegistration;
+import com.ecode.entity.CredentialRegistration;
 import com.ecode.entity.User;
 import com.ecode.entity.WebauthnCredential;
 import com.ecode.exception.LoginException;
@@ -13,6 +13,7 @@ import com.ecode.utils.ByteUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yubico.webauthn.*;
 import com.yubico.webauthn.data.*;
+import com.yubico.webauthn.data.exception.Base64UrlException;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import com.yubico.webauthn.exception.RegistrationFailedException;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,9 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.Clock;
+import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +87,7 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
      * @param credential 密钥凭证。
      */
     @Override
-    public void finishPasskeyRegistration(Integer userId, String credential) throws IOException, RegistrationFailedException {
+    public void finishPasskeyRegistration(Integer userId,String credentialName, String credential) throws IOException, RegistrationFailedException {
         var pkc = PublicKeyCredential.parseRegistrationResponseJson(credential);
         PublicKeyCredentialCreationOptions request = PublicKeyCredentialCreationOptions.fromJson((String) template.opsForHash().get(REDIS_PASSKEY_REGISTRATION_KEY, String.valueOf(userId)));
         System.out.println(relyingParty.getOrigins());
@@ -95,7 +98,7 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
 
         template.opsForHash().delete(REDIS_PASSKEY_REGISTRATION_KEY, String.valueOf(userId));
 
-        storeCredential(userId, request, result);
+        storeCredential(userId, credentialName, request, result);
 
     }
 
@@ -147,11 +150,47 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
         return userId;
     }
 
-    private void storeCredential(Integer id,
+    /**
+     * 获取密钥列表
+     *
+     * @param userId 用户id
+     * @return 列表<凭据注册>
+     */
+    @Override
+    public List<CredentialRegistration> getPasskeyList(Integer userId) {
+        return webauthnCredentialMapper.selectList(
+                new LambdaQueryWrapper<WebauthnCredential>()
+                        .eq(WebauthnCredential::getUserId, userId)
+        ).stream().map(WebauthnCredential::getCredentialRegistration).collect(Collectors.toList());
+    }
+
+    /**
+     * 批量删除通行密钥
+     *
+     * @param userId 用户id
+     * @param id     凭证id
+     */
+    @Override
+    public void deletePasskey(Integer userId, String id) {
+        webauthnCredentialMapper.selectList(
+                new LambdaQueryWrapper<WebauthnCredential>().eq(WebauthnCredential::getUserId, userId)
+        ).forEach(wc -> {
+            try {
+                if (wc.getCredentialRegistration().getCredential().getCredentialId().equals(ByteArray.fromBase64Url(id))){
+                    webauthnCredentialMapper.deleteById(wc.getId());
+                    return;
+                }
+            } catch (Base64UrlException e) {
+                throw new RuntimeException(e);//todo 异常最好自定义
+            }
+        });
+    }
+
+    private void storeCredential(Integer id,String credentialName,
                                  @NotNull PublicKeyCredentialCreationOptions request,
                                  @NotNull RegistrationResult result) {
 
-        webauthnCredentialMapper.insert(fromFinishPasskeyRegistration(id, request, result));
+        webauthnCredentialMapper.insert(fromFinishPasskeyRegistration(id, credentialName, request, result));
     }
 
     private void updateCredential(Integer id,
@@ -172,14 +211,15 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
     }
 
     @NotNull
-    private static WebauthnCredential fromFinishPasskeyRegistration(Integer id,
+    private static WebauthnCredential fromFinishPasskeyRegistration(Integer userId,String credentialName,
                                                                           PublicKeyCredentialCreationOptions request,
                                                                           RegistrationResult result) {
         return new WebauthnCredential(
                 null,
-                id,
+                userId,
                 CredentialRegistration.builder()
                         .userIdentity(request.getUser())
+                        .credentialNickname(credentialName)
                         .transports(result.getKeyId().getTransports().orElseGet(TreeSet::new))
                         .registration(Clock.systemUTC().instant())
                         .credential(RegisteredCredential.builder()

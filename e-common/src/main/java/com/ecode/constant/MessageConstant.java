@@ -26,6 +26,7 @@ public class MessageConstant {
     public static final String ORDER_NOT_FOUND = "订单不存在";
     public static final String ALREADY_EXISTS = "已存在";
     public static final String JWT_FAILS = "The login failed and the token became invalid";
+    public static final String PASSKEY_VERIFY_FAILED = "通行秘钥验证失败";
 
     public static final String INVALID_LOGIN_TYPE = "无效的登录类型";
     public static final String UPDATE_FAILED = "修改失败";

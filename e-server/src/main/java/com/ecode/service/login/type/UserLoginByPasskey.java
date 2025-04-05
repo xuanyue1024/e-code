@@ -7,11 +7,9 @@ import com.ecode.exception.LoginException;
 import com.ecode.mapper.UserMapper;
 import com.ecode.service.PasskeyAuthorizationService;
 import com.ecode.service.login.LoginStrategy;
-import com.yubico.webauthn.exception.AssertionFailedException;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 /**
  * 通行秘钥登录
@@ -27,10 +25,10 @@ public class UserLoginByPasskey implements LoginStrategy {
     @Autowired
     private PasskeyAuthorizationService passkeyAuthorizationService;
 
+    @SneakyThrows
     @Override
-    public User login(UserLoginDTO userLoginDTO) throws IOException, AssertionFailedException {
+    public User login(UserLoginDTO userLoginDTO) {
         Integer id = passkeyAuthorizationService.finishPasskeyAssertion(userLoginDTO.getIdentifier(), userLoginDTO.getCredential());
-
         User user = userMapper.selectById(id);
         if (user == null){
             throw new LoginException(MessageConstant.LOGIN_FAILED_USERNAME_OR_PASSWD);

@@ -11,17 +11,12 @@ import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.LoginException;
 import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
-import com.ecode.service.PasskeyAuthorizationService;
 import com.ecode.service.UserService;
 import com.ecode.service.login.LoginStrategy;
 import com.ecode.service.login.LoginStrategyFactory;
 import com.ecode.utils.JwtUtil;
 import com.ecode.vo.UserLoginVO;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.exception.AssertionFailedException;
-import com.yubico.webauthn.exception.RegistrationFailedException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +47,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private PasskeyAuthorizationService passkeyAuthorizationService;
 
 
     /**
@@ -122,28 +114,4 @@ public class UserController {
         User u = userService.getUserInfo(BaseContext.getCurrentId());
         return Result.success(u);
     }
-
-    @GetMapping(path = "/auth/registration")
-    @ApiOperation("获取注册凭证信息")
-    public Result getPasskeyRegistrationOptions() throws JsonProcessingException {
-        String option = passkeyAuthorizationService.startPasskeyRegistration(BaseContext.getCurrentId());
-        JsonNode jsonNode = new ObjectMapper().readTree(option);//避免json字符串被转义
-        return Result.success(jsonNode);
-    }
-
-    @PostMapping("/auth/registration")
-    @ApiOperation("注册凭证验证")
-    public Result verifyPasskeyRegistration(String credential) throws RegistrationFailedException, IOException {
-        passkeyAuthorizationService.finishPasskeyRegistration(BaseContext.getCurrentId(), credential);
-        return Result.success();
-    }
-
-    @GetMapping("/auth/assertion")
-    @ApiOperation("登录凭证信息")
-    public Result getPasskeyAssertionOptions(String identifier) throws JsonProcessingException {
-        String option = passkeyAuthorizationService.startPasskeyAssertion(identifier);
-        JsonNode jsonNode = new ObjectMapper().readTree(option);//避免json字符串被转义
-        return Result.success(jsonNode);
-    }
-
 }

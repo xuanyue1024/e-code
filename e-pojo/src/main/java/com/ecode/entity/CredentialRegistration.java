@@ -1,4 +1,4 @@
-package com.ecode.dto;
+package com.ecode.entity;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -18,6 +18,12 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.SortedSet;
 
+/**
+ * 数据表webauthn_credential实体成员CredentialRegistration实体
+ *
+ * @author 竹林听雨
+ * @date 2025/04/04
+ */
 @Builder
 @Data
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
