@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -221,7 +221,7 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
                         .userIdentity(request.getUser())
                         .credentialNickname(credentialName)
                         .transports(result.getKeyId().getTransports().orElseGet(TreeSet::new))
-                        .registration(Clock.systemUTC().instant())
+                        .registration(LocalDateTime.now())
                         .credential(RegisteredCredential.builder()
                                 .credentialId(result.getKeyId().getId())
                                 .userHandle(request.getUser().getId())

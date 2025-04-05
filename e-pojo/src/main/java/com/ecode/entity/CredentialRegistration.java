@@ -1,9 +1,7 @@
 package com.ecode.entity;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.AuthenticatorTransport;
 import com.yubico.webauthn.data.UserIdentity;
@@ -15,7 +13,7 @@ import lombok.NoArgsConstructor;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.SortedSet;
 
 /**
@@ -71,17 +69,8 @@ public class CredentialRegistration implements Serializable {
     * 凭据的注册时间
     * */
     @NotNull
-    private Instant registration;
+    private LocalDateTime registration;
 
-    @JsonGetter("registration")
-    public String getRegistration() {
-        return registration.toString();
-    }
-
-    @JsonSetter("registration")
-    public void setRegistration(String registration) {
-        this.registration = Instant.parse(registration);
-    }
 
     @JsonIgnore
     public String getUsername() {
