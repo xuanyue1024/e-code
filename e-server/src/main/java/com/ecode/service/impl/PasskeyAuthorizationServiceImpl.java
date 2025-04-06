@@ -8,6 +8,7 @@ import com.ecode.entity.WebauthnCredential;
 import com.ecode.exception.LoginException;
 import com.ecode.mapper.UserMapper;
 import com.ecode.mapper.WebauthnCredentialMapper;
+import com.ecode.properties.WebAuthnProperties;
 import com.ecode.service.PasskeyAuthorizationService;
 import com.ecode.utils.ByteUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,7 +25,9 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,8 +37,9 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
     private final RelyingParty relyingParty;
     private final RedisTemplate template;
     private final WebauthnCredentialMapper webauthnCredentialMapper;
-    private final String REDIS_PASSKEY_REGISTRATION_KEY = "passkey:registration";
-    private final String REDIS_PASSKEY_ASSERTION_KEY = "passkey:assertion";
+    private final WebAuthnProperties webAuthnProperties;
+    private final String REDIS_PASSKEY_REGISTRATION_KEY = "passkey:registration:";
+    private final String REDIS_PASSKEY_ASSERTION_KEY = "passkey:assertion:";
 
     /**
      * {@code startPasskeyRegistration(long userID)} 方法用于返回浏览器创建密钥所需的{@code options}。
@@ -59,18 +63,15 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
                         .displayName(user.getUsername())
                         .id(new ByteArray(ByteUtil.intToBytes(user.getId())))
                         .build())
-                .timeout(60000L) // 设置超时时间 60 秒
+                .timeout(Optional.ofNullable(webAuthnProperties.getRegistrationTimeout()).orElse(60000L)) // 设置超时时间,默认 60 秒
                 .authenticatorSelection(AuthenticatorSelectionCriteria.builder()
-                        .authenticatorAttachment(AuthenticatorAttachment.PLATFORM) // "preferred"
-                        .userVerification(UserVerificationRequirement.PREFERRED)
+                        .residentKey(webAuthnProperties.getAuthenticatorSelection().getResidentKey())
+                        .authenticatorAttachment(Optional.ofNullable(webAuthnProperties.getAuthenticatorSelection().getAuthenticatorAttachment()))
+                        .userVerification(webAuthnProperties.getAuthenticatorSelection().getUserVerification())
                         .build())
                 .build());
 
-        // 手动设置 attestation
-        options = options.toBuilder()
-                .attestation(AttestationConveyancePreference.DIRECT) // 认证方式
-                .build();
-        template.opsForHash().put(REDIS_PASSKEY_REGISTRATION_KEY, String.valueOf(user.getId()), options.toJson());
+        template.opsForValue().set(REDIS_PASSKEY_REGISTRATION_KEY + user.getId(), options.toJson(), Optional.ofNullable(webAuthnProperties.getRegistrationTimeout()).orElse(60000L), TimeUnit.MILLISECONDS);
 
         return options.toCredentialsCreateJson();
     }
@@ -89,14 +90,18 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
     @Override
     public void finishPasskeyRegistration(Integer userId,String credentialName, String credential) throws IOException, RegistrationFailedException {
         var pkc = PublicKeyCredential.parseRegistrationResponseJson(credential);
-        PublicKeyCredentialCreationOptions request = PublicKeyCredentialCreationOptions.fromJson((String) template.opsForHash().get(REDIS_PASSKEY_REGISTRATION_KEY, String.valueOf(userId)));
-        System.out.println(relyingParty.getOrigins());
+
+        String content = (String) template.opsForValue().getAndDelete(REDIS_PASSKEY_REGISTRATION_KEY + userId);
+        if (content == null){
+            throw new LoginException(MessageConstant.VERIFICATION_TIMEOUT);
+        }
+
+        PublicKeyCredentialCreationOptions request = PublicKeyCredentialCreationOptions.fromJson(content);
+
         RegistrationResult result = relyingParty.finishRegistration(FinishRegistrationOptions.builder()
                 .request(request)
                 .response(pkc)
                 .build());
-
-        template.opsForHash().delete(REDIS_PASSKEY_REGISTRATION_KEY, String.valueOf(userId));
 
         storeCredential(userId, credentialName, request, result);
 
@@ -115,8 +120,13 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
      */
     @Override
     public String startPasskeyAssertion(String identifier) throws JsonProcessingException {
-        AssertionRequest options = relyingParty.startAssertion(StartAssertionOptions.builder().build());
-        template.opsForHash().put(REDIS_PASSKEY_ASSERTION_KEY, identifier, options.toJson());
+        AssertionRequest options = relyingParty.startAssertion(StartAssertionOptions.builder()
+                .userVerification(webAuthnProperties.getAuthenticatorSelection().getUserVerification())
+                .timeout(Optional.ofNullable(webAuthnProperties.getAssertionTimeout()).orElse(60000L))
+                .build()
+        );
+
+        template.opsForValue().set(REDIS_PASSKEY_ASSERTION_KEY + identifier, options.toJson(), Optional.ofNullable(webAuthnProperties.getAssertionTimeout()).orElse(60000L), TimeUnit.MILLISECONDS);
 
         return options.toCredentialsGetJson();
     }
@@ -129,16 +139,18 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
      * @return 返回用于认证的结果。
      */
     @Override
-    public Integer finishPasskeyAssertion(String identifier, PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> credential) throws IOException, AssertionFailedException {
-        AssertionRequest request = AssertionRequest.fromJson((String) template.opsForHash().get(REDIS_PASSKEY_ASSERTION_KEY, identifier));
-        var pkc = credential;
+    public Integer finishPasskeyAssertion(String identifier, PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> credential) throws AssertionFailedException, IOException {
+        String content = (String) template.opsForValue().getAndDelete(REDIS_PASSKEY_ASSERTION_KEY + identifier);
+        if (content == null){
+            throw new LoginException(MessageConstant.VERIFICATION_TIMEOUT);
+        }
+
+        AssertionRequest request = AssertionRequest.fromJson(content);
 
         AssertionResult result = relyingParty.finishAssertion(FinishAssertionOptions.builder()
                 .request(request)
-                .response(pkc)
+                .response(credential)
                 .build());
-
-        template.opsForHash().delete(REDIS_PASSKEY_ASSERTION_KEY, identifier);
 
         if (!result.isSuccess()){
             throw new LoginException(MessageConstant.LOGIN_FAILED);
@@ -205,6 +217,9 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
                 webauthnCredential.getCredentialRegistration().getCredential().toBuilder().signatureCount(result.getSignatureCount()).build()
         );
 
+        //更新时间
+        webauthnCredential.getCredentialRegistration().setUseTime(LocalDateTime.now());
+
         //更新，先删除后插入
         webauthnCredentialMapper.deleteById(webauthnCredential.getId());
         webauthnCredentialMapper.insert(webauthnCredential);
@@ -221,7 +236,8 @@ public class PasskeyAuthorizationServiceImpl implements PasskeyAuthorizationServ
                         .userIdentity(request.getUser())
                         .credentialNickname(credentialName)
                         .transports(result.getKeyId().getTransports().orElseGet(TreeSet::new))
-                        .registration(LocalDateTime.now())
+                        .registrationTime(LocalDateTime.now())
+                        .useTime(LocalDateTime.now())
                         .credential(RegisteredCredential.builder()
                                 .credentialId(result.getKeyId().getId())
                                 .userHandle(request.getUser().getId())

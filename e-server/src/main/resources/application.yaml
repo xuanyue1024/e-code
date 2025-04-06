@@ -38,7 +38,7 @@ ecode:
         # \u8BBE\u7F6Ejwt\u7B7E\u540D\u52A0\u5BC6\u65F6\u4F7F\u7528\u7684\u79D8\u94A5
         user-secret-key: test34274279472346239432
         # \u8BBE\u7F6Ejwt\u8FC7\u671F\u65F6\u95F4ms
-        user-ttl: 172800000
+        user-ttl: 172800000000
         # \u8BBE\u7F6E\u524D\u7AEF\u4F20\u9012\u8FC7\u6765\u7684\u4EE4\u724C\u540D\u79F0
         user-token-name: token
 
@@ -54,9 +54,17 @@ ecode:
         access-key-secret: ${ecode.alioss.access-key-secret}
         bucket-name: ${ecode.alioss.bucket-name}
     webauthn:
-        relying-party:
-            id: ${ecode.webauthn.relying-party.id}
-            name: ${ecode.webauthn.relying-party.name}
+        allowed-origins: ${ecode.webauthn.allowed-origins}
+        attestation: ${ecode.webauthn.attestation}
+        identity:
+            id: ${ecode.webauthn.identity.id}
+            name: ${ecode.webauthn.identity.name}
+        registration-timeout: ${ecode.webauthn.registration-timeout}
+        assertion-timeout: ${ecode.webauthn.assertion-timeout}
+        authenticator-selection:
+            resident-key: ${ecode.webauthn.authenticator-selection.resident-key}
+            user-verification: ${ecode.webauthn.authenticator-selection.user-verification}
+            authenticator-attachment:
 knife4j:
     enable: true
 
