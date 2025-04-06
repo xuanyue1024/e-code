@@ -65,11 +65,18 @@ public class CredentialRegistration implements Serializable {
     * */
     @Nullable
     Object attestationMetadata;
+
     /*
     * 凭据的注册时间
     * */
     @NotNull
-    private LocalDateTime registration;
+    private LocalDateTime registrationTime;
+
+    /*
+     * 凭据的最后使用时间
+     * */
+    @NotNull
+    private LocalDateTime useTime;
 
 
     @JsonIgnore

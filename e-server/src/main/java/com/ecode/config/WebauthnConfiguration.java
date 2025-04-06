@@ -1,33 +1,34 @@
 package com.ecode.config;
 
+import com.ecode.properties.WebAuthnProperties;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @RequiredArgsConstructor
 @Configuration
+//https://developers.yubico.com/java-webauthn-server/JavaDoc/webauthn-server-core/2.5.0/com/yubico/webauthn/RelyingParty.RelyingPartyBuilder.html
 public class WebauthnConfiguration {
 
     private final CredentialRepository credentialRepository;
-    @Value("${ecode.webauthn.relying-party.id}")
-    private String relyingPartyId;
-    @Value("${ecode.webauthn.relying-party.name}")
-    private String relyingPartyName;
+
+    private final WebAuthnProperties webAuthnProperties;
 
     @Bean
     public RelyingParty relyingParty() {
         RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()
-                .id(relyingPartyId)
-                .name(relyingPartyName)
+                .id(webAuthnProperties.getIdentity().getId())
+                .name(webAuthnProperties.getIdentity().getName())
                 .build();
 
         return RelyingParty.builder()
                 .identity(rpIdentity)
                 .credentialRepository(credentialRepository)
+                .origins(webAuthnProperties.getAllowedOrigins())
+                .attestationConveyancePreference(webAuthnProperties.getAttestation())
                 .build();
     }
 
