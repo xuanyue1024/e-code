@@ -28,10 +28,10 @@
         <knife4j>3.0.2</knife4j>
         <docker-java>3.4.0</docker-java>
         <jjwt>0.9.1</jjwt>
-        <mybatis-plus>3.5.3.1</mybatis-plus>
+        <mybatis-plus>3.5.11</mybatis-plus>
         <fastjson>1.2.76</fastjson>
         <jackson>2.9.2</jackson>
-        <pagehelper>1.4.2</pagehelper>
+        <pagehelper>2.1.0</pagehelper>
         <rxjava>2.2.21</rxjava>
         <dashscope-sdk>2.16.2</dashscope-sdk>
         <java-diff-utils>4.12</java-diff-utils>
@@ -69,8 +69,13 @@
 
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus}</version> <!-- 确保版本和 MyBatis Plus 主包一致 -->
             </dependency>
             <!-- 邮件发送 https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
             <dependency>

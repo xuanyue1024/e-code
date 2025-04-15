@@ -28,7 +28,12 @@ public class PageQuery implements Serializable {
         // 2.排序条件
         // 2.1.先看前端有没有传排序字段
         if (sortBy != null) {
-            p.addOrder(new OrderItem(sortBy, isAsc));
+            if (isAsc){
+                p.addOrder(OrderItem.asc(sortBy));
+            }else {
+                p.addOrder(OrderItem.desc(sortBy));
+            }
+
             return p;
         }
         // 2.2.再看有没有手动指定排序字段
@@ -39,7 +44,13 @@ public class PageQuery implements Serializable {
     }
 
     public <T> Page<T> toMpPage(String defaultSortBy, boolean isAsc){
-        return this.toMpPage(new OrderItem(defaultSortBy, isAsc));
+        OrderItem sort;
+        if (isAsc){
+            sort = OrderItem.asc(sortBy);
+        }else {
+            sort = OrderItem.desc(sortBy);
+        }
+        return this.toMpPage(sort);
     }
 
     public <T> Page<T> toMpPageDefaultSortByCreateTimeDesc() {
