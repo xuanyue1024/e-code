@@ -9,13 +9,14 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.ecode.properties.AIProperties;
 import com.ecode.result.Result;
 import io.reactivex.Flowable;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
-import javax.annotation.PostConstruct;
+
 
 @Component
 @Slf4j

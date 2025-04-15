@@ -51,7 +51,7 @@ public class CredentialRegistration implements Serializable {
     *
     * */
     @NotNull
-    SortedSet<@NotNull AuthenticatorTransport> transports;
+    SortedSet<AuthenticatorTransport> transports;
     /*
     * com.yubico.webauthn.RegisteredCredential credential
     * 凭证详细数据，包括凭证 ID，凭证对应的用户 ID，凭证公钥，签名计数，备份信息等。
