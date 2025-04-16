@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,20 +25,20 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @Builder
 @TableName("class_problem")
-@ApiModel(value="ClassProblem对象", description="")
+@Schema(description="ClassProblem对象")
 public class ClassProblem implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "班级题目id")
+    @Schema(description = "班级题目id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "题库id")
+    @Schema(description = "题库id")
     @TableField("problem_id")
     private Integer problemId;
 
-    @ApiModelProperty(value = "班级id")
+    @Schema(description = "班级id")
     @TableField("class_id")
     private Integer classId;
 

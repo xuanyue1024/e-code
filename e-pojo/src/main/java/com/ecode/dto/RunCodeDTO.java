@@ -1,29 +1,28 @@
 package com.ecode.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@ApiModel(description = "代码运行提交数据模型")
+@Schema(description = "代码运行提交数据模型")
 public class RunCodeDTO implements Serializable {
 
     private static final long serialVersionUID = 4619556128447460185L;
 
-    @ApiModelProperty("代码文本")
+    @Schema(description = "代码文本")
     private String code;
 
-    @ApiModelProperty("类型")
+    @Schema(description = "类型")
     private String type;
 
-    @ApiModelProperty("班级题目id")
+    @Schema(description = "班级题目id")
     private Integer classProblemId;
 
-    @ApiModelProperty("题目id")
+    @Schema(description = "题目id")
     private Integer problemId;
 
-    @ApiModelProperty("班级id")
+    @Schema(description = "班级id")
     private Integer classId;
 }

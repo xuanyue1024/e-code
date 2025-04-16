@@ -2,24 +2,23 @@ package com.ecode.query;
 
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@ApiModel(description = "分页查询实体")
+@Schema(description = "分页查询实体")
 public class PageQuery implements Serializable {
     private static final long serialVersionUID = -4369849971849494143L;
 
-    @ApiModelProperty(value = "页码", required = true)
+    @Schema(description = "页码", required = true)
     private Long pageNo;
-    @ApiModelProperty(value = "每页记录数", required = true)
+    @Schema(description = "每页记录数", required = true)
     private Long pageSize;
-    @ApiModelProperty(value = "排序字段")
+    @Schema(description = "排序字段")
     private String sortBy;
-    @ApiModelProperty("是否升序")
+    @Schema(description = "是否升序")
     private Boolean isAsc;
 
     public <T>  Page<T> toMpPage(OrderItem... orders){

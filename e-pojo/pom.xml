@@ -27,10 +27,12 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
+        <!--添加knife4j依赖-->
         <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <groupId>com.github.xingfudeshi</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

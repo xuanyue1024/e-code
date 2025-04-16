@@ -26,7 +26,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.4.4</spring-boot.version>
 
-        <knife4j>3.0.2</knife4j>
+        <knife4j>4.6.0</knife4j>
         <docker-java>3.4.0</docker-java>
         <jjwt>0.9.1</jjwt>
         <mybatis-plus>3.5.11</mybatis-plus>
@@ -144,9 +144,11 @@
                 <optional>true</optional>
                 <version>${lombok}</version>
             </dependency>
+<!--            文档支持-->
+            <!--添加knife4j依赖，注意：非官方依赖，为兼容新springboot版本不得已而为之-->
             <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-spring-boot-starter</artifactId>
+                <groupId>com.github.xingfudeshi</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j}</version>
             </dependency>
 

@@ -1,6 +1,6 @@
 package com.ecode.result;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,13 +14,13 @@ public class Result<T> implements Serializable {
 
     private static final long serialVersionUID = -3384174519542040924L;
 
-    @ApiModelProperty(value="成功与否;200成功,500失败",required = true)
+    @Schema(description="成功与否;200成功,500失败",required = true)
     private Integer code; //编码：
 
-    @ApiModelProperty(value="消息")
+    @Schema(description="消息")
     private String msg; //错误信息
 
-    @ApiModelProperty(value="返回数据")
+    @Schema(description="返回数据")
     private T data; //数据
 
     public static <T> Result<T> success() {

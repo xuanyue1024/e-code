@@ -10,8 +10,8 @@ import com.ecode.result.Result;
 import com.ecode.service.AIService;
 import com.ecode.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -23,7 +23,7 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @Slf4j
-@Api(tags = "AI管理")
+@Tag(name = "AI管理")
 @RequestMapping("/user/ai")
 //@CrossOrigin(origins = "*")  // 允许所有来源的跨域请求
 public class AIController {
@@ -40,7 +40,7 @@ public class AIController {
      * @return Flux<Result < String>>返回流式聊天内容
      */
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @ApiOperation("聊天")
+    @Operation(summary = "聊天")
     public Flux<Result<String>> chat(@RequestBody AiInputDTO aiInputDTO) {
         jwtVerify(aiInputDTO.getToken());
         return aiService.getChat(aiInputDTO);

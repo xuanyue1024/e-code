@@ -8,9 +8,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yubico.webauthn.exception.RegistrationFailedException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ import java.io.IOException;
  */
 @RestController
 @Slf4j
-@Api(tags = "身份验证管理")
+@Tag(name = "身份验证管理")
 @RequestMapping("/auth/passkey")
 public class AuthPasskeyController {
 
@@ -33,7 +33,7 @@ public class AuthPasskeyController {
     private PasskeyAuthorizationService passkeyAuthorizationService;
 
     @GetMapping(path = "/registration")
-    @ApiOperation("获取注册凭证信息")
+    @Operation(summary = "获取注册凭证信息")
     public Result getPasskeyRegistrationOptions() throws JsonProcessingException {
         String option = passkeyAuthorizationService.startPasskeyRegistration(BaseContext.getCurrentId());
         JsonNode jsonNode = new ObjectMapper().readTree(option);//避免json字符串被转义
@@ -41,7 +41,7 @@ public class AuthPasskeyController {
     }
 
     @PostMapping("/registration")
-    @ApiOperation("注册凭证验证")
+    @Operation(summary = "注册凭证验证")
     public Result verifyPasskeyRegistration(@RequestBody PasskeyRegistrationDTO passkeyRegistrationDTO) throws RegistrationFailedException, IOException {
         passkeyAuthorizationService.finishPasskeyRegistration(
                 BaseContext.getCurrentId(),
@@ -51,7 +51,7 @@ public class AuthPasskeyController {
     }
 
     @GetMapping("/assertion")
-    @ApiOperation("登录凭证信息")
+    @Operation(summary = "登录凭证信息")
     public Result getPasskeyAssertionOptions(String identifier) throws JsonProcessingException {
         String option = passkeyAuthorizationService.startPasskeyAssertion(identifier);
         JsonNode jsonNode = new ObjectMapper().readTree(option);//避免json字符串被转义
@@ -59,14 +59,14 @@ public class AuthPasskeyController {
     }
 
     @GetMapping()
-    @ApiOperation("获取用户凭证列表")
+    @Operation(summary = "获取用户凭证列表")
     public Result getPasskeyList() {
         return Result.success(passkeyAuthorizationService.getPasskeyList(BaseContext.getCurrentId()));
     }
 
     @DeleteMapping()
-    @ApiOperation("移除密钥")
-    public Result deletePasskey(@ApiParam("班级id集合") @RequestParam String id) {
+    @Operation(summary = "移除密钥")
+    public Result deletePasskey(@Parameter(name = "班级id集合") @RequestParam String id) {
         passkeyAuthorizationService.deletePasskey(BaseContext.getCurrentId(), id);
         return Result.success();
     }

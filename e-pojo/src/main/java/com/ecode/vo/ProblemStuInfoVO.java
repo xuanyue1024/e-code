@@ -1,7 +1,6 @@
 package com.ecode.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,14 +10,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel(value="指定班级题目学生作答情况", description="")
+@Schema(description="指定班级题目学生作答情况")
 public class ProblemStuInfoVO {
-    @ApiModelProperty("作答次数")
+    @Schema(description = "作答次数")
     private Integer submitNumber;
 
-    @ApiModelProperty("得分")
+    @Schema(description = "得分")
     private Integer score;
 
-    @ApiModelProperty("通过次数")
+    @Schema(description = "通过次数")
     private Integer passNumber;
 }

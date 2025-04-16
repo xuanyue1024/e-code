@@ -1,7 +1,6 @@
 package com.ecode.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,17 +15,17 @@ import java.util.List;
  */
 @Data
 @Builder
-@ApiModel("题目详细信息展示")
+@Schema(description = "题目详细信息展示")
 public class RunCodeVO implements Serializable {
 
     private static final long serialVersionUID = -1954758120289998378L;
 
-    @ApiModelProperty("测试样例通过数(总的4个,=4个满分,一个1分)")
+    @Schema(description = "测试样例通过数(总的4个,=4个满分,一个1分)")
     private Integer passCount;
 
-    @ApiModelProperty("得分")
+    @Schema(description = "得分")
     private Integer score;
 
-    @ApiModelProperty("统一差异格式unifiedDiff列表(4个)")
+    @Schema(description = "统一差异格式unifiedDiff列表(4个)")
     private List<String> diff;
 }

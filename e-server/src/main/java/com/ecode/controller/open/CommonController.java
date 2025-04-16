@@ -4,8 +4,8 @@ import com.ecode.constant.MessageConstant;
 import com.ecode.result.Result;
 import com.ecode.service.CaptchaService;
 import com.ecode.utils.AliOssUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +22,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/open")
-@Api(tags = "开放接口")
+@Tag(name = "开放接口")
 @Slf4j
 public class CommonController {
 
@@ -37,7 +37,7 @@ public class CommonController {
      * @return
      */
     @PostMapping("/upload")
-    @ApiOperation(value = "文件上传",notes = "data值为上传返回的链接")
+    @Operation(summary = "文件上传", description = "data值为上传返回的链接")
     public Result<String> upload(MultipartFile file){
         log.info("文件上传：{}",file);
 
@@ -60,7 +60,7 @@ public class CommonController {
     }
 
     @GetMapping("/captcha/getCaptcha")
-    @ApiOperation("发送验证码")
+    @Operation(summary = "发送验证码")
     public Result sendCaptcha(String email){
         captchaService.sendCaptcha(email);
         return Result.success();

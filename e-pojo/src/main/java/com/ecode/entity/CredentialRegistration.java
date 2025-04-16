@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.AuthenticatorTransport;
 import com.yubico.webauthn.data.UserIdentity;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.SortedSet;

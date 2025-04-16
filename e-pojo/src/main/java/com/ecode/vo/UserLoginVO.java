@@ -1,8 +1,7 @@
 package com.ecode.vo;
 
 import com.ecode.enumeration.UserRole;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,24 +13,24 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel(description = "所有用户登录返回的数据格式")
+@Schema(description = "所有用户登录返回的数据格式")
 public class UserLoginVO implements Serializable {
 
     private static final long serialVersionUID = -8438672452042212117L;
 
-    @ApiModelProperty("主键值")
+    @Schema(description = "主键值")
     private Integer id;
 
-    @ApiModelProperty("用户名")
+    @Schema(description = "用户名")
     private String userName;
 
-    @ApiModelProperty("昵称")
+    @Schema(description = "昵称")
     private String name;
 
-    @ApiModelProperty("角色")
+    @Schema(description = "角色")
     private UserRole role;
 
-    @ApiModelProperty("jwt令牌")
+    @Schema(description = "jwt令牌")
     private String token;
 
 }

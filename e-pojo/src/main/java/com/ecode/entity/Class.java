@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,32 +26,32 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("class")
-@ApiModel(value="Class数据库对象", description="")
+@Schema(description="Class数据库对象")
 public class Class implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "班级id")
+    @Schema(description = "班级id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "教师id")
+    @Schema(description = "教师id")
     @TableField("teacher_id")
     private Integer teacherId;
 
-    @ApiModelProperty(value = "班级名称")
+    @Schema(description = "班级名称")
     @TableField("name")
     private String name;
 
-    @ApiModelProperty(value = "邀请码")
+    @Schema(description = "邀请码")
     @TableField("invitation_code")
     private String invitationCode;
 
-    @ApiModelProperty(value = "创建时间")
+    @Schema(description = "创建时间")
     @TableField("create_time")
     private LocalDateTime createTime;
 
-    @ApiModelProperty(value = "更新时间")
+    @Schema(description = "更新时间")
     @TableField("update_time")
     private LocalDateTime updateTime;
 

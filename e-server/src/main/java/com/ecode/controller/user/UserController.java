@@ -17,8 +17,8 @@ import com.ecode.service.login.LoginStrategyFactory;
 import com.ecode.utils.JwtUtil;
 import com.ecode.vo.UserLoginVO;
 import com.yubico.webauthn.exception.AssertionFailedException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @RestController
 @Slf4j
-@Api(tags = "用户管理")
+@Tag(name = "用户管理")
 @RequestMapping("/user")
 public class UserController {
 
@@ -56,7 +56,7 @@ public class UserController {
      * @return 结果<user login vo>
      */
     @PostMapping("/login")
-    @ApiOperation("用户登录")
+    @Operation(summary = "用户登录")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) throws IOException, AssertionFailedException {
         LoginStrategy strategy = loginStrategyFactory.getStrategy(userLoginDTO.getLoginType());
         User user = strategy.login(userLoginDTO);
@@ -93,7 +93,7 @@ public class UserController {
      * @return 后端统一返回结果
      */
     @PostMapping("/register")
-    @ApiOperation("用户注册")
+    @Operation(summary = "用户注册")
     public Result register(@RequestBody UserRegisterDTO userRegisterDTO){
 
         userService.save(userRegisterDTO);
@@ -102,14 +102,14 @@ public class UserController {
     }
 
     @PutMapping()
-    @ApiOperation("修改用户信息")
+    @Operation(summary = "修改用户信息")
     public Result update(@RequestBody UserUpdateDTO userUpdateDTO){
         userService.updateUser(userUpdateDTO, BaseContext.getCurrentId());
         return Result.success();
     }
 
     @GetMapping
-    @ApiOperation("获取用户详细信息")
+    @Operation(summary = "获取用户详细信息")
     public Result<User> get(){
         User u = userService.getUserInfo(BaseContext.getCurrentId());
         return Result.success(u);

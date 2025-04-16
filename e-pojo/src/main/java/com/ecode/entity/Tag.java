@@ -3,8 +3,7 @@ package com.ecode.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,21 +25,21 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("tag")
-@ApiModel(value="Tag对象", description="")
+@Schema(description="Tag对象")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Tag implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "标签id")
+    @Schema(description = "标签id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "标签名称")
+    @Schema(description = "标签名称")
     private String name;
 
-    @ApiModelProperty(value = "创建时间")
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
 

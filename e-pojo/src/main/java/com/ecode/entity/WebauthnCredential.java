@@ -5,8 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +26,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName(value = "webauthn_credential", autoResultMap = true)
-@ApiModel(value="WebauthnCredential对象", description="")
+@Schema(description="WebauthnCredential对象")
 @NoArgsConstructor
 @AllArgsConstructor
 public class WebauthnCredential implements Serializable {
@@ -37,11 +36,11 @@ public class WebauthnCredential implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "用户id")
+    @Schema(description = "用户id")
     @TableField("user_id")
     private Integer userId;
 
-    @ApiModelProperty(value = "注册凭据")
+    @Schema(description = "注册凭据")
     @TableField(value = "credential_registration", typeHandler = JacksonTypeHandler.class)
     private CredentialRegistration credentialRegistration;
 

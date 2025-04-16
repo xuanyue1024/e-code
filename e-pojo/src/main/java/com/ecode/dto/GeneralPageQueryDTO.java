@@ -1,7 +1,7 @@
 package com.ecode.dto;
 
 import com.ecode.query.PageQuery;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,11 +15,12 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Schema(description = "通用信息查询DTO")
 public class GeneralPageQueryDTO extends PageQuery implements Serializable {
 
     private static final long serialVersionUID = 2002519740600817050L;
 
-    @ApiModelProperty("名称")
+    @Schema(description = "名称")
     private String name;
 
 

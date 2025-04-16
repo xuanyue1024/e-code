@@ -3,8 +3,8 @@ package com.ecode.controller.user.student;
 import com.ecode.result.Result;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.ProblemVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@Api(tags = "题目管理")
+@Tag(name = "题目管理")
 @RestController
 @RequestMapping("/student/problem")
 @Component("studentProblemController")
@@ -29,7 +29,7 @@ public class ProblemController {
      * @return 返回一个Result对象，其中包含ProblemVO类型的题目详细信息
      */
     @GetMapping("/{id}")
-    @ApiOperation("获取题目详细信息")
+    @Operation(summary = "获取题目详细信息")
     public Result<ProblemVO> get(@PathVariable Integer id){
         ProblemVO p = problemService.getProblem(id);
         return Result.success(p);
@@ -42,7 +42,7 @@ public class ProblemController {
      * @return 返回封装了分页查询结果的Result对象，其中包含ProblemVO类型的PageVO对象
      */
     /*@GetMapping("/page")
-    @ApiOperation("题目分页查询")
+    @Operation(summary = "题目分页查询")
     public Result<PageVO<ProblemPageVO>> page(GeneralPageQueryDTO generalPageQueryDTO){
         // 调用problemService的分页查询方法，获取分页查询结果
         PageVO<ProblemPageVO> pv = problemService.pageQuery(generalPageQueryDTO);

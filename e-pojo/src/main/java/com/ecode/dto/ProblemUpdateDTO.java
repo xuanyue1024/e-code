@@ -1,15 +1,14 @@
 package com.ecode.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@ApiModel(value="ProblemUpdateDTO对象", description="")
+@Schema(description="ProblemUpdateDTO对象")
 public class ProblemUpdateDTO extends ProblemAddDTO{
     private static final long serialVersionUID = -5419034326902870843L;
 
-    @ApiModelProperty(value = "题目id")
+    @Schema(description = "题目id")
     private Integer id;
 
 }

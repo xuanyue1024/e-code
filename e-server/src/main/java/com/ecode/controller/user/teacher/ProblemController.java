@@ -9,9 +9,9 @@ import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
 import com.ecode.vo.ProblemVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@Api(tags = "题目管理")
+@Tag(name = "题目管理")
 @RestController
 @RequestMapping("/teacher/problem")
 @Component("teacherProblemController")
@@ -35,7 +35,7 @@ public class ProblemController {
      * @return 返回表示操作结果的Result对象，成功则返回成功信息
      */
     @PostMapping
-    @ApiOperation(value = "增加题目",notes = "data内返回新增题目id,用于设置标签")
+    @Operation(summary = "增加题目", description = "data内返回新增题目id,用于设置标签")
     public Result<Integer> add(@RequestBody ProblemAddDTO problemAddDTO){
         Integer id = problemService.add(problemAddDTO);
         return Result.success(id);
@@ -50,8 +50,8 @@ public class ProblemController {
      * @return 返回删除操作的结果
      */
     @DeleteMapping()
-    @ApiOperation("批量删除题目")
-    public Result deleteBatch(@ApiParam("题目id集合") @RequestParam List<Integer> ids){
+    @Operation(summary = "批量删除题目")
+    public Result deleteBatch(@Parameter(name = "题目id集合") @RequestParam List<Integer> ids){
         problemService.deleteProblemBatch(ids);
         return Result.success();
     }
@@ -63,7 +63,7 @@ public class ProblemController {
      * @return 返回操作结果，成功则返回成功结果
      */
     @PutMapping
-    @ApiOperation("修改题目信息")
+    @Operation(summary = "修改题目信息")
     public Result update(@RequestBody ProblemUpdateDTO problemUpdateDTO){
         problemService.updateProblem(problemUpdateDTO);
         return Result.success();
@@ -76,7 +76,7 @@ public class ProblemController {
      * @return 返回一个Result对象，其中包含ProblemVO类型的题目详细信息
      */
     @GetMapping("/{id}")
-    @ApiOperation("获取题目详细信息")
+    @Operation(summary = "获取题目详细信息")
     public Result<ProblemVO> get(@PathVariable Integer id){
         ProblemVO p = problemService.getProblem(id);
         return Result.success(p);
@@ -89,7 +89,7 @@ public class ProblemController {
      * @return 返回封装了分页查询结果的Result对象，其中包含ProblemVO类型的PageVO对象
      */
     @GetMapping("/page")
-    @ApiOperation("题目分页查询")
+    @Operation(summary = "题目分页查询")
     public Result<PageVO<ProblemPageVO>> page(GeneralPageQueryDTO generalPageQueryDTO){
         // 调用problemService的分页查询方法，获取分页查询结果
         PageVO<ProblemPageVO> pv = problemService.pageQuery(generalPageQueryDTO);
@@ -97,7 +97,7 @@ public class ProblemController {
     }
 
     @PutMapping("/tag")
-    @ApiOperation(value = "为题目设置标签集合", notes = "用于为问题设置标签,如果原来有标签,会覆盖原有标签")
+    @Operation(summary = "为题目设置标签集合", description = "用于为问题设置标签,如果原来有标签,会覆盖原有标签")
     public Result setTags(@RequestBody SetTagsDTO setTagsDTO){
         problemService.setTags(setTagsDTO);
         return Result.success();

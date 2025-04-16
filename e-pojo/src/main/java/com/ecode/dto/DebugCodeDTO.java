@@ -1,23 +1,22 @@
 package com.ecode.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@ApiModel(description = "代码调试提交数据模型")
+@Schema(description = "代码调试提交数据模型")
 public class DebugCodeDTO implements Serializable {
 
     private static final long serialVersionUID = 4619556128447460185L;
 
-    @ApiModelProperty("代码文本")
+    @Schema(description = "代码文本")
     private String code;
 
-    @ApiModelProperty("类型")
+    @Schema(description = "类型")
     private String type;
 
-    @ApiModelProperty("输入内容")
+    @Schema(description = "输入内容")
     private String input;
 }

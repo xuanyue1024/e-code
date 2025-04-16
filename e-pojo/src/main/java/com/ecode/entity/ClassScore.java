@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,33 +25,33 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @Builder
 @TableName("class_score")
-@ApiModel(value="ClassScore对象", description="")
+@Schema(description="ClassScore对象")
 public class ClassScore implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "班级学生题目得分id")
+    @Schema(description = "班级学生题目得分id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "指定学生_班级id")
+    @Schema(description = "指定学生_班级id")
     @TableField("sc_id")
     private Integer scId;
 
-    @ApiModelProperty(value = "班级题目id")
+    @Schema(description = "班级题目id")
     @TableField("class_problem_id")
     private Integer classProblemId;
 
-    @ApiModelProperty(value = "得分")
+    @Schema(description = "得分")
     @TableField("score")
     private Integer score;
 
 
-    @ApiModelProperty(value = "提交次数")
+    @Schema(description = "提交次数")
     @TableField("submit_number")
     private Integer submitNumber;
 
-    @ApiModelProperty(value = "通过次数")
+    @Schema(description = "通过次数")
     @TableField("pass_number")
     private Integer passNumber;
 }

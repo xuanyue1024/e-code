@@ -17,11 +17,11 @@ import com.yubico.webauthn.data.*;
 import com.yubico.webauthn.data.exception.Base64UrlException;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import com.yubico.webauthn.exception.RegistrationFailedException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;

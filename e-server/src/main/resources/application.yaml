@@ -66,6 +66,35 @@ ecode:
             resident-key: ${ecode.webauthn.authenticator-selection.resident-key}
             user-verification: ${ecode.webauthn.authenticator-selection.user-verification}
             authenticator-attachment:
+# springdoc-openapi项目配置
+springdoc:
+    # 默认是false，需要设置为true
+    default-flat-param-object: true
+    swagger-ui:
+        path: /swagger-ui.html
+        tags-sorter: alpha
+        operations-sorter: alpha
+    api-docs:
+        path: /v3/api-docs
+    group-configs:
+        - group: '学生端接口'
+          paths-to-match: '/**'
+          packages-to-scan: com.ecode.controller.user
+          packages-to-exclude: com.ecode.controller.user.teacher, com.ecode.controller.user.admin
+        - group: '教师端接口'
+          paths-to-match: '/**'
+          packages-to-scan: com.ecode.controller.user
+          packages-to-exclude: com.ecode.controller.user.student, com.ecode.controller.user.admin
+        - group: '管理员端接口'
+          paths-to-match: '/**'
+          packages-to-scan: com.ecode.controller.user
+          packages-to-exclude: com.ecode.controller.user.student, com.ecode.controller.user.teacher
+        - group: '开放接口'
+          paths-to-match: '/**'
+          packages-to-scan: com.ecode.controller.open
+# knife4j的增强配置，不需要增强可以不配
 knife4j:
     enable: true
+    setting:
+        language: zh_cn
 
