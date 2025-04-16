@@ -1,15 +1,9 @@
 package com.ecode.controller.user;
 
-import com.ecode.constant.JwtClaimsConstant;
-import com.ecode.constant.MessageConstant;
-import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
-import com.ecode.exception.SSEException;
 import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
 import com.ecode.service.AIService;
-import com.ecode.utils.JwtUtil;
-import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -42,22 +36,8 @@ public class AIController {
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "聊天")
     public Flux<Result<String>> chat(@RequestBody AiInputDTO aiInputDTO) {
-        jwtVerify(aiInputDTO.getToken());
         return aiService.getChat(aiInputDTO);
     }
 
-    private void jwtVerify(String token){
-        try {
-            log.info("jwt-ai访问校验:{}", token);
-            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
-            Integer empId = Integer.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
-            log.info("当前用户id：{}", empId);
-            BaseContext.setCurrentId(empId);
-            //通过，放行
-        } catch (Exception ex) {
-            //不通过，抛出异常
-            throw new SSEException(MessageConstant.TOKEN_FAILURE);
-        }
-    }
 
 }

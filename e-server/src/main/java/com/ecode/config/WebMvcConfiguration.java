@@ -41,7 +41,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/user/**","/auth/**")
                 .excludePathPatterns(
-                        "/user/register","/user/login","/user/ai/**",
+                        "/user/register","/user/login",
                         "/auth/passkey/assertion"
                         );
         //教师请求拦截
