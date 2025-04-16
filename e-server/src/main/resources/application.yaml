@@ -23,6 +23,9 @@ spring:
             port: ${ecode.redis.port}
             password: ${ecode.redis.password}
             database: ${ecode.redis.database}
+    ai:
+        dashscope:
+            api-key: ${ecode.ai.bailian-api-key}
 
 mybatis-plus:
     configuration:
@@ -46,14 +49,13 @@ ecode:
     docker:
         url: ${ecode.docker.url}
         timeout: ${ecode.docker.timeout}
-    ai:
-        bailian-id: ${ecode.ai.bailian-id}
-        bailian-api-key: ${ecode.ai.bailian-api-key}
+
     alioss:
         endpoint: ${ecode.alioss.endpoint}
         access-key-id: ${ecode.alioss.access-key-id}
         access-key-secret: ${ecode.alioss.access-key-secret}
         bucket-name: ${ecode.alioss.bucket-name}
+
     webauthn:
         allowed-origins: ${ecode.webauthn.allowed-origins}
         attestation: ${ecode.webauthn.attestation}
@@ -97,4 +99,8 @@ knife4j:
     enable: true
     setting:
         language: zh_cn
+logging:
+    level:
+        org.springframework.ai: debug
+        com.ecode.controller.user.AIController: debug
 

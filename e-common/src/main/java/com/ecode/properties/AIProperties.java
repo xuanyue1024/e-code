@@ -14,8 +14,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "ecode.ai")
 @Data
 public class AIProperties {
-    //阿里云百炼应用id
-    private String bailianId;
-    //阿里云百炼API KEY
-    private String bailianApiKey;
+
 }
