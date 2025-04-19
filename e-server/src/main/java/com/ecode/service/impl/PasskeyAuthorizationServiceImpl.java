@@ -2,7 +2,7 @@ package com.ecode.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ecode.constant.MessageConstant;
-import com.ecode.entity.CredentialRegistration;
+import com.ecode.entity.po.CredentialRegistration;
 import com.ecode.entity.User;
 import com.ecode.entity.WebauthnCredential;
 import com.ecode.exception.LoginException;

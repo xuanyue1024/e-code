@@ -1,6 +1,6 @@
 package com.ecode.service;
 
-import com.ecode.entity.CredentialRegistration;
+import com.ecode.entity.po.CredentialRegistration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yubico.webauthn.data.AuthenticatorAssertionResponse;
 import com.yubico.webauthn.data.ClientAssertionExtensionOutputs;

@@ -1,9 +1,10 @@
 package com.ecode.dto;
 
-import com.ecode.enumeration.AiAction;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -15,14 +16,21 @@ import java.io.Serializable;
 @Data
 public class AiInputDTO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6099069246684387027L;
 
-    @Schema(description = "身份令牌")
-    private String token;
 
-    @Schema(description = "动作")
-    private AiAction aiAction;
+    @Schema(description = "聊天id")
+    @NotNull(message = "聊天id不能为空")
+    private String chatId;
 
-    @Schema(description = "内容")
-    private String content;
+    @Schema(description = "对话内容")
+    @NotNull(message = "对话内容不能为空")
+    private String prompt;
+
+    @Schema(description = "是否深度思考", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private boolean isThinking;
+
+    @Schema(description = "是否联网搜索", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private boolean isSearch;
 }

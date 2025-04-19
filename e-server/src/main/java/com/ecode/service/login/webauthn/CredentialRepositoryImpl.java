@@ -1,7 +1,7 @@
 package com.ecode.service.login.webauthn;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ecode.entity.CredentialRegistration;
+import com.ecode.entity.po.CredentialRegistration;
 import com.ecode.entity.User;
 import com.ecode.entity.WebauthnCredential;
 import com.ecode.mapper.UserMapper;

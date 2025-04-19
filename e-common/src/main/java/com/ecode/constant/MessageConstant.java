@@ -61,4 +61,7 @@ public class MessageConstant {
     //题目
     public static final String PROBLEM_NOT_FOUND = "题目不存在";
 
+    //AI
+    public static final String AI_CHAT_ID_NOT_FOUND = "没有发现会话id";
+
 }

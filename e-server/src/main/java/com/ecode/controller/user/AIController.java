@@ -1,22 +1,21 @@
 package com.ecode.controller.user;
 
+import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
-import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
 import com.ecode.service.AIService;
+import com.ecode.service.AiChatHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 @RestController
-@Slf4j
 @Tag(name = "AI管理")
 @RequestMapping("/user/ai")
 //@CrossOrigin(origins = "*")  // 允许所有来源的跨域请求
@@ -25,7 +24,7 @@ public class AIController {
     @Autowired
     private AIService aiService;
     @Autowired
-    private JwtProperties  jwtProperties;
+    private AiChatHistoryService aiChatHistoryService;
 
     /**
      * 流式输出聊天内容的接口
@@ -35,9 +34,20 @@ public class AIController {
      */
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "聊天")
-    public Flux<Result<String>> chat(@RequestBody AiInputDTO aiInputDTO) {
+    public Flux<Result<String>> chat(@RequestBody @Valid AiInputDTO aiInputDTO) {
         return aiService.getChat(aiInputDTO);
     }
 
+    /**
+     * 创建聊天ID。
+     *
+     * @param type 指定创建聊天ID的类型，必须是"pdf"或"chat"
+     * @return 返回创建聊天ID的结果，包含字符串类型的聊天ID
+     */
+    @GetMapping("/creat")
+    public Result<String> createChatId(@RequestParam @NotBlank @Pattern(regexp = "pdf|chat") String type){
+        String chatId = aiChatHistoryService.createChatId(BaseContext.getCurrentId(), type);
+        return Result.success(chatId);
+    }
 
 }
