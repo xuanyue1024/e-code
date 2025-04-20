@@ -26,8 +26,8 @@ public class ProblemAddDTO implements Serializable {
     @Schema(description = "题目内容（md格式）")
     private String content;
 
-    @Schema(description = "要求，为空按默认值（md格式）")
-    private String require;
+    @Schema(description = "题目答案（md格式）")
+    private String answer;
 
     @Schema(description = "标签组id")
     private Integer problemTagId;

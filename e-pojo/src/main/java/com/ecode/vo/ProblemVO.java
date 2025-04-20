@@ -1,6 +1,5 @@
 package com.ecode.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.ecode.enumeration.ProblemGrade;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -28,9 +27,8 @@ public class ProblemVO implements Serializable {
     @Schema(description = "题目内容（md格式）")
     private String content;
 
-    @Schema(description = "要求，为空按默认值（md格式）")
-    @TableField("`require`")
-    private String require;
+    @Schema(description = "题目答案（md格式）")
+    private String answer;
 
     @Schema(description = "题目等级（0简单，1一般，2困难）")
     private ProblemGrade grade;

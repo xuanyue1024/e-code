@@ -15,6 +15,7 @@ import com.ecode.exception.ProblemException;
 import com.ecode.mapper.ClassProblemMapper;
 import com.ecode.mapper.ProblemMapper;
 import com.ecode.mapper.ProblemTagMapper;
+import com.ecode.mapper.TagMapper;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
