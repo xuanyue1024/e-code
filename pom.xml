@@ -29,7 +29,7 @@
         <spring-ai.version>1.0.0-M6</spring-ai.version>
 
 
-        <knife4j>4.6.0</knife4j>
+        <knife4j>4.5.0</knife4j>
         <docker-java>3.4.0</docker-java>
         <jjwt>0.9.1</jjwt>
         <mybatis-plus>3.5.11</mybatis-plus>
@@ -143,7 +143,7 @@
 <!--            文档支持-->
             <!--添加knife4j依赖，注意：非官方依赖，为兼容新springboot版本不得已而为之-->
             <dependency>
-                <groupId>com.github.xingfudeshi</groupId>
+                <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j}</version>
             </dependency>
