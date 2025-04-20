@@ -3,11 +3,13 @@ package com.ecode.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.entity.AiChatHistory;
+import com.ecode.enumeration.AiType;
 import com.ecode.mapper.AiChatHistoryMapper;
 import com.ecode.service.AiChatHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,17 +27,18 @@ public class AiChatHistoryServiceImpl extends ServiceImpl<AiChatHistoryMapper, A
     private AiChatHistoryMapper aiChatHistoryMapper;
 
     @Override
-    public String createChatId(Integer userId, String type) {
+    public String createChatId(Integer userId, AiType type) {
         AiChatHistory ach = AiChatHistory.builder()
                 .type(type)
                 .userId(userId)
+                .createTime(LocalDateTime.now())
                 .build();
         aiChatHistoryMapper.insert(ach);
         return ach.getId();
     }
 
     @Override
-    public List<String> getChatIds(Integer userId, String type) {
+    public List<String> getChatIds(Integer userId, AiType type) {
         return aiChatHistoryMapper.selectList(
                 new LambdaQueryWrapper<AiChatHistory>()
                         .eq(AiChatHistory::getUserId, userId)

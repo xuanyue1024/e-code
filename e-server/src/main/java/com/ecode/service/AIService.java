@@ -19,4 +19,12 @@ public interface AIService {
      */
     Flux<Result<String>> getChat(AiInputDTO aiInputDTO);
 
+    /**
+     * 生成题目
+     *
+     * @param require 题目要求
+     * @return Flux < result< string>>
+     */
+    Flux<Result<String>> generateQuestion(String require);
+
 }

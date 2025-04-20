@@ -1,5 +1,6 @@
 package com.ecode.service.impl;
 
+import com.ecode.constant.AiSystemConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.dto.AiInputDTO;
 import com.ecode.entity.AiChatHistory;
@@ -23,6 +24,9 @@ public class AIServiceImpl implements AIService {
     @Autowired
     private ChatClient chatClient;
 
+    @Autowired
+    private ChatClient generateQuestionClient;
+
     /**
      * 获取聊天内容的方法
      *
@@ -37,9 +41,32 @@ public class AIServiceImpl implements AIService {
             throw new AiException(MessageConstant.AI_CHAT_ID_NOT_FOUND);
         }
 
+        String systemPrompt;
+        switch (aiInputDTO.getType()) {
+            case CHAT -> systemPrompt = AiSystemConstant.DEFAULT_SYSTEM_PROMPT;
+            case CODE -> systemPrompt = AiSystemConstant.CODE_SYSTEM_PROMPT;
+            default -> throw new AiException(MessageConstant.AI_CHAT_TYPE_NOT_FOUND);
+        }
+
         return chatClient.prompt()
                 .user(aiInputDTO.getPrompt())
+                .system(systemPrompt)
                 .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
+                .stream()
+                .content()
+                .map(Result::success);
+    }
+
+    /**
+     * 生成题目的方法
+     *
+     * @param require 题目要求
+     * @return 返回包含生成题目的数据流
+     */
+    @Override
+    public Flux<Result<String>> generateQuestion(String require) {
+        return generateQuestionClient.prompt()
+                .user(require)
                 .stream()
                 .content()
                 .map(Result::success);

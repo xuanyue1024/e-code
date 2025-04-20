@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.ecode.enumeration.AiType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,7 @@ import java.util.List;
 
 /**
  * <p>
- * 
+ * ai会话历史实体类
  * </p>
  *
  * @author 竹林听雨
@@ -47,7 +48,7 @@ public class AiChatHistory implements Serializable {
      * 会话类型
      */
     @TableField("type")
-    private String type;
+    private AiType type;
 
     /**
      * 会话创建时间

@@ -63,5 +63,6 @@ public class MessageConstant {
 
     //AI
     public static final String AI_CHAT_ID_NOT_FOUND = "没有发现会话id";
+    public static final String AI_CHAT_TYPE_NOT_FOUND = "没有发现会话类型";
 
 }

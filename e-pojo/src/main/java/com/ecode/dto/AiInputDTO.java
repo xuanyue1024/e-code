@@ -1,5 +1,6 @@
 package com.ecode.dto;
 
+import com.ecode.enumeration.AiType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -27,6 +28,10 @@ public class AiInputDTO implements Serializable {
     @Schema(description = "对话内容")
     @NotNull(message = "对话内容不能为空")
     private String prompt;
+
+    @Schema(description = "对话类型: CHAT-普通聊天, CODE-代码助手")
+    @NotNull(message = "对话类型不能为空")
+    private AiType type;
 
     @Schema(description = "是否深度思考", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private boolean isThinking;

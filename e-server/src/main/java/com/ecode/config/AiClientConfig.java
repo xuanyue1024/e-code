@@ -2,6 +2,7 @@ package com.ecode.config;
 
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import com.ecode.constant.AiSystemConstant;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
@@ -12,14 +13,39 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AiClientConfig {
+
+    /**
+     * 创建聊天客户端的方法
+     *
+     * @param model      聊天模型
+     * @param chatMemory 聊天记忆对象
+     * @return 创建好的聊天客户端
+     */
     @Bean
     public ChatClient chatClient(DashScopeChatModel model, ChatMemory chatMemory){
         return ChatClient
                 .builder(model)
-                .defaultSystem("你是一个热心、可爱的智能助手，请以小团团的身份和语气回答问题。")
+                .defaultSystem(AiSystemConstant.DEFAULT_SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
                         new MessageChatMemoryAdvisor(chatMemory)
+                )
+                .build();
+    }
+
+    /**
+     * 创建生成问题的聊天客户端
+     *
+     * @param model 聊天模型实例
+     * @return 构建的聊天客户端
+     */
+    @Bean
+    public ChatClient generateQuestionClient(DashScopeChatModel model){
+        return ChatClient
+                .builder(model)
+                .defaultSystem(AiSystemConstant.GENERATE_QUESTION)
+                .defaultAdvisors(
+                        new SimpleLoggerAdvisor()
                 )
                 .build();
     }
