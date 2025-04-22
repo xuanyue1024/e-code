@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.ai.tool.annotation.ToolParam;
 
 import java.io.Serializable;
 
@@ -24,8 +25,10 @@ public class TagVO implements Serializable {
     private static final long serialVersionUID = 4657308623668794631L;
 
     @Schema(description = "标签id")
+    @ToolParam(description = "标签id")
     private Integer id;
 
     @Schema(description = "标签名称")
+    @ToolParam(description = "标签名称")
     private String name;
 }

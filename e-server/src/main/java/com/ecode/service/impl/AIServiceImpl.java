@@ -2,6 +2,7 @@ package com.ecode.service.impl;
 
 import com.ecode.constant.AiSystemConstant;
 import com.ecode.constant.MessageConstant;
+import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
 import com.ecode.entity.AiChatHistory;
 import com.ecode.exception.AiException;
@@ -43,7 +44,7 @@ public class AIServiceImpl implements AIService {
 
         String systemPrompt;
         switch (aiInputDTO.getType()) {
-            case CHAT -> systemPrompt = AiSystemConstant.DEFAULT_SYSTEM_PROMPT;
+            case CHAT -> systemPrompt = AiSystemConstant.SMART_RECOMMENDATIONS + BaseContext.getCurrentId();
             case CODE -> systemPrompt = AiSystemConstant.CODE_SYSTEM_PROMPT;
             default -> throw new AiException(MessageConstant.AI_CHAT_TYPE_NOT_FOUND);
         }

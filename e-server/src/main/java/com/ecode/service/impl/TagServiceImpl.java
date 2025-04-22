@@ -1,8 +1,11 @@
 package com.ecode.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ecode.entity.ProblemTag;
 import com.ecode.entity.Tag;
+import com.ecode.mapper.ProblemTagMapper;
 import com.ecode.mapper.TagMapper;
 import com.ecode.service.TagService;
 import com.ecode.vo.TagVO;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
     @Autowired
     private TagMapper tagMapper;
+    @Autowired
+    private ProblemTagMapper problemTagMapper;
 
     @Override
     public List<TagVO> getByName(String name) {
@@ -49,5 +54,14 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 .name(t.getName())
                 .build()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TagVO> getByProblemId(Integer problemId) {
+        List<Integer> tagIds = problemTagMapper.selectList(
+                new LambdaQueryWrapper<ProblemTag>().eq(ProblemTag::getProblemId, problemId)
+        ).stream().map(ProblemTag::getTagId).toList();
+
+        return getByIds(tagIds);
     }
 }

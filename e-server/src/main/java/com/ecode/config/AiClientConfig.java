@@ -2,17 +2,21 @@ package com.ecode.config;
 
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import com.ecode.ai.tools.ProblemRecommendationTools;
 import com.ecode.constant.AiSystemConstant;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AiClientConfig {
+    @Autowired
+    private ProblemRecommendationTools problemRecommendationTools;
 
     /**
      * 创建聊天客户端的方法
@@ -30,6 +34,7 @@ public class AiClientConfig {
                         new SimpleLoggerAdvisor(),
                         new MessageChatMemoryAdvisor(chatMemory)
                 )
+                .defaultTools(problemRecommendationTools)
                 .build();
     }
 

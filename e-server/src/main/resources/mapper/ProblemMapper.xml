@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecode.mapper.ProblemMapper">
+    <select id="findProblemsByTagIdAndClassId" resultType="com.ecode.entity.Problem">
+        SELECT
+            p.id,
+            p.title
+        FROM
+            problem p
+                INNER JOIN
+            class_problem cp ON p.id = cp.problem_id
+                INNER JOIN
+            problem_tag pt ON p.id = pt.problem_id
+        WHERE
+            pt.tag_id = #{tagId}
+          AND
+            cp.class_id = #{classId}
+    </select>
+</mapper>

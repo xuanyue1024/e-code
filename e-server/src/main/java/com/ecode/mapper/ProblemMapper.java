@@ -1,7 +1,9 @@
 package com.ecode.mapper;
 
-import com.ecode.entity.Problem;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ecode.entity.Problem;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +15,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProblemMapper extends BaseMapper<Problem> {
 
+    /**
+     * 根据标签ID和班级ID查询班内问题列表
+     *
+     * @param tagId   标签ID
+     * @param classId 班级ID
+     * @return 符合条件的问题列表
+     */
+    List<Problem> findProblemsByTagIdAndClassId(Integer tagId, Integer classId);
 }
