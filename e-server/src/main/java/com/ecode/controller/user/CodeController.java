@@ -1,7 +1,9 @@
 package com.ecode.controller.user;
 
+import com.ecode.context.BaseContext;
 import com.ecode.dto.DebugCodeDTO;
 import com.ecode.dto.RunCodeDTO;
+import com.ecode.entity.po.CodeSubmission;
 import com.ecode.result.Result;
 import com.ecode.service.CodeService;
 import com.ecode.vo.RunCodeVO;
@@ -9,10 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -22,6 +23,7 @@ public class CodeController {
 
     @Autowired
     private CodeService codeService;
+
     @PostMapping("/debug")
     @Operation(summary = "调试代码")
     public Result<String> debug(@RequestBody DebugCodeDTO debugCodeDTO){
@@ -34,5 +36,13 @@ public class CodeController {
     public Result<RunCodeVO> run(@RequestBody RunCodeDTO runCodeDTO){
         RunCodeVO result = codeService.runCode(runCodeDTO);
         return Result.success(result);
+    }
+
+    @GetMapping("/codeSubmissions/{classId}/{classProblemId}")
+    @Operation(summary = "获取代码提交记录")
+    public Result<List<CodeSubmission>> getCodeSubmissions(@PathVariable Integer classId, @PathVariable Integer classProblemId) {
+        // 获取当前学生id
+        Integer studentId = BaseContext.getCurrentId();
+        return Result.success(codeService.getCodeSubmissions(studentId, classId, classProblemId));
     }
 }

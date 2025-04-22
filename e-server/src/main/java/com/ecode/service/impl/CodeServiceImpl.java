@@ -11,6 +11,7 @@ import com.ecode.entity.Problem;
 import com.ecode.entity.StudentClass;
 import com.ecode.entity.po.CodeSubmission;
 import com.ecode.enumeration.UserRole;
+import com.ecode.exception.BaseException;
 import com.ecode.exception.ClassException;
 import com.ecode.mapper.ClassScoreMapper;
 import com.ecode.mapper.ProblemMapper;
@@ -152,6 +153,30 @@ public class CodeServiceImpl implements CodeService {
                 .score(score)
                 .build();
     }
+
+    @Override
+    public List<CodeSubmission> getCodeSubmissions(Integer studentId, Integer classId, Integer classProblemId) {
+
+        // 根据当前学生id获取班级学生id
+        StudentClass studentClass = studentClassMapper.selectOne(new LambdaQueryWrapper<StudentClass>()
+                .eq(StudentClass::getStudentId, studentId)
+                .eq(StudentClass::getClassId, classId)
+        );
+
+        Integer scId = studentClass.getId();
+
+        // 根据scId和classProblemId查询学生的代码提交记录
+        ClassScore classScore = classScoreMapper.selectOne(new LambdaQueryWrapper<ClassScore>()
+                .eq(ClassScore::getScId, scId)
+                .eq(ClassScore::getClassProblemId, classProblemId)
+        );
+        if (classScore != null) {
+            // 返回代码提交记录
+            return classScore.getCodeSubmission();
+        }
+        return List.of();
+    }
+
 
     /**
      * 运行代码工具方法

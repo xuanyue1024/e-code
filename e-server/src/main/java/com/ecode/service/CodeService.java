@@ -2,7 +2,10 @@ package com.ecode.service;
 
 import com.ecode.dto.DebugCodeDTO;
 import com.ecode.dto.RunCodeDTO;
+import com.ecode.entity.po.CodeSubmission;
 import com.ecode.vo.RunCodeVO;
+
+import java.util.List;
 
 
 public interface CodeService {
@@ -22,4 +25,10 @@ public interface CodeService {
      */
     RunCodeVO runCode(RunCodeDTO runCodeDTO);
 
+    /**
+     * 获取代码提交记录
+     *
+     * @return 代码提交记录列表
+     */
+    List<CodeSubmission> getCodeSubmissions(Integer studentId, Integer classId, Integer classProblemId);
 }
