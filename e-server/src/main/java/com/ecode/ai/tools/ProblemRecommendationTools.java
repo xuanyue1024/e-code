@@ -44,6 +44,21 @@ public class ProblemRecommendationTools {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Tool(description = "查询学生信息")
+    public Map<String, Object> queryStudentInfo(@ToolParam(description = "学生用户id") Integer studentId) {
+        Map<String, Object> map = new HashMap<>();
+        User user = userMapper.selectById(studentId);
+        if (user != null) {
+            map.put("用户名", user.getName());
+            map.put("学生id", user.getId());
+        }
+        log.info("查询到的学生信息: {}", map);
+        return map;
+    }
+
     @Tool(description = "查询当前学生加入的所有班级")
     public List queryStudentClass(@ToolParam(description = "学生用户id") Integer studentId){
         List<Map<String,Object>> list = new ArrayList<>();
