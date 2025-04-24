@@ -28,7 +28,7 @@ spring:
             api-key: ${ecode.ai.bailian-api-key}
             chat:
                 options:
-                    model: qwen-max
+                    model: qwen-long
         openai:
             base-url: https://dashscope.aliyuncs.com/compatible-mode
             api-key: ${ecode.ai.bailian-api-key}
