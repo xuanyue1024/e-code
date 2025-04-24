@@ -49,7 +49,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .addPathPatterns("/teacher/**");
         //学生请求拦截
         registry.addInterceptor(jwtTokenStudentInterceptor)
-                .addPathPatterns("/student/**");
+                .addPathPatterns("/student/**")
+                .excludePathPatterns("/student/problem/*");//排除获取题目信息
     }
 
 
