@@ -6,7 +6,9 @@ import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 文本差异对比工具类
@@ -26,13 +28,22 @@ public class TextDiffUtil {
         }
 
         // 按行分割文本
-        List<String> originalLines = List.of(text1.split("\\n"));
-        List<String> revisedLines = List.of(text2.split("\\n"));
+        List<String> originalLines = normalizeLines(text1);
+        List<String> revisedLines = normalizeLines(text2);
 
         // 生成差异对比
         Patch<String> patch = DiffUtils.diff(originalLines, revisedLines);
 
+
         return patch.getDeltas();
+    }
+    /**
+     * 标准化文本行（去除行尾空格）
+     */
+    private static List<String> normalizeLines(String text) {
+        return Arrays.stream(text.split("\\n"))
+                .map(line -> line.replaceAll("\\s+$", ""))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -67,8 +78,9 @@ public class TextDiffUtil {
             throw new IllegalArgumentException("输入文本不能为空");
         }
 
-        List<String> originalLines = List.of(text1.split("\\n"));
-        List<String> revisedLines = List.of(text2.split("\\n"));
+        // 按行分割文本
+        List<String> originalLines = normalizeLines(text1);
+        List<String> revisedLines = normalizeLines(text2);
 
         Patch<String> patch = DiffUtils.diff(originalLines, revisedLines);
 
