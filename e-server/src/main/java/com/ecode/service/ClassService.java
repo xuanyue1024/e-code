@@ -103,4 +103,19 @@ public interface ClassService extends IService<Class> {
      * @return 问题信息
      */
     ProblemStuInfoVO problemStuInfo(Integer stuId, Integer classProblemId);
+
+    /**
+     * 获取指定学生指定班级题目的完成信息
+     *
+     * @param classId          班级id
+     * @return 问题完成信息
+     */
+    ClassProblemCompleteVO problemCompleteInfo(Integer classId);
+
+    /**
+     * 获取指定班级题目的提交信息
+     * @param classId         班级id
+     * @return 题目提交信息
+     */
+    List<ClassProblemSubmissionsVO> submissionsInfo(Integer classId);
 }

@@ -257,6 +257,16 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         return psv;
     }
 
+    @Override
+    public ClassProblemCompleteVO problemCompleteInfo(Integer classId) {
+        return classMapper.selectClassProblemCompleteByClassId(classId);
+    }
+
+    @Override
+    public List<ClassProblemSubmissionsVO> submissionsInfo(Integer classId) {
+        return classMapper.selectClassProblemSubmissionsByClassId(classId);
+    }
+
     /**
      * 验证教师是否在指定班级授课
      * 验证学生是否在指定班级
