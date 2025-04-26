@@ -35,6 +35,7 @@
                 SELECT
                     p.id as problemId,
                     p.title as problemTitle,
+                    p.grade as problemGrade,
                     t.id as tagId,
                     t.name as tagName,
                     c.id as classId,

@@ -28,7 +28,7 @@ spring:
             api-key: ${ecode.ai.bailian-api-key}
             chat:
                 options:
-                    model: qwen-long
+                    model: qwen-max-latest
         openai:
             base-url: https://dashscope.aliyuncs.com/compatible-mode
             api-key: ${ecode.ai.bailian-api-key}
@@ -110,6 +110,6 @@ knife4j:
         language: zh_cn
 logging:
     level:
-        org.springframework.ai: info
-        com.ecode.controller.user.AIController: info
+        org.springframework.ai: debug
+        com.ecode.controller.user.AIController: debug
 
