@@ -52,8 +52,8 @@ public class RunCodeUtil {
             "php", new CodeDockerOption("run-php:1.0", null, "php /home/user/Main.php", "php", false),
             "nodejs", new CodeDockerOption("run-nodejs:1.0", null, "node /home/user/Main.js", "js", false),
             "kotlin", new CodeDockerOption("run-kotlin:1.0", "kotlinc /home/user/Main.kt -include-runtime -d /home/user/Main.jar", "java -jar /home/user/Main.jar", "kt", true),
-            "go", new CodeDockerOption("run-go:1.0", "go build /home/user/Main.go", "./Main", "go", true),
-            ".net", new CodeDockerOption("run-net:1.0", "dotnet publish /home/user/Main.csproj -r linux-x64 -c Release --self-contained true", "dotnet /home/user/Main.dll", "cs", true)
+            "go", new CodeDockerOption("run-go:1.0", "go build /home/user/Main.go", "/home/user/Main", "go", true),
+            ".net", new CodeDockerOption("run-net:1.0", "find /usr -name \"csc.dll\" 2>/dev/null && dotnet csc /target:exe /out:/home/user/Main /home/user/Main.cs", "/home/user/Main", "cs", true)
     );
 
     public static String runCode(String url, int timeout,String codeType, String codeStr, String input) {
