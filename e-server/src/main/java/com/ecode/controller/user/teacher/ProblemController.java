@@ -7,8 +7,8 @@ import com.ecode.dto.SetTagsDTO;
 import com.ecode.result.Result;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
+import com.ecode.vo.ProblemEditVO;
 import com.ecode.vo.ProblemPageVO;
-import com.ecode.vo.ProblemVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,8 +77,8 @@ public class ProblemController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "获取题目详细信息")
-    public Result<ProblemVO> get(@PathVariable Integer id){
-        ProblemVO p = problemService.getProblem(id);
+    public Result<ProblemEditVO> get(@PathVariable @Parameter(name = "题目id") Integer id){
+        ProblemEditVO p = problemService.getProblem(id, ProblemEditVO.class);
         return Result.success(p);
     }
 

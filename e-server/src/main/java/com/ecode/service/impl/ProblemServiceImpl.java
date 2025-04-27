@@ -11,6 +11,7 @@ import com.ecode.dto.SetTagsDTO;
 import com.ecode.entity.ClassProblem;
 import com.ecode.entity.Problem;
 import com.ecode.entity.ProblemTag;
+import com.ecode.entity.Tag;
 import com.ecode.exception.ProblemException;
 import com.ecode.mapper.ClassProblemMapper;
 import com.ecode.mapper.ProblemMapper;
@@ -19,7 +20,6 @@ import com.ecode.mapper.TagMapper;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
-import com.ecode.vo.ProblemVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +47,8 @@ public class ProblemServiceImpl implements ProblemService {
     private ProblemTagMapper problemTagMapper;
     @Autowired
     private ClassProblemMapper classProblemMapper;
+    @Autowired
+    private TagMapper tagMapper;
 
     @Override
     public Integer add(ProblemAddDTO problemAddDTO) {
@@ -108,17 +110,27 @@ public class ProblemServiceImpl implements ProblemService {
         problemMapper.updateById(p);
     }
 
-    @Override
-    public ProblemVO getProblem(Integer id) {
-        Problem p = problemMapper.selectById(id);
-        if (p == null){
-            throw new ProblemException(MessageConstant.DATA_NOT_FOUND);
-        }
+   @Override
+   public <E> E getProblem(Integer id, Class<E> clazz) {
+       Problem p = problemMapper.selectById(id);
+       if (p == null){
+           throw new ProblemException(MessageConstant.DATA_NOT_FOUND);
+       }
+       List<Tag> tags = tagMapper.selectTagByProblemId(id);
 
-        ProblemVO pv = new ProblemVO();
-        BeanUtils.copyProperties(p, pv);
-        return pv;
-    }
+       try {
+           E result = clazz.getDeclaredConstructor().newInstance();
+           BeanUtils.copyProperties(p, result);
+
+          //设置标签
+          if (tags != null && !tags.isEmpty()) {
+              clazz.getMethod("setTags", List.class).invoke(result, tags);
+          }
+           return result;
+       } catch (Exception e) {
+           throw new RuntimeException("无法创建目标类实例: " + e.getMessage());
+       }
+   }
 
     @Override
     public void setTags(SetTagsDTO setTagsDTO) {
