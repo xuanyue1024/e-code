@@ -13,6 +13,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,5 +65,23 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         ).stream().map(ProblemTag::getTagId).toList();
 
         return getByIds(tagIds);
+    }
+
+    @Override
+    public List<Integer> addTags(List<String> tags) {
+        List<Integer> tagIds = new ArrayList<>();
+        tags.forEach(tag -> {
+            Tag t = tagMapper.selectOne(new LambdaQueryWrapper<Tag>()
+                    .eq(Tag::getName, tag));
+            if (t == null) {
+                t = Tag.builder()
+                        .name(tag)
+                        .createTime(LocalDateTime.now())
+                        .build();
+                tagMapper.insert(t);
+            }
+            tagIds.add(t.getId());
+        });
+        return tagIds;
     }
 }

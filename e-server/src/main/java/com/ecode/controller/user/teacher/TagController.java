@@ -25,12 +25,20 @@ public class TagController {
     private TagService tagService;
 
     @PostMapping("/{name}")
-    @Operation(summary = "增加标签", description = "返回值data里存放添加的标签id")
+    @Operation(summary = "增单个加标签", description = "返回值data里存放添加的标签id")
     public Result<Integer> add(@Parameter(name = "标签名称") @PathVariable String name){
         Tag tag = new Tag(null, name, LocalDateTime.now());
         tagService.save(tag);
         return Result.success(tag.getId());
     }
+
+    @PostMapping("/batch")
+    @Operation(summary = "批量添加标签", description = "根据标签名称列表批量添加标签，返回添加的标签ID列表")
+    public Result<List<Integer>> addBatch(@Parameter(name = "标签名称集合", description = "要添加的标签名称列表") @RequestBody List<String> names) {
+        List<Integer> list = tagService.addTags(names);
+        return Result.success(list);
+    }
+
 
     @DeleteMapping
     @Operation(summary = "批量删除标签")
