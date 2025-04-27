@@ -29,18 +29,6 @@
         </if>
     </select>
 
-    <!--根据班级id查询班级题目完成情况-->
-    <select id="selectClassProblemCompleteByClassId" resultType="com.ecode.vo.ClassProblemCompleteVO">
-        SELECT
-            c.name as className,
-            COUNT(cp.id) as totalProblems,
-            COUNT(DISTINCT CASE WHEN cs.pass_number > 0 THEN cs.class_problem_id END) as completedProblems
-        FROM class c
-        LEFT JOIN class_problem cp ON c.id = cp.class_id
-        LEFT JOIN class_score cs ON cp.id = cs.class_problem_id
-        WHERE c.id = #{classId}
-        GROUP BY c.id, c.name
-    </select>
 
     <!--班级题目提交情况统计-->
     <select id="selectClassProblemSubmissionsByClassId" resultType="com.ecode.vo.ClassProblemSubmissionsVO">
@@ -56,5 +44,52 @@
         AND sc.class_id = #{classId}
         GROUP BY u.id, u.name
         ORDER BY passRate DESC
+    </select>
+
+    <!--班级学生成绩排名-->
+    <select id="selectClassStudentRank" resultType="com.ecode.vo.ClassStudentRankVO">
+        SELECT 
+            u.id as studentId,
+            u.name as studentName,
+            COUNT(DISTINCT cs.class_problem_id) as attemptedProblems,
+            SUM(cs.submit_number) as totalSubmissions,
+            SUM(cs.pass_number) as totalPasses,
+            ROUND(AVG(cs.score), 2) as averageScore,
+            ROUND(SUM(cs.pass_number) * 100.0 / NULLIF(SUM(cs.submit_number), 0), 2) as passRate,
+            MAX(cs.code_submission) as lastUsedLanguage
+        FROM user u
+        JOIN student_class sc ON u.id = sc.student_id
+        LEFT JOIN class_score cs ON sc.id = cs.sc_id
+        WHERE u.role = 'student'
+        AND sc.class_id = #{classId}
+        GROUP BY u.id, u.name
+        ORDER BY averageScore DESC
+    </select>
+    <!--班级学生完成不同难度题目的分布-->
+    <select id="selectClassDifficultyDistribution" resultType="com.ecode.vo.ClassDifficultyDistributionVO">
+        SELECT 
+            u.name AS student_name, 
+            SUM(CASE WHEN p.grade = 0 THEN cs.pass_number ELSE 0 END) AS easy_passed, 
+            SUM(CASE WHEN p.grade = 1 THEN cs.pass_number ELSE 0 END) AS medium_passed, 
+            SUM(CASE WHEN p.grade = 2 THEN cs.pass_number ELSE 0 END) AS hard_passed, 
+            SUM(CASE WHEN p.grade = 0 THEN 1 ELSE 0 END) AS easy_total, 
+            SUM(CASE WHEN p.grade = 1 THEN 1 ELSE 0 END) AS medium_total, 
+            SUM(CASE WHEN p.grade = 2 THEN 1 ELSE 0 END) AS hard_total 
+        FROM 
+            user u 
+        JOIN 
+            student_class sc ON u.id = sc.student_id 
+        JOIN 
+            class_score cs ON sc.id = cs.sc_id 
+        JOIN 
+            class_problem cp ON cs.class_problem_id = cp.id 
+        JOIN 
+            problem p ON cp.problem_id = p.id 
+        WHERE 
+            sc.class_id = #{classId} 
+        GROUP BY 
+            u.id, u.name 
+        ORDER BY 
+            (easy_passed + medium_passed + hard_passed) DESC
     </select>
 </mapper>
