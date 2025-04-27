@@ -98,9 +98,41 @@ public interface ClassService extends IService<Class> {
     /**
      * 获取指定学生指定班级题目的作答信息
      *
-     * @param stuId          学生id
-     * @param classProblemId 班级问题id
-     * @return 问题信息
+     * @param studentId 学生id
+     * @param classProblemId 班级题目id
+     * @return ProblemStuInfoVO
      */
-    ProblemStuInfoVO problemStuInfo(Integer stuId, Integer classProblemId);
+    ProblemStuInfoVO problemStuInfo(Integer studentId, Integer classProblemId);
+
+    /**
+     * 获取班级题目提交情况
+     *
+     * @param classId 班级id
+     * @return List<ClassProblemSubmissionsVO>
+     */
+    List<ClassProblemSubmissionsVO> submissionsInfo(Integer classId);
+
+    /**
+     * 获取班级题目提交情况
+     *
+     * @param classId 班级id
+     * @return List<ClassProblemSubmissionsVO>
+     */
+    List<ClassStudentRankVO> getClassStudentRank(Integer classId);
+
+    /**
+     * 获取班级学生完成不同难度题目分布
+     *
+     * @param classId 班级id
+     * @return List<ClassStudentDifficultyVO>
+     */
+    List<ClassDifficultyDistributionVO> getClassStudentDifficulty(Integer classId);
+
+    /**
+     * 获取班级题目通过率排行榜
+     *
+     * @param classId 班级id
+     * @return List<ClassProblemPassRateVO>
+     */
+    List<ClassProblemPassRateVO> getClassProblemPassRate(Integer classId);
 }
