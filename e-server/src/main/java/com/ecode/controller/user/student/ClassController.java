@@ -74,29 +74,4 @@ public class ClassController {
         return Result.success(psv);
     }
 
-    /**
-     * 班级题目完成情况表
-     * @param classId 班级id
-     * @return Result<ClassProblemCompleteVO>
-     */
-    @GetMapping("/problem/complete/{classId}")
-    @Operation(summary = "班级题目完成情况表")
-    public Result<ClassProblemCompleteVO> problemComplete(@PathVariable @Parameter(name = "班级id") Integer classId){
-
-        // 返回完成的题目数量
-        return Result.success(classService.problemCompleteInfo(classId));
-    }
-
-    /**
-     * 班级题目提交情况表
-     * @param classId 班级id
-     * @return Result<ClassProblemSubmissionsVO>
-     */
-    @GetMapping("/problem/submissions/{classId}")
-    @Operation(summary = "班级题目提交情况表")
-    public Result<List<ClassProblemSubmissionsVO>> problemSubmissions(@PathVariable @Parameter(name = "班级id") Integer classId){
-
-        // 返回提交的题目数量
-        return Result.success(classService.submissionsInfo(classId));
-    }
 }

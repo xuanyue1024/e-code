@@ -1,12 +1,12 @@
 # \u670D\u52A1\u7AEF\u53E3
 server:
-    port: 8080
+    port: ${ecode.server.port}
 
 spring:
     profiles:
         active: dev
     datasource:
-        url: jdbc:mysql://${ecode.data.mysql.host} /e_code?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+        url: jdbc:mysql://${ecode.data.mysql.host}/${ecode.data.mysql.db-name}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
         driver-class-name: com.mysql.cj.jdbc.Driver
         username: ${ecode.data.mysql.username}
         password: ${ecode.data.mysql.password}
@@ -17,6 +17,7 @@ spring:
         username: ${ecode.mail.username} #发送邮件的邮箱也就是你开通服务的邮箱
         password: ${ecode.mail.password} #开通服务后得到的授权码
         default-encoding: ${ecode.mail.default-encoding} #邮件内容的编码
+        port: ${ecode.mail.port} #邮件服务器端口
     data:
         redis:
             host: ${ecode.redis.host}
@@ -28,7 +29,7 @@ spring:
             api-key: ${ecode.ai.bailian-api-key}
             chat:
                 options:
-                    model: qwen-max-latest
+                    model: ${ecode.ai.chat.options.model}
         openai:
             base-url: https://dashscope.aliyuncs.com/compatible-mode
             api-key: ${ecode.ai.bailian-api-key}
@@ -110,6 +111,6 @@ knife4j:
         language: zh_cn
 logging:
     level:
-        org.springframework.ai: debug
-        com.ecode.controller.user.AIController: debug
+        org.springframework.ai: info
+        com.ecode.controller.user.AIController: info
 
