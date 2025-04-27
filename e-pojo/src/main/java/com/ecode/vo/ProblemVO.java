@@ -1,11 +1,13 @@
 package com.ecode.vo;
 
+import com.ecode.entity.Tag;
 import com.ecode.enumeration.ProblemGrade;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 问题详细内容VO
@@ -23,6 +25,9 @@ public class ProblemVO implements Serializable {
 
     @Schema(description = "题目标题")
     private String title;
+
+    @Schema(description = "标签组")
+    private List<Tag> tags;
 
     @Schema(description = "题目内容（md格式）")
     private String content;

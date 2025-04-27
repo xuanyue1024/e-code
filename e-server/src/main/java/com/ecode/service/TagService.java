@@ -39,4 +39,12 @@ public interface TagService extends IService<Tag> {
      * @return 列表<tag vo>
      */
     List<TagVO> getByProblemId(Integer problemId);
+
+    /**
+     * 将字符串列表转换为Integer类型的标签列表。
+     *
+     * @param tags 字符串标签id列表
+     * @return 转换后的Integer类型标签列表
+     */
+    List<Integer> addTags(List<String> tags);
 }

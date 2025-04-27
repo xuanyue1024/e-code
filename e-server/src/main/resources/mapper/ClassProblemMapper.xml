@@ -8,7 +8,7 @@
                  JOIN class_problem cp ON p.id = cp.problem_id
         WHERE cp.class_id = #{classId}
         <if test="name != null and name != ''">
-            AND p.name like concat('%',#{name},'%')
+            AND p.title like concat('%',#{name},'%')
         </if>
     </select>
 </mapper>

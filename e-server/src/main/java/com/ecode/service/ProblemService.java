@@ -6,7 +6,6 @@ import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.dto.SetTagsDTO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
-import com.ecode.vo.ProblemVO;
 
 import java.util.List;
 
@@ -50,12 +49,12 @@ public interface ProblemService {
     void updateProblem(ProblemUpdateDTO problemUpdateDTO);
 
     /**
-     * 获取问题
+     * 获取问题内容
      *
      * @param id id
      * @return 问题详细内容VO
      */
-    ProblemVO getProblem(Integer id);
+    <E> E getProblem(Integer id, Class<E> clazz);
 
     /**
      * 设置标签s

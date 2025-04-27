@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        <mapper namespace="com.ecode.mapper.AIToolsMapper">
+
+            <select id="selectStudentClass" resultType="com.ecode.dto.AIToolsDTO">
+                SELECT
+                    u.id as userId,
+                    u.name as userName,
+                    c.id as classId,
+                    c.name as className
+                FROM user u
+                JOIN student_class sc ON u.id = sc.student_id
+                JOIN class c ON sc.class_id = c.id
+                WHERE u.id = #{studentId}
+                AND u.role = 'student'
+            </select>
+
+            <select id="selectStudentClassProblemCompletion" resultType="com.ecode.dto.AIToolsDTO">
+                SELECT
+                    p.id as problemId,
+                    p.title as problemTitle,
+                    t.id as tagId,
+                    t.name as tagName,
+                    cs.score as classScore
+                FROM class_problem cp
+                JOIN problem p ON cp.problem_id = p.id
+                LEFT JOIN class_score cs ON cp.id = cs.class_problem_id
+                JOIN problem_tag pt ON p.id = pt.problem_id
+                JOIN tag t ON pt.tag_id = t.id
+                WHERE cp.class_id = #{classId}
+                AND (cs.sc_id = #{studentId} OR cs.sc_id IS NULL)
+            </select>
+
+            <select id="selectClassProblemsByTagId" resultType="com.ecode.dto.AIToolsDTO">
+                SELECT
+                    p.id as problemId,
+                    p.title as problemTitle,
+                    p.grade as problemGrade,
+                    t.id as tagId,
+                    t.name as tagName,
+                    c.id as classId,
+                    c.name as className
+                FROM problem p
+                JOIN class_problem cp ON p.id = cp.problem_id
+                JOIN problem_tag pt ON p.id = pt.problem_id
+                JOIN tag t ON pt.tag_id = t.id
+                JOIN class c ON cp.class_id = c.id
+                WHERE t.id = #{tagId}
+                AND c.id = #{classId}
+            </select>
+        </mapper>

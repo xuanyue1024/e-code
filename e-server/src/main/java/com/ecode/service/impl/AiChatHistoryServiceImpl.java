@@ -2,14 +2,18 @@ package com.ecode.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ecode.constant.MessageConstant;
 import com.ecode.entity.AiChatHistory;
 import com.ecode.enumeration.AiType;
+import com.ecode.exception.AiException;
 import com.ecode.mapper.AiChatHistoryMapper;
 import com.ecode.service.AiChatHistoryService;
+import com.ecode.vo.AiChatIdsVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,13 +42,33 @@ public class AiChatHistoryServiceImpl extends ServiceImpl<AiChatHistoryMapper, A
     }
 
     @Override
-    public List<String> getChatIds(Integer userId, AiType type) {
-        return aiChatHistoryMapper.selectList(
+    public List<AiChatIdsVO> getChatIds(Integer userId, AiType type) {
+        List<AiChatIdsVO> list = new ArrayList<>();
+
+        aiChatHistoryMapper.selectList(
                 new LambdaQueryWrapper<AiChatHistory>()
                         .eq(AiChatHistory::getUserId, userId)
                         .eq(AiChatHistory::getType, type)
-        ).stream()
-         .map(AiChatHistory::getId)
-         .toList(); // 返回空集合时，toList() 会自动处理为空集合
+                        .orderByDesc(AiChatHistory::getCreateTime)
+        ).forEach(ach -> {
+             AiChatIdsVO acv = AiChatIdsVO.builder()
+                     .chgatId(ach.getId())
+                     .createTime(ach.getCreateTime())
+                     .build();
+             list.add(acv);
+         });
+        return list;
+    }
+
+    @Override
+    public void deleteChatId(String chatId, Integer userId) {
+        int i = aiChatHistoryMapper.delete(
+                new LambdaQueryWrapper<AiChatHistory>()
+                        .eq(AiChatHistory::getId, chatId)
+                        .eq(AiChatHistory::getUserId, userId)
+        );
+        if (i == 0) {
+            throw new AiException(MessageConstant.AI_CHAT_ID_NOT_FOUND);
+        }
     }
 }

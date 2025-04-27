@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecode.mapper.TagMapper">
+
+    <select id="selectTagByProblemId" resultType="com.ecode.entity.Tag" parameterType="java.lang.Integer">
+        SELECT t.*
+        FROM problem_tag pt
+                 INNER JOIN tag t ON pt.tag_id = t.id
+        WHERE pt.problem_id = #{problemId};
+    </select>
+</mapper>

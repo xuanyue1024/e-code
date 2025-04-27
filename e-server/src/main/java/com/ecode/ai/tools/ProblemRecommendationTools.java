@@ -1,8 +1,10 @@
 package com.ecode.ai.tools;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.ecode.entity.*;
-import com.ecode.entity.Class;
+import com.ecode.entity.ClassProblem;
+import com.ecode.entity.ClassScore;
+import com.ecode.entity.Problem;
+import com.ecode.entity.User;
 import com.ecode.mapper.*;
 import com.ecode.service.TagService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +29,10 @@ import java.util.Map;
 public class ProblemRecommendationTools {
 
     @Autowired
-    private StudentClassMapper studentClassMapper;
+    private AIToolsMapper aiToolsMapper;
 
     @Autowired
     private ClassProblemMapper classProblemMapper;
-
-    @Autowired
-    private ClassMapper classMapper;
 
     @Autowired
     private ClassScoreMapper classScoreMapper;
@@ -44,17 +43,29 @@ public class ProblemRecommendationTools {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Tool(description = "查询用户信息")
+    public Map<String, Object> queryStudentInfo(@ToolParam(description = "用户id") Integer studentId) {
+        Map<String, Object> map = new HashMap<>();
+        User user = userMapper.selectById(studentId);
+        if (user != null) {
+            map.put("用户名", user.getName());
+            map.put("学生用户id", user.getId());
+            map.put("用户角色", user.getRole());
+        }
+        log.info("查询到的学生信息: {}", map);
+        return map;
+    }
+
     @Tool(description = "查询当前学生加入的所有班级")
-    public List queryStudentClass(@ToolParam(description = "学生用户id") Integer studentId){
+    public List<Map<String, Object>> queryStudentClass(@ToolParam(description = "学生用户id") Integer studentId) {
         List<Map<String,Object>> list = new ArrayList<>();
-        studentClassMapper.selectList(
-                new LambdaQueryWrapper<StudentClass>().eq(StudentClass::getStudentId, studentId)
-        ).forEach(sc -> {
-            Class c = classMapper.selectById(sc.getClassId());
+        aiToolsMapper.selectStudentClass(studentId).forEach(sc -> {
             Map<String, Object> map = new HashMap<>();
-            map.put("班级id", c.getId());
-            map.put("班级名称", c.getName());
-//            map.put("学生在班内唯一id", sc.getId());
+            map.put("班级id", sc.getClassId());
+            map.put("班级名称", sc.getClassName());
             list.add(map);
         });
         log.info("查询到的班级信息: {}", list);
@@ -71,11 +82,12 @@ public class ProblemRecommendationTools {
             Map<String, Object> map = new HashMap<>();
             ClassScore classScore = classScoreMapper.problemStuInfo(studentId, cp.getId());
             Problem problem = problemMapper.selectOne(
-                    new LambdaQueryWrapper<Problem>().eq(Problem::getId, cp.getProblemId()).select(Problem::getTitle)
+                    new LambdaQueryWrapper<Problem>().eq(Problem::getId, cp.getProblemId()).select(Problem::getTitle, Problem::getGrade)
             );
             map.put("题目id", cp.getProblemId());
             map.put("题目标题", problem.getTitle());
-            if (classScore == null || classScore.getPassNumber() == 0) {
+            map.put("题目难度", problem.getGrade().getValue() + 1);
+            if (classScore == null || classScore.getPassNumber() < 4) {
                 map.put("是否完成", "未完成");
             }else {
                 map.put("是否完成", "已完成");
@@ -89,13 +101,15 @@ public class ProblemRecommendationTools {
     }
 
     @Tool(description = "根据标签id查找班内对应的题目列表")
-    public List queryClassProblemsByTagId(@ToolParam(description = "标签id") Integer tagId,
-                                          @ToolParam(description = "班级id") Integer classId){
-        List<Map<String,Object>> list = new ArrayList<>();
-        problemMapper.findProblemsByTagIdAndClassId(tagId, classId).forEach(p -> {
+    public List queryClassProblemsByTagId(
+            @ToolParam(description = "标签id") Integer tagId,
+            @ToolParam(description = "班级id") Integer classId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        aiToolsMapper.selectClassProblemsByTagId(tagId, classId).forEach(at -> {
             Map<String, Object> map = new HashMap<>();
-            map.put("题目id", p.getId());
-            map.put("题目标题", p.getTitle());
+            map.put("题目id", at.getProblemId());
+            map.put("题目标题", at.getProblemTitle());
+            map.put("题目难度", at.getProblemGrade() + 1);
             list.add(map);
         });
         log.info("查询到的题目列表: {}", list);

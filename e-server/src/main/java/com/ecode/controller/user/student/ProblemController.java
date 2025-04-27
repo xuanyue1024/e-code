@@ -31,7 +31,7 @@ public class ProblemController {
     @GetMapping("/{id}")
     @Operation(summary = "获取题目详细信息")
     public Result<ProblemVO> get(@PathVariable Integer id){
-        ProblemVO p = problemService.getProblem(id);
+        ProblemVO p = problemService.getProblem(id, ProblemVO.class);
         return Result.success(p);
     }
 
