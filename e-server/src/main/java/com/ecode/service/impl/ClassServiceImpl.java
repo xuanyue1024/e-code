@@ -258,19 +258,13 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
     }
 
     @Override
-    public List<ClassProblemSubmissionsVO> submissionsInfo(Integer classId) {
-        return classMapper.selectClassProblemSubmissionsByClassId(classId);
+    public ClassProblemCompleteVO problemCompleteInfo(Integer classId) {
+        return classMapper.selectClassProblemCompleteByClassId(classId);
     }
 
     @Override
-    public List<ClassStudentRankVO> getClassStudentRank(Integer classId) {
-        return classMapper.selectClassStudentRank(classId);
-    }
-    
-    @Override
-    public List<ClassDifficultyDistributionVO> getClassDifficultyDistribution(Integer classId) {
-        verifyClassStudent(classId);
-        return classMapper.selectClassDifficultyDistribution(classId);
+    public List<ClassProblemSubmissionsVO> submissionsInfo(Integer classId) {
+        return classMapper.selectClassProblemSubmissionsByClassId(classId);
     }
 
     /**
