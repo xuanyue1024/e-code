@@ -123,4 +123,44 @@
             pass_rate ASC
         LIMIT 10
     </select>
+
+    <select id="getDifficultyNum" resultType="com.ecode.vo.ClassProblemDifficultyNumVO">
+        WITH difficulty_levels AS (
+            SELECT 0 AS grade, '简单' AS level_name
+            UNION SELECT 1, '一般'
+            UNION SELECT 2, '困难'
+        )
+        SELECT
+            dl.level_name AS difficulty,
+            COUNT(p.id) AS problem_num
+        FROM
+            difficulty_levels dl
+                LEFT JOIN (
+                SELECT p.grade, p.id
+                FROM class_problem cp
+                         JOIN problem p ON cp.problem_id = p.id
+                WHERE cp.class_id = #{classId}
+            ) p ON dl.grade = p.grade
+        GROUP BY
+            dl.grade, dl.level_name
+        ORDER BY
+            dl.grade;
+    </select>
+    <select id="getClassProblemTagNum" resultType="com.ecode.vo.ClassProblemTagNumVO">
+        SELECT
+            t.name AS tag_name,
+            COUNT(DISTINCT cp.problem_id) AS problem_count
+        FROM
+            class_problem cp
+                JOIN
+            problem_tag pt ON cp.problem_id = pt.problem_id
+                JOIN
+            tag t ON pt.tag_id = t.id
+        WHERE
+            cp.class_id = #{classId}
+        GROUP BY
+            t.id, t.name
+        ORDER BY
+            problem_count DESC, t.name;
+    </select>
 </mapper>

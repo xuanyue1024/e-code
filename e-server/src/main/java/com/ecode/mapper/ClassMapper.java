@@ -44,4 +44,18 @@ public interface ClassMapper extends BaseMapper<Class> {
      */
     List<ClassProblemPassRateVO> selectClassProblemPassRate(Integer classId);
 
+    /**
+     * 查询班级题目难度数量
+     * @param classId 班级ID
+     * @return 班级题目完成情况列表
+     */
+    List<ClassProblemDifficultyNumVO> getDifficultyNum(Integer classId);
+
+    /**
+     * 查询班级题目标签数量
+     * @param classId 班级ID
+     * @return 班级题目标签数量列表
+     */
+    List<ClassProblemTagNumVO> getClassProblemTagNum(Integer classId);
+
 }

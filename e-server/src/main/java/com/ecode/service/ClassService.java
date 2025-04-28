@@ -135,4 +135,20 @@ public interface ClassService extends IService<Class> {
      * @return List<ClassProblemPassRateVO>
      */
     List<ClassProblemPassRateVO> getClassProblemPassRate(Integer classId);
+
+    /**
+     * 获取班级题目难度分布
+     *
+     * @param classId 班级id
+     * @return List<ClassProblemDifficultyNumVO>
+     */
+    List<ClassProblemDifficultyNumVO> getClassProblemDifficultyNum(Integer classId);
+
+    /**
+     * 获取班级题目标签数量
+     *
+     * @param classId 班级id
+     * @return List<ClassProblemTagNumVO>
+     */
+    List<ClassProblemTagNumVO> getClassProblemTagNum(Integer classId);
 }

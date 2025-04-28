@@ -2,10 +2,7 @@ package com.ecode.controller.user.teacher;
 
 import com.ecode.result.Result;
 import com.ecode.service.ClassService;
-import com.ecode.vo.ClassDifficultyDistributionVO;
-import com.ecode.vo.ClassProblemPassRateVO;
-import com.ecode.vo.ClassProblemSubmissionsVO;
-import com.ecode.vo.ClassStudentRankVO;
+import com.ecode.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -76,5 +73,31 @@ public class StatisticController {
     public Result<List<ClassProblemPassRateVO>> getClassProblemPassRate(@PathVariable @Parameter(name = "班级id") Integer classId) {
         List<ClassProblemPassRateVO> passRateList = classService.getClassProblemPassRate(classId);
         return Result.success(passRateList);
+    }
+
+    /**
+     * 获取指定班级的题目难度分布情况。
+     *
+     * @param classId 班级ID
+     * @return 返回封装了班级题目难度分布数据的Result对象
+     */
+    @GetMapping("/classProblemDifficultyNum/{classId}")
+    @Operation(summary = "获取班级题目难度分布")
+    public Result<List<ClassProblemDifficultyNumVO>> getClassProblemDifficultyNum(@PathVariable @Parameter(name = "班级id") Integer classId) {
+        List<ClassProblemDifficultyNumVO> difficultyNumList = classService.getClassProblemDifficultyNum(classId);
+        return Result.success(difficultyNumList);
+    }
+
+    /**
+     * 获取班级题目标签数量
+     *
+     * @param classId 班级ID
+     * @return 返回封装了班级题目标签数量数据的Result对象
+     */
+    @GetMapping("/classProblemTagNum/{classId}")
+    @Operation(summary = "获取班内标签的题目数量")
+    public Result<List<ClassProblemTagNumVO>> getClassProblemTagNum(@PathVariable @Parameter(name = "班级id") Integer classId) {
+        List<ClassProblemTagNumVO> tagNumList = classService.getClassProblemTagNum(classId);
+        return Result.success(tagNumList);
     }
 }

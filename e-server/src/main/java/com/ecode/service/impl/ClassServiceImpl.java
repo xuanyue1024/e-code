@@ -280,6 +280,16 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         return classMapper.selectClassProblemPassRate(classId);
     }
 
+    @Override
+    public List<ClassProblemDifficultyNumVO> getClassProblemDifficultyNum(Integer classId) {
+        return classMapper.getDifficultyNum(classId);
+    }
+
+    @Override
+    public List<ClassProblemTagNumVO> getClassProblemTagNum(Integer classId) {
+        return classMapper.getClassProblemTagNum(classId);
+    }
+
     /**
      * 验证教师是否在指定班级授课
      * 验证学生是否在指定班级
