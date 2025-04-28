@@ -18,6 +18,8 @@ spring:
         password: ${ecode.mail.password} #开通服务后得到的授权码
         default-encoding: ${ecode.mail.default-encoding} #邮件内容的编码
         port: ${ecode.mail.port} #邮件服务器端口
+        ssl:
+            enabled: true
     data:
         redis:
             host: ${ecode.redis.host}
