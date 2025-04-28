@@ -41,4 +41,7 @@ public class AiInputDTO implements Serializable {
 
     @Schema(description = "解答题目页面题目id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Integer problemId;
+
+    @Schema(description = "班级id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Integer classId;
 }

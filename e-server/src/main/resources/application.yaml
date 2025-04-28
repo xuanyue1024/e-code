@@ -38,6 +38,15 @@ spring:
             chat:
                 options:
                     model: qwen-max-latest
+            embedding:
+                options:
+                    model: text-embedding-v3
+                    dimensions: 1024
+
+    servlet:
+        multipart:
+            max-file-size: 104857600
+            max-request-size: 104857600
 
 mybatis-plus:
     configuration:

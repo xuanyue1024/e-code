@@ -1,5 +1,6 @@
 package com.ecode.service.impl;
 
+import com.ecode.ai.repository.FileRepository;
 import com.ecode.constant.AiSystemConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
@@ -12,7 +13,9 @@ import com.ecode.service.AIService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -31,6 +34,8 @@ public class AIServiceImpl implements AIService {
     @Autowired
     private ChatClient questionAnswerClient;
 
+    @Autowired
+    private FileRepository fileRepository;
     /**
      * 获取聊天内容的方法
      *
@@ -68,10 +73,22 @@ public class AIServiceImpl implements AIService {
             throw new AiException(MessageConstant.AI_CHAT_ID_NOT_FOUND);
         }
 
+        Resource file = fileRepository.getFile(String.valueOf(aiInputDTO.getClassId()));
+        log.info("文件路径: {}", file == null ? "null" :file.getFilename());
+        if (file == null) {
+            return questionAnswerClient.prompt()
+                    .user(aiInputDTO.getPrompt())
+                    .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
+                    .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
+                    .stream()
+                    .content()
+                    .map(Result::success);
+        }
         return questionAnswerClient.prompt()
                 .user(aiInputDTO.getPrompt())
                 .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
                 .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
+                .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "file_name == '"+file.getFilename()+"'"))
                 .stream()
                 .content()
                 .map(Result::success);
