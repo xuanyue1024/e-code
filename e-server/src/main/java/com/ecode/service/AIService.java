@@ -2,6 +2,7 @@ package com.ecode.service;
 
 import com.ecode.dto.AiInputDTO;
 import com.ecode.result.Result;
+import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 
 /**
@@ -27,4 +28,11 @@ public interface AIService {
      */
     Flux<Result<String>> generateQuestion(String require);
 
+    /**
+     * questionAnswer方法，处理AI输入数据并返回结果流
+     *
+     * @param aiInputDTO 有效验证的AI输入数据传输对象
+     * @return 包含字符串结果的Flux流
+     */
+    Flux<Result<String>> questionAnswer(@Valid AiInputDTO aiInputDTO);
 }

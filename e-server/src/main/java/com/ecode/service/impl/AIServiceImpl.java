@@ -28,6 +28,9 @@ public class AIServiceImpl implements AIService {
     @Autowired
     private ChatClient generateQuestionClient;
 
+    @Autowired
+    private ChatClient questionAnswerClient;
+
     /**
      * 获取聊天内容的方法
      *
@@ -52,6 +55,22 @@ public class AIServiceImpl implements AIService {
         return chatClient.prompt()
                 .user(aiInputDTO.getPrompt())
                 .system(systemPrompt)
+                .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
+                .stream()
+                .content()
+                .map(Result::success);
+    }
+
+    @Override
+    public Flux<Result<String>> questionAnswer(AiInputDTO aiInputDTO) {
+        AiChatHistory ach = aiChatHistoryMapper.selectById(aiInputDTO.getChatId());
+        if (ach == null) {
+            throw new AiException(MessageConstant.AI_CHAT_ID_NOT_FOUND);
+        }
+
+        return questionAnswerClient.prompt()
+                .user(aiInputDTO.getPrompt())
+                .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
                 .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
                 .stream()
                 .content()

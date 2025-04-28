@@ -38,4 +38,7 @@ public class AiInputDTO implements Serializable {
 
     @Schema(description = "是否联网搜索", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private boolean isSearch;
+
+    @Schema(description = "解答题目页面题目id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Integer problemId;
 }

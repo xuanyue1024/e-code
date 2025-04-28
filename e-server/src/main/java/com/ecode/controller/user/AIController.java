@@ -47,6 +47,12 @@ public class AIController {
         return aiService.getChat(aiInputDTO);
     }
 
+    @PostMapping(value = "/questionAnswer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "题目解答")
+    public Flux<Result<String>> questionAnswer(@RequestBody @Valid AiInputDTO aiInputDTO) {
+        return aiService.questionAnswer(aiInputDTO);
+    }
+
     /**
      * 生成题目的接口
      *
