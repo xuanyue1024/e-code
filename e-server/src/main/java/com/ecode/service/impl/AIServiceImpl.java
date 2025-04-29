@@ -35,6 +35,9 @@ public class AIServiceImpl implements AIService {
     private ChatClient questionAnswerClient;
 
     @Autowired
+    private ChatClient questionAnswerClientVec;
+
+    @Autowired
     private FileRepository fileRepository;
     /**
      * 获取聊天内容的方法
@@ -84,7 +87,7 @@ public class AIServiceImpl implements AIService {
                     .content()
                     .map(Result::success);
         }
-        return questionAnswerClient.prompt()
+        return questionAnswerClientVec.prompt()
                 .user(aiInputDTO.getPrompt())
                 .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
                 .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))

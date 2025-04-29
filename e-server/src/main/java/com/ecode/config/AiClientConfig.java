@@ -47,7 +47,19 @@ public class AiClientConfig {
     }
 
     @Bean
-    public ChatClient questionAnswerClient(DashScopeChatModel model, ChatMemory chatMemory, VectorStore vectorStore){
+    public ChatClient questionAnswerClient(DashScopeChatModel model, ChatMemory chatMemory){
+        return ChatClient
+                .builder(model)
+                .defaultSystem(AiSystemConstant.CODE_SYSTEM_PROMPT)
+                .defaultAdvisors(
+                        new SimpleLoggerAdvisor(),
+                        new MessageChatMemoryAdvisor(chatMemory)
+                )
+                .defaultTools(problemSolutionTools)
+                .build();
+    }
+    @Bean
+    public ChatClient questionAnswerClientVec(DashScopeChatModel model, ChatMemory chatMemory, VectorStore vectorStore){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.CODE_SYSTEM_PROMPT)
