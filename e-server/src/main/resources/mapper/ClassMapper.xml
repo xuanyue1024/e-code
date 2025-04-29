@@ -105,23 +105,28 @@
             p.title AS problem_title,
             p.grade AS difficulty,
             COUNT(DISTINCT sc.student_id) AS attempted_students,
-            ROUND(SUM(cs.pass_number) * 100.0 / SUM(cs.submit_number), 2) AS pass_rate,
+            ROUND(
+                    CASE
+                        WHEN SUM(cs.submit_number) = 0 THEN 0
+                        ELSE SUM(cs.pass_number) * 100.0 / SUM(cs.submit_number)
+                        END, 2
+            ) AS pass_rate,
             SUM(cs.submit_number) AS total_submissions
         FROM
             problem p
-        JOIN
+                JOIN
             class_problem cp ON p.id = cp.problem_id
-        JOIN
+                JOIN
             class_score cs ON cp.id = cs.class_problem_id
-        JOIN
+                JOIN
             student_class sc ON cs.sc_id = sc.id
         WHERE
             sc.class_id = #{classId}
         GROUP BY
             p.id, p.title, p.grade
         ORDER BY
-            pass_rate ASC
-        LIMIT 10
+            pass_rate desc
+#         LIMIT 10
     </select>
 
     <select id="getDifficultyNum" resultType="com.ecode.vo.ClassProblemDifficultyNumVO">
