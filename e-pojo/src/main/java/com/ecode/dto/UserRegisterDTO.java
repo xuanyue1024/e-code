@@ -1,5 +1,6 @@
 package com.ecode.dto;
 
+import com.ecode.enumeration.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -16,6 +17,9 @@ public class UserRegisterDTO implements Serializable {
 
     @Schema(description = "密码")
     private String password;
+
+    @Schema(description = "注册用户角色")
+    private UserRole role;
 
     @Schema(description = "邮箱")
     private String email;

@@ -48,8 +48,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         redisTemplate.delete("email:captcha:" + userRegisterDTO.getEmail());
         User user = User.builder()
                 .status(UserStatus.ENABLE)
+                .role(userRegisterDTO.getRole())
                 .name("默认用户")
-                .profilePicture("https://web-tlias-itheima1024.oss-cn-chengdu.aliyuncs.com/23f57464-eb9b-42a6-b98e-91ab1937fbf3.jpg")
+                .profilePicture("https://sky-take-out-xuanyue.oss-cn-chengdu.aliyuncs.com/0bf3e49e-0de6-4c9a-b6f2-e2c28beeff33.jpg")
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
                 .score(0L)
