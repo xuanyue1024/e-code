@@ -32,6 +32,10 @@ spring:
             chat:
                 options:
                     model: ${ecode.ai.chat.options.model}
+            embedding:
+                options:
+                    model: text-embedding-v3
+                    dimensions: 1024
         openai:
             base-url: https://dashscope.aliyuncs.com/compatible-mode
             api-key: ${ecode.ai.bailian-api-key}
