@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.ecode.entity.po.RepositoryFile;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -24,8 +24,10 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
+@AllArgsConstructor
 @Accessors(chain = true)
-@TableName("class")
+@TableName(value = "class", autoResultMap = true)
 @Schema(description="Class数据库对象")
 public class Class implements Serializable {
 
@@ -46,6 +48,14 @@ public class Class implements Serializable {
     @Schema(description = "邀请码")
     @TableField("invitation_code")
     private String invitationCode;
+
+    @Schema(description = "知识库文件")
+    @TableField(value = "repository_file", typeHandler = JacksonTypeHandler.class)
+    private RepositoryFile repositoryFile;
+
+    @Schema(description = "加入人数")
+    @TableField("join_number")
+    private Integer joinNumber;
 
     @Schema(description = "创建时间")
     @TableField("create_time")

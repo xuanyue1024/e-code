@@ -1,62 +1,85 @@
 package com.ecode.ai.repository;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ecode.entity.Class;
+import com.ecode.entity.po.RepositoryFile;
+import com.ecode.mapper.ClassMapper;
+import com.ecode.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Properties;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class LocalPdfFileRepository implements FileRepository {
 
+    private final FileUtil fileUtil;
+
+    private final ClassMapper classMapper;
+
     private final VectorStore vectorStore;
 
-    // 会话id 与 文件名的对应关系，方便查询会话历史时重新加载文件
-    private final Properties chatFiles = new Properties();
 
     @Override
-    public boolean save(String chatId, Resource resource) {
+    public boolean save(Integer classId, MultipartFile file) {
+        deleteFile(classId);
 
-        // 2.保存到本地磁盘
-        String filename = resource.getFilename();
-        File target = new File("e-server/" + Objects.requireNonNull(filename));
-        if (!target.exists()) {
-            try {
-                Files.copy(resource.getInputStream(), target.toPath());
-            } catch (IOException e) {
-                log.error("Failed to save PDF resource.", e);
-                return false;
-            }
+        String filename = file.getOriginalFilename();
+        String url = fileUtil.uploadFile(file);
+
+        if (url == null){
+            return false;
         }
         // 3.保存映射关系
-        chatFiles.put(chatId, filename);
+        classMapper.updateById(Class.builder()
+                .id(classId)
+                .repositoryFile(
+                        RepositoryFile.builder()
+                                .createTime(LocalDateTime.now())
+                                .name(filename)
+                                .url(url)
+                                .build()
+                ).build());
         return true;
     }
 
     @Override
-    public Resource getFile(String chatId) {
-        String property = chatFiles.getProperty(chatId);
-        log.info("getFile: {}", property);
-        if (property == null) {
-            return null;
-        }
-        return new FileSystemResource("e-server/" + property);
+    public RepositoryFile getFile(Integer classId) {
+        RepositoryFile repositoryFile = classMapper.selectById(classId).getRepositoryFile();
+        log.info("getFile: {}", repositoryFile);
+        return repositoryFile;
     }
 
-    @PostConstruct
+    @Override
+    public void deleteFile(Integer classId) {
+        Class c = classMapper.selectById(classId);
+        RepositoryFile repositoryFile = c.getRepositoryFile();
+        if (repositoryFile != null){
+            //删除远程阿里云文件
+            fileUtil.deleteFileByUrl(repositoryFile.getUrl());
+
+            //todo 创建过滤条件，目前删除失败
+            Filter.Expression expr = new FilterExpressionBuilder()
+                    .eq("classId", classId)
+                    .build();
+            vectorStore.delete(expr);
+
+            //删除数据库内容
+            classMapper.update(
+                    new LambdaUpdateWrapper<Class>().eq(Class::getId, classId)
+                    .set(Class::getRepositoryFile, null)
+            );
+        }
+    }
+
+    /*@PostConstruct
     private void init() {
         FileSystemResource pdfResource = new FileSystemResource("e-server\\chat-pdf.properties");
         if (pdfResource.exists()) {
@@ -85,6 +108,6 @@ public class LocalPdfFileRepository implements FileRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
 }

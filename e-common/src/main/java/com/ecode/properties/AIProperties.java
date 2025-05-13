@@ -14,5 +14,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "ecode.ai")
 @Data
 public class AIProperties {
-
+    /**
+     *题目推荐链接URL
+     */
+    private String problemRecommendationUrl;
 }

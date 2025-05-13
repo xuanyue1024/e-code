@@ -1,12 +1,24 @@
 package com.ecode.constant;
 
+import com.ecode.properties.AIProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * AI系统提示词常量类：提供AI系统相关的提示词常量定义
  *
  * @author 竹林听雨
  * @date 2023/04/20
  */
+@Component
 public class AiSystemConstant {
+
+    private static AIProperties aiProperties;
+
+    @Autowired
+    public void setAiProperties(AIProperties aiProperties) {
+        AiSystemConstant.aiProperties = aiProperties;
+    }
 
     /**
      * 默认AI助手角色系统提示词
@@ -149,8 +161,8 @@ public class AiSystemConstant {
               - 包含1道简单级题目，1-2道一般级题目，1道困难级题目
               - 按照难度从低到高排序展示
               
-           推荐时题目标题请写成链接的形式,如[题目标题](http://localhost/#/code?problemId=题目ID&classId=班级ID),当然,你还需要给用户题目标签,难度,如果用户是询问题目完成情况,还需要展示是否完成,格式如下:
-           - [题目标题](http://localhost/#/code?problemId=题目ID&classId=班级ID)（难度★或★★或★★★）
+           推荐时题目标题请写成链接的形式,如[题目标题](%s/#/code?problemId=题目ID&classId=班级ID),当然,你还需要给用户题目标签,难度,如果用户是询问题目完成情况,还需要展示是否完成,格式如下:
+           - [题目标题](%s/#/code?problemId=题目ID&classId=班级ID)（难度★或★★或★★★）
              - 标签: 标签列表
              - 是否完成: 已完成/未完成 (只在用户询问题目完成情况时展示)
              
@@ -165,4 +177,14 @@ public class AiSystemConstant {
             - 不要重复询问所在班级,当用户告诉你所在班级后请牢记班级id,后面用户询问相关问题直接用班级id即可,而不是再此询问
            
            必须告诉你的是,当前用户ID为:""";
+
+    /**
+     * 获取带有动态URL的题目智能推荐提示词
+     *
+     * @return 完整的智能推荐提示词
+     */
+    public static String getSmartRecommendations() {
+        String url = aiProperties != null ? aiProperties.getProblemRecommendationUrl() : "http://localhost";
+        return String.format(SMART_RECOMMENDATIONS, url, url);
+    }
 }

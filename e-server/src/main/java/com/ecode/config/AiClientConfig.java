@@ -1,6 +1,7 @@
 package com.ecode.config;
 
 
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 import com.ecode.ai.tools.ProblemRecommendationTools;
@@ -11,10 +12,11 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,6 +27,19 @@ public class AiClientConfig {
 
     @Autowired
     private ProblemSolutionTools problemSolutionTools;
+
+    @Value("${spring.ai.dashscope.api-key}")
+    private String dashScopeApiKey;
+
+    /**
+     * 创建并返回嵌入模型。
+     *
+     * @return 嵌入模型实例
+     */
+    @Bean
+    public EmbeddingModel embeddingModel() {
+        return new DashScopeEmbeddingModel(new DashScopeApi(dashScopeApiKey));
+    }
 
     /**
      * 创建聊天客户端的方法
@@ -74,7 +89,6 @@ public class AiClientConfig {
                                         .build()
                         )
                 )
-                .defaultTools(problemSolutionTools)
                 .build();
     }
 
@@ -95,15 +109,17 @@ public class AiClientConfig {
                 .build();
     }
 
+
+
     /**
      * 创建并返回一个基于指定嵌入模型的向量存储实例。
      *
      * @param embeddingModel 嵌入模型
      * @return 构建完成的向量存储实例
      */
-    @Bean
+    /*@Bean
     public VectorStore vectorStore(DashScopeEmbeddingModel embeddingModel) {
         return SimpleVectorStore.builder(embeddingModel).build();
-    }
+    }*/
 
 }

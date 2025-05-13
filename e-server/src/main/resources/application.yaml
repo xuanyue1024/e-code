@@ -34,18 +34,14 @@ spring:
                     model: ${ecode.ai.chat.options.model}
             embedding:
                 options:
-                    model: text-embedding-v3
-                    dimensions: 1024
-        openai:
-            base-url: https://dashscope.aliyuncs.com/compatible-mode
-            api-key: ${ecode.ai.bailian-api-key}
-            chat:
-                options:
-                    model: qwen-max-latest
-            embedding:
-                options:
-                    model: text-embedding-v3
-                    dimensions: 1024
+                    model: ${ecode.ai.embedding.options.model}
+                    dimensions: ${ecode.ai.embedding.options.dimensions}
+        vectorstore:
+            chroma:
+                client:
+                    host: ${ecode.ai.vectorstore.chroma.client.host}
+                    port: ${ecode.ai.vectorstore.chroma.client.port}
+                initialize-schema: true
 
     servlet:
         multipart:
@@ -93,6 +89,8 @@ ecode:
             resident-key: ${ecode.webauthn.authenticator-selection.resident-key}
             user-verification: ${ecode.webauthn.authenticator-selection.user-verification}
             authenticator-attachment:
+    ai:
+        problem-recommendation-url: ${ecode.ai.problem-recommendation-url}
 # springdoc-openapi项目配置
 springdoc:
     # 默认是false，需要设置为true

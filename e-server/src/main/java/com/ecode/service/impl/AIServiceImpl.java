@@ -6,6 +6,7 @@ import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
 import com.ecode.entity.AiChatHistory;
+import com.ecode.entity.po.RepositoryFile;
 import com.ecode.exception.AiException;
 import com.ecode.mapper.AiChatHistoryMapper;
 import com.ecode.result.Result;
@@ -15,7 +16,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -55,7 +55,7 @@ public class AIServiceImpl implements AIService {
 
         String systemPrompt;
         switch (aiInputDTO.getType()) {
-            case CHAT -> systemPrompt = AiSystemConstant.SMART_RECOMMENDATIONS + BaseContext.getCurrentId();
+            case CHAT -> systemPrompt = AiSystemConstant.getSmartRecommendations() + BaseContext.getCurrentId();
             case CODE -> systemPrompt = AiSystemConstant.CODE_SYSTEM_PROMPT;
             default -> throw new AiException(MessageConstant.AI_CHAT_TYPE_NOT_FOUND);
         }
@@ -76,9 +76,10 @@ public class AIServiceImpl implements AIService {
             throw new AiException(MessageConstant.AI_CHAT_ID_NOT_FOUND);
         }
 
-        Resource file = fileRepository.getFile(String.valueOf(aiInputDTO.getClassId()));
-        log.info("文件路径: {}", file == null ? "null" :file.getFilename());
+        RepositoryFile file = fileRepository.getFile(aiInputDTO.getClassId());
+        log.info("文件路径: {}", file == null ? "null" :file.getName());
         if (file == null) {
+            log.info("AI解答走数据库答案通道");
             return questionAnswerClient.prompt()
                     .user(aiInputDTO.getPrompt())
                     .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
@@ -87,11 +88,12 @@ public class AIServiceImpl implements AIService {
                     .content()
                     .map(Result::success);
         }
+        log.info("AI解答走知识库答案通道");
         return questionAnswerClientVec.prompt()
                 .user(aiInputDTO.getPrompt())
-                .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
+                .system("请根据知识库内容回答用户问题")
                 .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
-                .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "file_name == '"+file.getFilename()+"'"))
+                .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "file_name == '" + file.getName() + "' && classId == " + aiInputDTO.getClassId()))
                 .stream()
                 .content()
                 .map(Result::success);
