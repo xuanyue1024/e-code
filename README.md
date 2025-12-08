@@ -45,6 +45,8 @@
 
 ### 1.5 数据库设计
 
+
+
 ![](assets/05b4072dd56ff02bf0ffb379dc8c3418efd3a67da419b7bd5f06cb5c82edda12.jpg)  
 <p align="center">图4 数据库设计</p>
 
@@ -161,68 +163,68 @@ ExecStart=/usr/bin/dockerd-H fd:/// --containerd=/run/containerd/containerd SOCK
 
 使用需要通过账号密码登录后注册 webauthn)，无需密码，保障账号安全，也可使用账号密码进行登录操作。
 
-![](assets/ad81594b00478ee41fc174673f49d282f6d6c1fabaac57387e3cf0ec0a6d8988.jpg)  
+![PixPin_2025-12-09_00-26-25](./assets/PixPin_2025-12-09_00-26-25.jpg)  
 <p align="center">图5 学生用户登录界面</p>
 
-![](assets/34794de6836d17f71d0a8c4cfe81db92069f6f9ff9c51d6988d3bb65696ff26f.jpg)  
+  ![PixPin_2025-12-09_00-28-04](./assets/PixPin_2025-12-09_00-28-04.jpg)
 <p align="center">图6 学生用户注册页面</p>
 
 #### 2. 个人信息修改
 
 进入个人信息界面，可对昵称、性别、电话、地址、出生日期、邮箱等信息进行修改，其中，邮箱修改需要进行新邮箱验证，用户名、角色注册时绑定不可修改。
 
-![](assets/abeb9cf4db38b059622d96de8bbd2f6822ab365c34317085084250a9555233d1.jpg)  
+![PixPin_2025-12-09_00-33-12](./assets/PixPin_2025-12-09_00-33-12.jpg)  
 <p align="center">图7 个人信息修改</p>
 
-![](assets/6241afcc218a5934cd682b953aa451b4107810b9fa45defb03dad4333c0d3858.jpg)  
+![PixPin_2025-12-09_00-33-49](./assets/PixPin_2025-12-09_00-33-49.jpg)  
 <p align="center">图8 邮箱更换</p>
 
 #### 3. 我的班级
 
 学生在此可进入指定班级，要加入新班级时，点击右上角加入班级按钮输入通过老师创建班级后生成的邀请码加入相应的班级。
 
-![](assets/3f36754be6b6dacfd2b5e4c98c2d6b87e9ed4a53dc7016a05311c8580fcf2734.jpg)  
+![PixPin_2025-12-09_00-34-26](./assets/PixPin_2025-12-09_00-34-26.jpg)
 <p align="center">图9 我的班级</p>
 
 学生从我的班级选择班级后即可进入班级详情界面。
 
 (1)班级概览：可在班级概览中快速了解班级整体情况，可查看当前班级人数，题目数量，我的题目完成情况，题目难度和标签分布信息。
 
-![](assets/721ffc83c57483296fc725eb33e5c29f3ea69cea00959beb4f015277ec7af9f1.jpg)  
+![PixPin_2025-12-09_00-35-06](./assets/PixPin_2025-12-09_00-35-06.jpg)  
 <p align="center">图10 班级概览</p>
 
 (2)班级成员：可查看当前班内加入的学生用户名、姓名、邮箱信息。
 
-![](assets/0cd9f42c78664c686a0eaebdda019dc75a1a938f43ea0a1c53b22947bad735b9.jpg)  
+  ![PixPin_2025-12-09_00-35-36](./assets/PixPin_2025-12-09_00-35-36.jpg)
 <p align="center">图11 班级成员</p>
 
 (3) 题目集：在题目集页面查看老师添加至班级内的题目，包括题目名称、难度、标签、提交次数、通过率、完成状态等信息，选择题目开始做题或重做。
 
-![](assets/d266b80346aea9bdec063adf8e8f68259792444d271e61768487b98e8fc1d560.jpg)  
+![PixPin_2025-12-09_00-36-29](./assets/PixPin_2025-12-09_00-36-29.jpg)  
 <p align="center">图12 题目集</p>
 
 进入答题页面：点击开始做题或重做按钮后，进入答题界面在答题页面，左侧查看题目名称、内容和难度，可根据需要点击历史图标按钮查看该题目的提交历史，包括提交语言、提交时间、通过测试数及提交历史代码等；右上方可更换编辑器主题、切换代码语言、调整字号等；选中代码右键可使用AI优化代码、修复bug、解释代码等功能；也可点击顶栏对话按钮与AI进行对话获取辅助学习帮助。
 
-![](assets/e08735687098720aacd2491aca97e16e0372d8ecf7f2d06316f81ad9e755a5ae.jpg)  
+![PixPin_2025-12-09_00-37-09](./assets/PixPin_2025-12-09_00-37-09.jpg)  
 <p align="center">图13 答题界面</p>
 
-![](assets/83708cdec48d7ac2c914dff0c42c88313979418d13208a83e787ffbf1ace1298.jpg)  
+![PixPin_2025-12-09_00-38-33](./assets/PixPin_2025-12-09_00-38-33.jpg)  
 <p align="center">图14 题目提交历史</p>
 
-![](assets/99b6b687703d369684c72d1e5c35410e37b3d8459c45a998fc5fb09497ddc7a5.jpg)  
+  ![PixPin_2025-12-09_00-38-53](./assets/PixPin_2025-12-09_00-38-53.jpg)
 <p align="center">图15 提交代码详情</p>
 
-![](assets/253266244949517b7407e8be783da5c7db9e97a6c0a434122df7fe39c7bd4823.jpg)  
+![PixPin_2025-12-09_00-40-14](./assets/PixPin_2025-12-09_00-40-14.jpg)  
 <p align="center">图16 AI助手</p>
 
 代码运行与调试：在输入值编辑框输入自测值，点击调试按钮，通过Docker容器化技术实现代码运行环境的快速部署和高度隔离，获得该语言代码的运行结果；提交代码后，系统通过查询数据库获取代码输入值并交给Docker容器运行，执行完毕后返回输出值，与数据库输出值进行比对，返回统一差异格式，完成评分。
 
-![](assets/cb51537d883ce20330043a6605897ff6237c2bb2025f0e3eb839ef85b14b37a9.jpg)  
+![PixPin_2025-12-09_00-42-31](./assets/PixPin_2025-12-09_00-42-31.jpg)  
 <p align="center">图17 代码运行与调试</p>
 
 (4) 数据统计：可查看当前学生用户在当前班级的学习情况统计，包括得分、提交次数和通过次数。
 
-![](assets/42a6a69c39241e03019e76e6be52315558b54b8145cd6e05ca42f2e5f751b787.jpg)  
+![PixPin_2025-12-09_00-42-54](./assets/PixPin_2025-12-09_00-42-54.jpg)  
 <p align="center">图18 我的统计</p>
 
 #### 4.AI助手
@@ -231,21 +233,21 @@ ExecStart=/usr/bin/dockerd-H fd:/// --containerd=/run/containerd/containerd SOCK
 
 能，让 AI 查询学生信息、所在班级、题目完成情况以及班级内各种标签的题目，从而获得题目推荐、题目分析等能力，辅助学习。
 
-![](assets/e014f9398af2886a1ee60506e8531868bd060b70f44716b0ca64055cf7da07b8.jpg)  
+![PixPin_2025-12-09_00-43-28](./assets/PixPin_2025-12-09_00-43-28.jpg)  
 <p align="center">图19 AI助手</p>
 
 #### 5. 通行密钥
 
 可在此注册通信密钥，便于登录时直接使用通行密钥一键登录，而不是使用账号密码登录。
 
-![](assets/1a32e998c33afa85c36ebf40971755f86e6efa82737fd9731a0e702a6f113f89.jpg)  
+![PixPin_2025-12-09_00-43-46](./assets/PixPin_2025-12-09_00-43-46.jpg)  
 <p align="center">图20 通行密钥</p>
 
 #### 6. 退出登录
 
 点击右上角头像位置，点击退出登录按钮即可退出登录。
 
-![](assets/c6bc797e58d24dd6f7ffe8dec5a7ec386201d45ff08777cf69631a9cf5c4abe7.jpg)  
+![PixPin_2025-12-09_00-44-03](./assets/PixPin_2025-12-09_00-44-03.jpg)  
 <p align="center">图21退出登录</p>
 
 ### 2.3 教师使用流程
@@ -262,7 +264,7 @@ ExecStart=/usr/bin/dockerd-H fd:/// --containerd=/run/containerd/containerd SOCK
 
 此处展示老师添加的班级列表，展示班级的名称、邀请码、加入人数、创建时间信息，也可进行查看班级详情、编辑班级名称和删除班级操作。
 
-![](assets/dc8adec88fb60ec93dc83a9ea5c501df9f26683d3b81f27a5d6f1cd84f1c76ff.jpg)  
+![PixPin_2025-12-09_00-44-43](./assets/PixPin_2025-12-09_00-44-43.jpg)  
 <p align="center">图22 班级管理</p>
 
 教师从班级管理点击查看详情即可进入班级详情页面。
@@ -270,41 +272,41 @@ ExecStart=/usr/bin/dockerd-H fd:/// --containerd=/run/containerd/containerd SOCK
 (1) 班级概览：和学生端的班级概览一致。  
 (2) 班级成员：查看加入班级的所有学生用户信息，包括姓名、邮箱、总得分、完成率，以及每道题目的详细情况（标题、提交次数、通过次数、得分）等，方便对学生的整体学习情况进行掌握。
 
-![](assets/906a44157592250d0371d74cf97b1376b4cb41dc1885ca1d2ed7d02ab3620e6a.jpg)  
+![PixPin_2025-12-09_00-45-25](./assets/PixPin_2025-12-09_00-45-25.jpg)  
 <p align="center">图23 学生做题详情</p>
 
 (3) 班级题目：查看所有在班内的题目，包括题目标题、难度、标签、创建时间、更新时间
 
 等信息，支持查看与编辑功能，也可从题库中批量添加题目到现有班级。
 
-![](assets/9da77f1b18e21c74e23dfa356ab6cbcb82548715998e2781b319c934af33be81.jpg)  
+![PixPin_2025-12-09_00-45-45](./assets/PixPin_2025-12-09_00-45-45.jpg)  
 <p align="center">图24 班级题目</p>
 
 (4) 排行榜：进行多维度的班级学情分析，包括查看班级题目提交情况表、班级学生成绩排名、班级学生完成不同难度题目分布、班级题目通过率排行榜等信息，全面了解班级学习情况。
 
-![](assets/dfc32d9dd68a2a0213fc3f3a265fa9acecac71faee3c6628c245e914112bf36c.jpg)  
+![PixPin_2025-12-09_00-46-05](./assets/PixPin_2025-12-09_00-46-05.jpg)  
 <p align="center">图25 排行榜</p>
 
-![](assets/4f234df27751f8adf9c6de7b6832b235f8466bc6e2b79c97167b1bd8a371dfcb.jpg)  
+![PixPin_2025-12-09_00-46-26](./assets/PixPin_2025-12-09_00-46-26.jpg)  
 <p align="center">图26 排行榜2</p>
 
 (5) 知识库：每个班级可以拥有一篇 PDF 格式的知识库文档。用户上传知识库资料后，可以查看、下载或重新上传。当知识库文件上传完成后，系统会将文件按页拆分成多个片段，并通过向量大模型将这些片段转换为高维向量，以捕捉文本的语义信息。随后，这些向量化的文档片段会被存储到向量数据库中。
 
 在问答环节中，AI会先将用户的问题输入向量模型进行向量化处理，然后通过向量数据库快速检索相似信息，最后将检索到的信息传递给文本模型，生成答案返回给用户。
 
-![](assets/cbf7b88f7759d3e83bcf74663dab9541329a6a6332b2cf046995fd3eef1e8b1a.jpg)  
+![PixPin_2025-12-09_00-47-11](./assets/PixPin_2025-12-09_00-47-11.jpg)  
 <p align="center">图27 班级知识库</p>
 
 #### 4. 题目管理
 
 查看与搜索题目：可查看、搜索题目，查看题目标题、难度、标签、创建时间等信息，并进行编辑、删除操作。
 
-![](assets/f73c60c8ddd904ae2353ae13ff3971e0994107c21e30f3ec0eadd3a16d52f7f8.jpg)  
+![PixPin_2025-12-09_00-48-12](./assets/PixPin_2025-12-09_00-48-12.jpg)  
 <p align="center">图28 题目管理</p>
 
 新增题目：用户可自行添加题目标题、难度、标签、题目描述、解答、测试用例等信息；也可将要求发给 AI，一键生成包括标题、难度、标签、题目描述、解答、测试用例在内的题目内容。
 
-![](assets/f003f37f01946a10b713911097154cbdfe6a59c40def28ddd70ff45f7879bf3d.jpg)  
+![PixPin_2025-12-09_00-54-02](./assets/PixPin_2025-12-09_00-54-02.jpg)  
 <p align="center">图29 新增题目</p>
 
 #### 5.AI助手
