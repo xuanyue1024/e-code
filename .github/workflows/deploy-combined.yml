@@ -1,0 +1,112 @@
+name: Build Combined Jar & Push
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ 'v*.*.*' ]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  # 后端仓库的名称
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-combined-image:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出后端代码 (当前仓库)
+      - name: Checkout Backend
+        uses: actions/checkout@v4
+        with:
+          path: backend-repo  # 检出到子目录，防止混乱
+
+      # 2. 检出前端代码 (从 xuanyue1024/ecode-vue3)
+      - name: Checkout Frontend
+        uses: actions/checkout@v4
+        with:
+          repository: xuanyue1024/ecode-vue3
+          path: frontend-repo # 检出到另一个子目录
+          # 如果前端是私有仓库，需要取消下面注释并配置 Token
+          # token: ${{ secrets.MY_PAT_TOKEN }}
+
+      # 3. 构建前端 (生成 dist)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend-repo/package-lock.json
+
+      - name: Build Frontend
+        run: |
+          cd frontend-repo
+          npm ci
+          npm run build
+          # 构建结果在 frontend-repo/dist
+
+      # 4. 【关键步骤】搬运前端文件到后端资源目录
+      # 目标路径: backend-repo/e-server/src/main/resources/static
+      - name: Move Frontend to Backend Static
+        run: |
+          # 确保目标目录存在
+          mkdir -p backend-repo/e-server/src/main/resources/static
+          
+          # 复制 dist 下的所有文件到 static 目录
+          # -r 递归, -v 显示过程
+          cp -rv frontend-repo/dist/* backend-repo/e-server/src/main/resources/static/
+          
+          # 验证一下是否复制成功 (可选)
+          ls -R backend-repo/e-server/src/main/resources/static
+
+      # 5. 构建后端 (此时 static 里面已经有前端文件了)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+          # 指定 maven 缓存路径基于后端 pom.xml
+          cache-dependency-path: backend-repo/e-server/pom.xml
+
+      - name: Build Backend with Maven
+        run: |
+          cd backend-repo/e-server
+          # 保留测试，不跳过
+          mvn clean package
+
+      # 6. Docker 登录、打标签、推送
+      - name: Log in to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            #规则1：如果是 Tag 推送 (如 v1.0.0)，则使用该 Tag 名称作为镜像标签
+            type=ref,event=tag
+            # 规则2：如果是 Tag 推送，额外增加一个 'latest' 标签
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+            # 规则3：如果是 Branch 推送 (推送到 main)，则使用 'test' 标签
+            type=raw,value=test,enable=${{ github.ref_type == 'branch' }}
+          # 将 GitHub 仓库信息转换为小写，避免 Docker 镜像名称大小写问题
+          flavor: |
+            latest=false
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          # context 变成了后端代码目录 backend-repo，因为 Dockerfile 在里面
+          context: backend-repo
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
