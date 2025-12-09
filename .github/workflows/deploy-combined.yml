@@ -109,3 +109,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # cache-from: 读取缓存。type=gha 表示使用 GitHub Actions 内部缓存
+          cache-from: type=gha
+          # cache-to: 写入缓存。mode=max 表示尽可能缓存所有层
+          cache-to: type=gha,mode=max
