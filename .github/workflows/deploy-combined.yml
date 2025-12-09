@@ -59,7 +59,7 @@ jobs:
           # -r 递归, -v 显示过程
           cp -rv frontend-repo/dist/* backend-repo/e-server/src/main/resources/static/
           
-          # 验证一下是否复制成功 (可选)
+          # 验证一下是否复制成功
           ls -R backend-repo/e-server/src/main/resources/static
 
       # 5. 构建后端 (此时 static 里面已经有前端文件了)
@@ -70,12 +70,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
           # 指定 maven 缓存路径基于后端 pom.xml
-          cache-dependency-path: backend-repo/e-server/pom.xml
+          cache-dependency-path: backend-repo/pom.xml
 
       - name: Build Backend with Maven
         run: |
-          cd backend-repo/e-server
-          # 保留测试，不跳过
+          cd backend-repo
           mvn clean package
 
       # 6. Docker 登录、打标签、推送
