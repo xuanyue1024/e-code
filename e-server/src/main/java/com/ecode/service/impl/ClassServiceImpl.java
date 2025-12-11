@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -214,10 +215,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<StudentClass> page = classStudentDTO.toMpPage("join_time",false);
 
         //判断是否有name
-        /*QueryWrapper<StudentClass> queryWrapper = new QueryWrapper<>();
-        if (classStudentDTO.getName() != null && !classStudentDTO.getName().isEmpty()){
-            queryWrapper.lambda().like(studeget, generalPageQueryDTO.getName());
-        }*/
         //todo 可优化
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<StudentClass> studentClassPage = studentClassMapper.selectPage(page, new QueryWrapper<StudentClass>().lambda().eq(StudentClass::getClassId, classStudentDTO.getClassId()));
 
@@ -230,14 +227,20 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         //有数据，转换
         List<UserVO> collect = records.stream().map(s -> {
             UserVO uv = new UserVO();
-            User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, s.getStudentId()));
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .eq(User::getId, s.getStudentId())
+                    .like(User::getName, classStudentDTO.getName())
+            );
+            if (user == null) {
+                return null;
+            }
             BeanUtils.copyProperties(user, uv);
             List<ClassScore> classScores = classScoreMapper.selectList(new LambdaQueryWrapper<ClassScore>().eq(ClassScore::getScId, s.getId()));
 
             int sumScore = classScores.stream().mapToInt(ClassScore::getScore).sum();
             uv.setTotalScore(sumScore);
             return uv;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         return new PageVO<>(studentClassPage.getTotal(), studentClassPage.getPages(), collect);
     }

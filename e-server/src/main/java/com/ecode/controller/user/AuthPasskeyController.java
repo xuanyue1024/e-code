@@ -1,21 +1,20 @@
 package com.ecode.controller.user;
 
+import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.PasskeyRegistrationDTO;
+import com.ecode.exception.LoginException;
 import com.ecode.result.Result;
 import com.ecode.service.PasskeyAuthorizationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yubico.webauthn.exception.RegistrationFailedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 /**
  * 身份验证控制器
@@ -42,11 +41,17 @@ public class AuthPasskeyController {
 
     @PostMapping("/registration")
     @Operation(summary = "注册凭证验证")
-    public Result verifyPasskeyRegistration(@RequestBody PasskeyRegistrationDTO passkeyRegistrationDTO) throws RegistrationFailedException, IOException {
-        passkeyAuthorizationService.finishPasskeyRegistration(
-                BaseContext.getCurrentId(),
-                passkeyRegistrationDTO.getName(),
-                passkeyRegistrationDTO.getCredential());
+    public Result verifyPasskeyRegistration(@RequestBody PasskeyRegistrationDTO passkeyRegistrationDTO) {
+        try {
+            passkeyAuthorizationService.finishPasskeyRegistration(
+                    BaseContext.getCurrentId(),
+                    passkeyRegistrationDTO.getName(),
+                    passkeyRegistrationDTO.getCredential());
+        }catch (Exception e){
+            log.error("{}: {}",MessageConstant.WEBAUTHN_ORIGIN_ERROR, e.getMessage());
+            throw new LoginException(MessageConstant.WEBAUTHN_ORIGIN_ERROR);
+        }
+
         return Result.success();
     }
 

@@ -5,6 +5,7 @@ import com.ecode.enumeration.EmailTemplateEnum;
 import com.ecode.exception.MailCaptchaException;
 import com.ecode.service.CaptchaService;
 import com.ecode.utils.EmailApi;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 @Service
+@Slf4j
 public class CaptchaServiceImpl implements CaptchaService {
 
     @Autowired
@@ -59,6 +61,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         try {
             emailApi.sendHtmlEmail(emailTemplateEnum.getSubject(), emailTemplateEnum.set(captcha), email);
         } catch (Exception e) {
+            log.info(e.getMessage());
             throw new MailCaptchaException(MessageConstant.CAPTCHA_ERROR);
         }
         hashOps.put("captcha", captcha);

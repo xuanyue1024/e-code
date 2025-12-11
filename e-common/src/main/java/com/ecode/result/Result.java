@@ -18,7 +18,7 @@ public class Result<T> implements Serializable {
     private Integer code; //编码：
 
     @Schema(description="消息")
-    private String msg; //错误信息
+    private String msg; //信息
 
     @Schema(description="返回数据")
     private T data; //数据
@@ -26,6 +26,7 @@ public class Result<T> implements Serializable {
     public static <T> Result<T> success() {
         Result<T> result = new Result<T>();
         result.code = 200;
+        result.msg = "成功";
         return result;
     }
 
@@ -33,6 +34,7 @@ public class Result<T> implements Serializable {
         Result<T> result = new Result<T>();
         result.data = object;
         result.code = 200;
+        result.msg = "成功";
         return result;
     }
 

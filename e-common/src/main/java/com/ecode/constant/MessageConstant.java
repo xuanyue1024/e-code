@@ -69,4 +69,6 @@ public class MessageConstant {
     //其它
     public static final String TYPE_NOT_FOUND = "类型不存在";
 
+    public static final String WEBAUTHN_ORIGIN_ERROR = "WebAuthn网址异常,请联系网站管理员";
+
 }
