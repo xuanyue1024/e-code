@@ -99,8 +99,8 @@ jobs:
             type=ref,event=tag
             # 规则2：如果是 Tag 推送，额外增加一个 'latest' 标签
             type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
-            # 规则3：如果是 Branch 推送 (推送到 main)，则使用 'test' 标签
-            type=raw,value=test,enable=${{ github.ref_type == 'branch' }}
+            # 规则3：如果是 Branch 推送 (推送到 main)，则使用 'debug' 标签
+            type=raw,value=debug,enable=${{ github.ref_type == 'branch' }}
           # 将 GitHub 仓库信息转换为小写，避免 Docker 镜像名称大小写问题
           flavor: |
             latest=false

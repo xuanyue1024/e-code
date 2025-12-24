@@ -13,8 +13,6 @@ services:
     restart: unless-stopped
     depends_on:
       # - mariadb
-      chroma:
-        condition: service_healthy
       redis:
         condition: service_started
     # 挂载宿主机 Docker Socket
@@ -50,38 +48,15 @@ services:
       --max-connections=50
 
   # -------------------------------------------------------------------
-  # 3. Chroma 向量数据库
-  # -------------------------------------------------------------------
-  chroma:
-    image: chromadb/chroma:0.4.15
-    container_name: chroma-db
-    restart: unless-stopped
-      # ports:
-    # - "8000:8000"
-    volumes:
-      - ./data/chroma:/chroma/chroma
-    environment:
-      - IS_PERSISTENT=TRUE
-      - CHROMA_DISABLE_HNSWLIB_AUTOINSTALL=TRUE #禁用联网下载
-      - ANONYMIZED_TELEMETRY=false   # 关闭遥测
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat', timeout=5)"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-      start_period: 50s
-
-  # -------------------------------------------------------------------
-  # 4. Redis
+  # 3. Redis
   # -------------------------------------------------------------------
   redis:
-    image: redis:alpine
+    image: redis/redis-stack-server:latest
     container_name: redis-service
     restart: unless-stopped
-      # ports:
-    # - "6379:6379"
-    # 开启持久化 (AOF) 并设置密码为 '123456'
-    # 如果不需要密码，去掉 --requirepass 123456 即可
+    # 如果需要从外部访问（如开发调试），可取消注释以下端口
+    # ports:
+    #   - "6379:6379"
     command: redis-server --appendonly yes --requirepass XW%1lk1vKu*W
     volumes:
       - ./data/redis:/data

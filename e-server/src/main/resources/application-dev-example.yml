@@ -1,0 +1,99 @@
+ecode:
+  server:
+    # 服务端口
+    port: 8088
+  # 数据库配置
+  data:
+    mysql:
+      # 数据库地址
+      host: mariadb:3306
+      # 数据库名称
+      db-name: ecode
+      # 数据库用户名
+      username: root
+      # 数据库密码
+      password: XW%1lk1vKu*W
+  # 邮件服务配置
+  mail:
+    # 邮件服务器地址
+    host: smtp.126.com
+    # 协议
+    protocol: smtp
+    # 发送邮件的邮箱也就是你开通服务的邮箱
+    username: aabbcc@126.com
+    # 开通服务后得到的授权码
+    password: aabbcc
+    # 邮件内容的编码
+    default-encoding: utf-8
+    # 邮件服务器端口
+    port: 465
+
+  # redis数据库配置
+  redis:
+    # Redis主机地址
+    host: redis
+    # Redis端口
+    port: 6379
+    # Redis密码
+    password: XW%1lk1vKu*W
+    # Redis数据库索引
+    database: 1
+  # docker设置
+  docker:
+    # Docker服务地址
+    url: tcp://10.8.0.1:5489
+    # 超时时间
+    timeout: 15
+  # 阿里云OSS配置
+  alioss:
+    # OSS节点
+    endpoint: oss-cn-chengdu.aliyuncs.com
+    # AccessKey ID
+    access-key-id: aabbcc
+    # AccessKey Secret
+    access-key-secret: aabbcc
+    # Bucket名称
+    bucket-name: aabbcc
+  # AI相关配置
+  ai:
+    # 题目推荐链接URL前缀,改为运行时域名或者IP
+    problem-recommendation-url: http://localhost
+    # 百炼API Key
+    bailian-api-key: sk-aabbcc
+    # 聊天模型配置
+    chat:
+      options:
+        # 模型名称
+        model: qwen-max-latest
+    # 嵌入模型配置
+    embedding:
+      options:
+        # 模型名称
+        model: text-embedding-v3
+        # 维度
+        dimensions: 1024
+
+  # WebAuthn配置
+  webauthn:
+    # 允许的来源，表示允许的来源 URL 集合
+    allowed-origins:
+      - https://test.aabbcc.dev
+      - http://localhost:8088
+    # 认证方式
+    attestation: direct
+    # 身份信息
+    identity:
+      # id一定要和访问网址一致
+      id: localhost
+      # 应用名称
+      name: ecode代码平台
+    # 注册超时时间
+    registration-timeout: 120000
+    # 断言超时时间
+    assertion-timeout: 120000
+    # 认证器选择
+    authenticator-selection:
+      # 驻留密钥
+      resident-key: preferred
+      # 用户验证
+      user-verification: preferred

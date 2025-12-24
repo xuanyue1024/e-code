@@ -2,7 +2,8 @@
   <img src="assets/logo.ico" alt="Ecode Logo" width="120" />
   <h1>Ecode 编程实践平台</h1>
 </div>
-## 一、 APP 操作说明
+
+## 一、 操作说明
 
 ### 1.1 如何安装
 
@@ -10,11 +11,12 @@
 
 下载[docker-compose.yaml](./docker-compose.yaml)文件到你的服务器
 
+把文件[application-dev-example.yml](./e-server/src/main/resources/application-dev-example.yml)改为`application-dev.yml`
+
 在文件当前目录创建以下结构
 
 ```txt
 ecode
-├── README.md
 ├── config
 │   └── application-dev.yml # 后端配置文件
 ├── data # 容器数据持久化
@@ -125,7 +127,7 @@ docker compose up -d
 ![PixPin_2025-12-09_00-44-03](./assets/PixPin_2025-12-09_00-44-03.jpg)  
 <p align="center">图17退出登录</p>
 
-### 1.2 教师使用流程
+### 1.2 教师使用
 
 #### 1.注册与登录
 
