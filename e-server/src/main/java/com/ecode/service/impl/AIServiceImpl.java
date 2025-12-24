@@ -13,8 +13,9 @@ import com.ecode.result.Result;
 import com.ecode.service.AIService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -26,7 +27,7 @@ public class AIServiceImpl implements AIService {
     private AiChatHistoryMapper aiChatHistoryMapper;
 
     @Autowired
-    private ChatClient chatClient;
+    private ChatClient chatClient ;
 
     @Autowired
     private ChatClient generateQuestionClient;
@@ -39,6 +40,9 @@ public class AIServiceImpl implements AIService {
 
     @Autowired
     private FileRepository fileRepository;
+
+    @Autowired
+    private ChatMemory chatMemory;
     /**
      * 获取聊天内容的方法
      *
@@ -60,10 +64,12 @@ public class AIServiceImpl implements AIService {
             default -> throw new AiException(MessageConstant.AI_CHAT_TYPE_NOT_FOUND);
         }
 
+
         return chatClient.prompt()
                 .user(aiInputDTO.getPrompt())
                 .system(systemPrompt)
-                .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
+                .advisors()
+                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                 .stream()
                 .content()
                 .map(Result::success);
@@ -83,7 +89,7 @@ public class AIServiceImpl implements AIService {
             return questionAnswerClient.prompt()
                     .user(aiInputDTO.getPrompt())
                     .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
-                    .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
+                    .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                     .stream()
                     .content()
                     .map(Result::success);
@@ -92,7 +98,7 @@ public class AIServiceImpl implements AIService {
         return questionAnswerClientVec.prompt()
                 .user(aiInputDTO.getPrompt())
                 .system("请根据知识库内容回答用户问题")
-                .advisors(a -> a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, aiInputDTO.getChatId()))
+                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                 .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "file_name == '" + file.getName() + "' && classId == " + aiInputDTO.getClassId()))
                 .stream()
                 .content()

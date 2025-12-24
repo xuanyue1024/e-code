@@ -1,24 +1,24 @@
 package com.ecode.config;
 
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 import com.ecode.ai.tools.ProblemRecommendationTools;
 import com.ecode.ai.tools.ProblemSolutionTools;
 import com.ecode.constant.AiSystemConstant;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import redis.clients.jedis.JedisPooled;
 
 @Configuration
 public class AiClientConfig {
@@ -28,66 +28,49 @@ public class AiClientConfig {
     @Autowired
     private ProblemSolutionTools problemSolutionTools;
 
-    @Value("${spring.ai.dashscope.api-key}")
-    private String dashScopeApiKey;
-
-    /**
-     * 创建并返回嵌入模型。
-     *
-     * @return 嵌入模型实例
-     */
-    @Bean
-    public EmbeddingModel embeddingModel() {
-        return new DashScopeEmbeddingModel(new DashScopeApi(dashScopeApiKey));
-    }
 
     /**
      * 创建聊天客户端的方法
      *
      * @param model      聊天模型
-     * @param chatMemory 聊天记忆对象
      * @return 创建好的聊天客户端
      */
     @Bean
-    public ChatClient chatClient(DashScopeChatModel model, ChatMemory chatMemory){
+    public ChatClient chatClient(DashScopeChatModel model){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.DEFAULT_SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        new SimpleLoggerAdvisor(),
-                        new MessageChatMemoryAdvisor(chatMemory)
+                        new SimpleLoggerAdvisor()
                 )
                 .defaultTools(problemRecommendationTools)
                 .build();
     }
 
     @Bean
-    public ChatClient questionAnswerClient(DashScopeChatModel model, ChatMemory chatMemory){
+    public ChatClient questionAnswerClient(DashScopeChatModel model){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.CODE_SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        new SimpleLoggerAdvisor(),
-                        new MessageChatMemoryAdvisor(chatMemory)
+                        new SimpleLoggerAdvisor()
                 )
                 .defaultTools(problemSolutionTools)
                 .build();
     }
     @Bean
-    public ChatClient questionAnswerClientVec(DashScopeChatModel model, ChatMemory chatMemory, VectorStore vectorStore){
+    public ChatClient questionAnswerClientVec(DashScopeChatModel model, VectorStore vectorStore){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.CODE_SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
-                        new MessageChatMemoryAdvisor(chatMemory),
-                        new QuestionAnswerAdvisor(
-                                vectorStore, // 向量库
+                        QuestionAnswerAdvisor.builder(vectorStore).searchRequest(
                                 SearchRequest.builder() // 向量检索的请求参数
                                         .similarityThreshold(0.3) // 相似度阈值
                                         .topK(2) // 返回的文档片段数量
                                         .build()
-                        )
+                        ).build()
                 )
                 .build();
     }
@@ -109,17 +92,41 @@ public class AiClientConfig {
                 .build();
     }
 
+    //redis向量数据库初始化不初始元数据字段而不得已而为之,只能自己手动配置
+    // https://github.com/spring-projects/spring-ai/pull/3809
+    // 1. 先把 JedisConnectionFactory 转换成 JedisPooled 并注册为 Bean
+    @Bean
+    public JedisPooled jedisPooled(JedisConnectionFactory factory) {
+        RedisStandaloneConfiguration config = factory.getStandaloneConfiguration();
 
+        // 处理带密码的情况
+        if (config.getPassword().isPresent()) {
+            return new JedisPooled(
+                    config.getHostName(),
+                    config.getPort(),
+                    null,
+                    new String(config.getPassword().get())
+            );
+        }
+        // 处理无密码的情况
+        return new JedisPooled(config.getHostName(), config.getPort());
+    }
 
-    /**
-     * 创建并返回一个基于指定嵌入模型的向量存储实例。
-     *
-     * @param embeddingModel 嵌入模型
-     * @return 构建完成的向量存储实例
-     */
-    /*@Bean
-    public VectorStore vectorStore(DashScopeEmbeddingModel embeddingModel) {
-        return SimpleVectorStore.builder(embeddingModel).build();
-    }*/
+    // 2. 此时 Parameter 0 就能找到 JedisPooled Bean 了
+    @Bean
+    public RedisVectorStore vectorStore(
+            JedisPooled jedisPooled, // 现在可以找到了
+            EmbeddingModel embeddingModel,
+            RedisVectorStoreProperties properties) {
+        return RedisVectorStore.builder(jedisPooled, embeddingModel)
+                .indexName(properties.getIndexName())
+                .prefix(properties.getPrefix())
+                .initializeSchema(true)
+                .metadataFields(
+                        RedisVectorStore.MetadataField.numeric("classId"),
+                        RedisVectorStore.MetadataField.text("file_name")
+                )
+                .build();
+    }
 
 }

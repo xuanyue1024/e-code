@@ -20,6 +20,7 @@ spring:
         port: ${ecode.mail.port} #邮件服务器端口
         ssl:
             enabled: true
+
     data:
         redis:
             host: ${ecode.redis.host}
@@ -37,11 +38,16 @@ spring:
                     model: ${ecode.ai.embedding.options.model}
                     dimensions: ${ecode.ai.embedding.options.dimensions}
         vectorstore:
-            chroma:
-                client:
-                    host: ${ecode.ai.vectorstore.chroma.client.host}
-                    port: ${ecode.ai.vectorstore.chroma.client.port}
+            redis:
                 initialize-schema: true
+                index-name: kb
+                prefix: 'kb:'
+        chat:
+            memory:
+                repository:
+                    jdbc:
+                        initialize-schema: always  # 或 embedded / never
+            #            platform: mysql           # 显式指定平台（可选）
 
     servlet:
         multipart:

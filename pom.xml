@@ -25,8 +25,8 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.4.4</spring-boot.version>
-        <spring-ai-alibaba.version>1.0.0-M6.1</spring-ai-alibaba.version>
-        <spring-ai.version>1.0.0-M6</spring-ai.version>
+        <spring-ai-alibaba.version>1.1.0.0-RC2</spring-ai-alibaba.version>
+        <spring-ai.version>1.1.0</spring-ai.version>
 
 
         <knife4j>4.5.0</knife4j>
@@ -58,17 +58,24 @@
 
             <!-- spring-ai的依赖管理项-->
             <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-agent-framework</artifactId>
+                <version>${spring-ai-alibaba.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+                <version>${spring-ai-alibaba.version}</version>
+            </dependency>
+
+<!--     spring ai版本清单       -->
+            <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
                 <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-starter</artifactId>
-                <version>${spring-ai-alibaba.version}</version>
             </dependency>
 
             <dependency>
@@ -103,12 +110,7 @@
                 <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis-plus}</version> <!-- 确保版本和 MyBatis Plus 主包一致 -->
             </dependency>
-            <!-- 邮件发送 https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-mail</artifactId>
-                <version>3.4.4</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
@@ -167,12 +169,12 @@
                 <version>2.5.0</version>
                 <scope>compile</scope>
             </dependency>
-
-            <dependency>
+            <!--为避免 spring-ai-starter-vector-store-redis 冲突,移除spring redis实现-->
+            <!--<dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
                 <version>3.4.4</version>
-            </dependency>
+            </dependency>-->
 
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>

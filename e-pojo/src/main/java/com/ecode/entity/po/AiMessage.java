@@ -25,8 +25,8 @@ public class AiMessage {
     public Message toMessage() {
         return switch (messageType) {
             case SYSTEM -> new SystemMessage(text);
-            case USER -> new UserMessage(text, List.of(), metadata);
-            case ASSISTANT -> new AssistantMessage(text, metadata, List.of(), List.of());
+            case USER -> UserMessage.builder().text(text).media(List.of()).metadata(metadata).build();
+            case ASSISTANT -> AssistantMessage.builder().content(text).properties(metadata).build();
             default -> throw new IllegalArgumentException("Unsupported message type: " + messageType);
         };
     }

@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,7 +33,7 @@ public class AIController {
     @Autowired
     private AiChatHistoryService aiChatHistoryService;
     @Autowired
-    private ChatMemory chatMemory;
+    private ChatMemoryRepository chatMemoryRepository;
 
     /**
      * 流式输出聊天内容的接口
@@ -101,10 +101,7 @@ public class AIController {
     @GetMapping("/history/{type}/{chatId}")
     @Operation(summary = "查询单个会话历史")
     public Result<List<AiMessageVO>> getChatHistory(@PathVariable("type") AiType type, @PathVariable("chatId") String chatId) {
-        List<Message> messages = chatMemory.get(chatId, Integer.MAX_VALUE);
-        if(messages == null) {
-            return Result.success(List.of());
-        }
+        List<Message> messages = chatMemoryRepository.findByConversationId(chatId);
         List<AiMessageVO> messageVOS = messages.stream().map(AiMessageVO::new).toList();
         return Result.success(messageVOS);
     }
@@ -114,7 +111,7 @@ public class AIController {
     @Operation(summary = "删除会话")
     public Result deleteChatHistory(@PathVariable("type") AiType type, @PathVariable("chatId") String chatId) {
         aiChatHistoryService.deleteChatId(chatId, BaseContext.getCurrentId());
-        chatMemory.clear(chatId);
+        chatMemoryRepository.deleteByConversationId(chatId);
         return Result.success();
     }
 }

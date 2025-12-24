@@ -2,12 +2,13 @@ package com.ecode.interceptor;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 
 @Component
 public class ApiPrefixFilter implements Filter {
+
     /**
      * 解决前后端不分离时去除/api
      * @param request
@@ -21,7 +22,6 @@ public class ApiPrefixFilter implements Filter {
             throws IOException, ServletException {
         
         HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
         String path = req.getRequestURI();
 
         // 如果路径以 /api 开头
