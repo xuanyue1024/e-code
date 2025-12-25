@@ -6,7 +6,7 @@ services:
   # -------------------------------------------------------------------
   app:
     container_name: ecode
-    image: ghcr.io/xuanyue1024/e-code:test
+    image: ghcr.io/xuanyue1024/e-code:latest
     ports:
       - "8088:8088"
       - "465:465" #邮件服务
@@ -51,13 +51,13 @@ services:
   # 3. Redis
   # -------------------------------------------------------------------
   redis:
-    image: redis/redis-stack-server:latest
+    image: redis/redis-stack:7.2.0-v20
     container_name: redis-service
     restart: unless-stopped
-    # 如果需要从外部访问（如开发调试），可取消注释以下端口
-    # ports:
-    #   - "6379:6379"
-    command: redis-server --appendonly yes --requirepass XW%1lk1vKu*W
+#    ports:
+#      - "6379:6379"
+    environment:
+      REDIS_ARGS: "--appendonly yes --requirepass XW%1lk1vKu*W"
     volumes:
       - ./data/redis:/data
 
