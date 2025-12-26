@@ -6,6 +6,7 @@ import com.ecode.annotation.DataAccessCheck;
 import com.ecode.entity.po.RepositoryFile;
 import com.ecode.enumeration.OperationType;
 import com.ecode.result.Result;
+import com.ecode.vo.RepositoryFileVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -67,9 +69,11 @@ public class PdfController {
     @GetMapping("/file/{classId}")
     @Operation(summary = "知识库文件下载",description = "如果文件不存在,data返回null")
     @DataAccessCheck(value = OperationType.TEACHER_TO_CLASS)
-    public Result<RepositoryFile> download(@PathVariable Integer  classId)  {
+    public Result<RepositoryFileVO> download(@PathVariable Integer  classId)  {
         RepositoryFile file = fileRepository.getFile(classId);
-        return Result.success(file);
+        RepositoryFileVO rfv = new RepositoryFileVO();
+        BeanUtils.copyProperties(file, rfv);
+        return Result.success(rfv);
     }
 
     @DeleteMapping("/delete/{classId}")

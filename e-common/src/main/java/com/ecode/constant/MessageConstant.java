@@ -71,4 +71,5 @@ public class MessageConstant {
 
     public static final String WEBAUTHN_ORIGIN_ERROR = "WebAuthn网址异常,请联系网站管理员";
 
+    public static final String FILE_UPLOAD_FAIL = "文件上传失败,请联系管理员";
 }

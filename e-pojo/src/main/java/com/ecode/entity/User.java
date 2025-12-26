@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.ecode.enumeration.UserRole;
 import com.ecode.enumeration.UserSex;
 import com.ecode.enumeration.UserStatus;
+import com.ecode.json.S3UrlSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -57,6 +59,7 @@ public class User implements Serializable {
     private String name;
 
     @Schema(description = "头像链接")
+    @JsonSerialize(using = S3UrlSerializer.class)
     private String profilePicture;
 
     @Schema(description = "手机号")

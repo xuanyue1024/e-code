@@ -62,10 +62,10 @@ public class LocalPdfFileRepository implements FileRepository {
         Class c = classMapper.selectById(classId);
         RepositoryFile repositoryFile = c.getRepositoryFile();
         if (repositoryFile != null){
-            //删除远程阿里云文件
+            //删除远程文件
             fileUtil.deleteFileByUrl(repositoryFile.getUrl());
 
-            //todo 创建过滤条件，目前删除失败
+            //创建过滤条件
             Filter.Expression expr = new FilterExpressionBuilder()
                     .eq("classId", classId)
                     .build();

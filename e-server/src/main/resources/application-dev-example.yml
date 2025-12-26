@@ -38,33 +38,36 @@ ecode:
     password: XW%1lk1vKu*W
     # Redis数据库索引
     database: 1
+
   # docker设置
   docker:
     # Docker服务地址
     url: tcp://10.8.0.1:5489
     # 超时时间
     timeout: 15
-  # 阿里云OSS配置
-  alioss:
-    # OSS节点
-    endpoint: oss-cn-chengdu.aliyuncs.com
+
+  # s3配置
+  s3:
+    # OSS节点,要有http或者https
+    endpoint: https://s3.aabbcc.dev
     # AccessKey ID
-    access-key-id: aabbcc
+    access-key: aabbccid
     # AccessKey Secret
-    access-key-secret: aabbcc
+    secret-key: aabbcc
     # Bucket名称
-    bucket-name: aabbcc
+    bucket-name: ecode
+
   # AI相关配置
   ai:
-    # 题目推荐链接URL前缀,改为运行时域名或者IP
+    # 题目推荐链接URL前缀
     problem-recommendation-url: http://localhost
     # 百炼API Key
     bailian-api-key: sk-aabbcc
     # 聊天模型配置
     chat:
       options:
-        # 模型名称
-        model: qwen-max-latest
+          # 模型名称
+          model: qwen-max-latest
     # 嵌入模型配置
     embedding:
       options:

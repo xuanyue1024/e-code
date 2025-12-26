@@ -46,11 +46,6 @@
             <artifactId>java-diff-utils</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
-        <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.yubico</groupId>
             <artifactId>webauthn-server-core</artifactId>
@@ -86,6 +81,10 @@
             <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
 
     </dependencies>
 </project>

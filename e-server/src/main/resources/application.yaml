@@ -77,11 +77,12 @@ ecode:
         url: ${ecode.docker.url}
         timeout: ${ecode.docker.timeout}
 
-    alioss:
-        endpoint: ${ecode.alioss.endpoint}
-        access-key-id: ${ecode.alioss.access-key-id}
-        access-key-secret: ${ecode.alioss.access-key-secret}
-        bucket-name: ${ecode.alioss.bucket-name}
+    s3:
+        endpoint: ${ecode.s3.endpoint}
+        access-key: ${ecode.s3.access-key}
+        secret-key: ${ecode.s3.secret-key}
+        bucket-name: ${ecode.s3.bucket-name}
+
 
     webauthn:
         allowed-origins: ${ecode.webauthn.allowed-origins}
