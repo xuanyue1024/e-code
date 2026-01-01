@@ -64,13 +64,15 @@ public class S3Util {
      * @param objectName 对象的完整键，如user/avatars/12345.jpg（目录层级+文件名)
      * @return
      */
-    public boolean upload(InputStream inputStream, long contentLength, String objectName) {
+    public boolean upload(InputStream inputStream, long contentLength, String contentType, String objectName) {
         try {
             // 3. 上传文件
             s3Client.putObject(
                     PutObjectRequest.builder()
                             .bucket(bucketName)
                             .key(objectName)
+                            .contentLength(contentLength)
+                            .contentType(contentType)
                             .build(),
                     RequestBody.fromInputStream(inputStream, contentLength)
             );

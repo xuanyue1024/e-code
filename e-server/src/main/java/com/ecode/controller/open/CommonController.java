@@ -3,11 +3,11 @@ package com.ecode.controller.open;
 import com.ecode.constant.MessageConstant;
 import com.ecode.result.Result;
 import com.ecode.service.CaptchaService;
-import com.ecode.utils.FileUtil;
+import com.ecode.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,13 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/open")
 @Tag(name = "开放接口")
 @Slf4j
+@RequiredArgsConstructor
 public class CommonController {
 
-    @Autowired
-    private FileUtil fileUtil;
+    private final FileService fileService;
 
-    @Autowired
-    private CaptchaService captchaService;
+    private final CaptchaService captchaService;
 
     /**
      * 文件上传
@@ -36,7 +35,7 @@ public class CommonController {
     public Result<String> upload(@RequestPart("file") MultipartFile file){
         log.info("文件上传：{}",file);
 
-        String url = fileUtil.uploadFile(file);
+        String url = fileService.uploadFile(file);
 
         if (url != null){
             return Result.success(url);

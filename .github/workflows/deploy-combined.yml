@@ -59,7 +59,7 @@ jobs:
           echo "VITE_BUILD_NUMBER=$BUILD_NUMBER" >> .env
           echo "VITE_BUILD_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> .env
           echo "VITE_COMMIT_SHA=${{ github.sha }}" >> .env
-          echo "VITE_BUILD_DATE=$(date +'%Y-%m-%d')" >> .env
+          echo "VITE_BUILD_DATE=$(TZ='Asia/Shanghai' date +'%Y-%m-%d')" >> .env
 
           echo "=== Generated .env ==="
           cat .env

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ecode.entity.Class;
 import com.ecode.entity.po.RepositoryFile;
 import com.ecode.mapper.ClassMapper;
-import com.ecode.utils.FileUtil;
+import com.ecode.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class LocalPdfFileRepository implements FileRepository {
 
-    private final FileUtil fileUtil;
+    private final FileService fileService;
 
     private final ClassMapper classMapper;
 
@@ -32,7 +32,7 @@ public class LocalPdfFileRepository implements FileRepository {
         deleteFile(classId);
 
         String filename = file.getOriginalFilename();
-        String url = fileUtil.uploadFile(file);
+        String url = fileService.uploadFile(file);
 
         if (url == null){
             return false;
@@ -63,7 +63,7 @@ public class LocalPdfFileRepository implements FileRepository {
         RepositoryFile repositoryFile = c.getRepositoryFile();
         if (repositoryFile != null){
             //删除远程文件
-            fileUtil.deleteFileByUrl(repositoryFile.getUrl());
+            fileService.deleteFileByObjectName(repositoryFile.getUrl());
 
             //创建过滤条件
             Filter.Expression expr = new FilterExpressionBuilder()
@@ -78,36 +78,4 @@ public class LocalPdfFileRepository implements FileRepository {
             );
         }
     }
-
-    /*@PostConstruct
-    private void init() {
-        FileSystemResource pdfResource = new FileSystemResource("e-server\\chat-pdf.properties");
-        if (pdfResource.exists()) {
-            try {
-                chatFiles.load(new BufferedReader(new InputStreamReader(pdfResource.getInputStream(), StandardCharsets.UTF_8)));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        FileSystemResource vectorResource = new FileSystemResource("e-server\\chat-pdf.json");
-        if (vectorResource.exists()) {
-            SimpleVectorStore simpleVectorStore = (SimpleVectorStore) vectorStore;
-            simpleVectorStore.load(vectorResource);
-            log.info("向量存储加载完成，包文档");
-        }else {
-            log.warn("向量存储文件不存在: {}", vectorResource.getFilename());
-        }
-    }
-
-    @PreDestroy
-    private void persistent() {
-        try {
-            chatFiles.store(new FileWriter("e-server\\chat-pdf.properties"), LocalDateTime.now().toString());
-            SimpleVectorStore simpleVectorStore = (SimpleVectorStore) vectorStore;
-            simpleVectorStore.save(new File("e-server\\chat-pdf.json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
 }
