@@ -16,17 +16,21 @@ ecode:
   # 邮件服务配置
   mail:
     # 邮件服务器地址
-    host: smtp.126.com
+    host: smtp.resend.com
     # 协议
     protocol: smtp
-    # 发送邮件的邮箱也就是你开通服务的邮箱
-    username: aabbcc@126.com
+    # 邮件方用户名(默认可能是邮箱)
+    username: resend
     # 开通服务后得到的授权码
     password: aabbcc
+    #邮件发送邮箱
+    from: Ecode 编程实践平台 <ecode@email.aabbcc.cn>
     # 邮件内容的编码
     default-encoding: utf-8
     # 邮件服务器端口
     port: 465
+    # 来自的主机名,可随意填写域名
+    localhost: email.aabbcc.cn
 
   # redis数据库配置
   redis:

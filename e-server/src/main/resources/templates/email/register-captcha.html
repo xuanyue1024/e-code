@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证您的账户</title>
+    <!-- Schema.org 结构化数据：帮助邮件客户端识别验证码 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EmailMessage",
+      "description": "您的身份验证码",
+      "potentialAction": {
+        "@type": "VerifyAction",
+        "name": "验证码",
+        "code": /*[[${code}]]*/
+      }
+    }
+    </script>
+    <style>
+        /* 基础样式复位 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            -webkit-font-smoothing: antialiased;
+        }
+        table {
+            border-spacing: 0;
+            width: 100%;
+        }
+        img {
+            border: 0;
+        }
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f9fafb;
+            padding-bottom: 40px;
+        }
+        .main-content {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+        /* 响应式调整 */
+        @media screen and (max-width: 600px) {
+            .main-content {
+                width: 95% !important;
+                margin-top: 20px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <table class="main-content" role="presentation">
+            <!-- 页眉/Logo -->
+            <tr>
+                <td style="padding: 40px 40px 20px 40px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: 700; color: #4f46e5; letter-spacing: -0.5px;">
+                        Ecode 编程实践平台
+                    </div>
+                </td>
+            </tr>
+
+            <!-- 正文内容 -->
+            <tr>
+                <td style="padding: 20px 40px 40px 40px;">
+                    <h1 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600; color: #111827; text-align: center;">
+                        验证您的身份
+                    </h1>
+                    <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 24px; color: #4b5563; text-align: center;">
+                        您好！我们收到了您的注册请求。请使用下方的验证码完成验证。该验证码在 <span th:text="${time}">10</span> 分钟内有效。
+                    </p>
+
+                    <!-- 验证码展示区 -->
+                    <div style="background-color: #f3f4f6; border-radius: 8px; padding: 24px; text-align: center; margin-bottom: 24px;">
+                        <span style="display: block; font-size: 14px; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">验证码</span>
+                        <div style="font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 700; color: #111827; letter-spacing: 8px;">
+                            <span th:text="${code}">123456</span>
+                        </div>
+                    </div>
+
+                    <p style="margin: 0; font-size: 14px; line-height: 20px; color: #9ca3af; text-align: center;">
+                        如果您没有请求此代码，请忽略此邮件或联系支持人员。
+                    </p>
+                </td>
+            </tr>
+
+            <!-- 页脚 -->
+            <tr>
+                <td style="padding: 0 40px 40px 40px; text-align: center;">
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 24px;">
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #9ca3af;">
+                            &copy; 2026 <a style="text-decoration: none; color: rgba(0,0,0,0.67)" href="https://github.com/xuanyue1024">xuanyue1024</a>. 保留所有权利。
+                        </p>
+                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                            xuanyue1024/e-code, Github
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

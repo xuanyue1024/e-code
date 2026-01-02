@@ -1,5 +1,6 @@
 package com.ecode.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
@@ -73,5 +74,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getUserInfo(Integer currentId) {
         return userMapper.selectById(currentId);
+    }
+
+    @Override
+    public User getUsernameAndNameByEmail(String email) {
+        return userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .select(User::getUsername, User::getName)
+                .eq(User::getEmail, email));
     }
 }

@@ -40,3 +40,4 @@ build/
 /e-server/src/main/resources/application-dev.yml
 /e-server/src/main/resources/application-pre.yml
 /e-server/src/main/resources/static/
+/logs/

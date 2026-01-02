@@ -1,9 +1,9 @@
 package com.ecode.service.impl;
 
 import com.ecode.constant.MessageConstant;
-import com.ecode.enumeration.EmailTemplateEnum;
 import com.ecode.exception.MailCaptchaException;
 import com.ecode.service.CaptchaService;
+import com.ecode.service.UserService;
 import com.ecode.utils.EmailApi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.util.concurrent.TimeUnit;
 @Service
@@ -23,6 +25,9 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     @Autowired
     private EmailApi emailApi;
+
+    @Autowired
+    private TemplateEngine templateEngine;
 
     @Override
     public void sendCaptcha(String email) {
@@ -56,10 +61,14 @@ public class CaptchaServiceImpl implements CaptchaService {
         }
         int newSendCount = StringUtils.isNotBlank(sendCount) ? Integer.parseInt(sendCount) + 1 : 1;
         String captcha = RandomStringUtils.randomNumeric(6);
-        EmailTemplateEnum emailTemplateEnum = EmailTemplateEnum.VERIFICATION_CODE_EMAIL_HTML;
+
+        Context context = new Context();
+        context.setVariable("code", captcha);
+        context.setVariable("time", 15);
+        String htmlContent = templateEngine.process("email/register-captcha", context);
 
         try {
-            emailApi.sendHtmlEmail(emailTemplateEnum.getSubject(), emailTemplateEnum.set(captcha), email);
+            emailApi.sendHtmlEmail("验证码", htmlContent, email);
         } catch (Exception e) {
             log.info(e.getMessage());
             throw new MailCaptchaException(MessageConstant.CAPTCHA_ERROR);

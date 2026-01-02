@@ -10,10 +10,12 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Objects;
  
 /**
@@ -25,7 +27,7 @@ public class EmailApi {
     @Autowired
     private JavaMailSender mailSender;
  
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.from}")
     private String from ;// 发件人
 
     /**
@@ -60,7 +62,9 @@ public class EmailApi {
      * @return 是否成功
      */
     @SneakyThrows(Exception.class)
-    public boolean sendHtmlEmail(String subject, String content, String... to){
+    @Async
+    public void sendHtmlEmail(String subject, String content, String... to){
+        log.info("开始发送邮件向{}", Arrays.toString(to));
         // 创建邮件消息
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -76,8 +80,6 @@ public class EmailApi {
         mailSender.send(mimeMessage);
  
         log.info("发送邮件成功");
-        return true;
- 
     }
     /**
      * 发送带附件的邮件
