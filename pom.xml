@@ -33,7 +33,7 @@
         <docker-java>3.4.0</docker-java>
         <jjwt>0.9.1</jjwt>
         <mybatis-plus>3.5.11</mybatis-plus>
-        <fastjson>1.2.76</fastjson>
+        <fastjson>1.2.83</fastjson>
         <jackson-jdk8>2.18.3</jackson-jdk8>
         <pagehelper>2.1.0</pagehelper>
         <java-diff-utils>4.12</java-diff-utils>
