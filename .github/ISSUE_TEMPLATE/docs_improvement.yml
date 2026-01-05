@@ -1,0 +1,24 @@
+name: "📝 文档改进"
+description: 报告文档中的错误、缺失或不清晰的地方。
+title: "[DOCS]: "
+labels: ["documentation"]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: 涉及的文档链接或文件
+      placeholder: "例如：README.md 或 /docs/api-guide.md"
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: 文档中存在的问题
+      description: 哪里写错了？或者哪里让你感到困惑？
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 改进建议
+      description: 你觉得怎么写会更清楚？

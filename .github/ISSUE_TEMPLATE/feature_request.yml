@@ -1,0 +1,28 @@
+name: "🚀 功能建议"
+description: 为项目提出新功能或改进现有功能的点子。
+title: "[FEATURE]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你为项目贡献想法！请描述你希望看到的功能。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你目前遇到了什么问题？
+      description: 请描述该功能解决的具体痛点。
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: 你预期的解决方案是什么？
+      description: 详细描述该功能应该如何工作。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 你考虑过哪些替代方案？
+      description: 有没有通过现有的配置或其他插件解决的方法？

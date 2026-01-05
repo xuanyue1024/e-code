@@ -1,0 +1,38 @@
+name: "🐞 Bug 反馈"
+description: 提交一个程序运行错误或异常报告。
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你反馈问题！请尽量提供详细信息以获得快速定位。
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 如何重现
+      description: 请提供具体的重现步骤。
+      value: |
+        1. 启动项目
+        2. 调用接口 `/api/test`
+        3. 控制台报错...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 错误日志 (Stacktrace)
+      description: 请贴出完整的错误堆栈。
+      render: java
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认
+      options:
+        - label: 我确认这不是一个配置问题，而是代码 Bug。
+          required: true
