@@ -9,7 +9,6 @@ services:
     image: ghcr.io/xuanyue1024/e-code:latest
     ports:
       - "8088:8088"
-      - "465:465" #邮件服务
     restart: unless-stopped
     depends_on:
       # - mariadb
@@ -19,6 +18,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock #代码运行支持
       - ./config/application-dev.yml:/app/application-dev.yml
+      - ./logs:/app/logs
 
   # -------------------------------------------------------------------
   # 2. MariaDB

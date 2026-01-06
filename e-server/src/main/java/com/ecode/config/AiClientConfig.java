@@ -1,6 +1,5 @@
 package com.ecode.config;
 
-
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.ecode.ai.tools.ProblemRecommendationTools;
 import com.ecode.ai.tools.ProblemSolutionTools;
@@ -8,6 +7,7 @@ import com.ecode.constant.AiSystemConstant;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -44,6 +44,24 @@ public class AiClientConfig {
                         new SimpleLoggerAdvisor()
                 )
                 .defaultTools(problemRecommendationTools)
+                .build();
+    }
+
+    /**
+     * 创建聊天标题生成的方法
+     *
+     * @param model 聊天模型
+     * @return 创建好的聊天客户端
+     */
+    @Bean
+    public ChatClient titleChatClient(DashScopeChatModel model){
+        return ChatClient
+                .builder(model)
+                .defaultOptions(ChatOptions.builder()
+                        .model("qwen1.5-110b-chat")
+                        .build())
+                .defaultSystem(AiSystemConstant.TITLE_GENERATION)
+                .defaultAdvisors(SimpleLoggerAdvisor.builder().build())
                 .build();
     }
 

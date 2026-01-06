@@ -17,6 +17,7 @@ import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -43,7 +44,7 @@ public class AIController {
      */
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "聊天")
-    public Flux<Result<String>> chat(@RequestBody @Valid AiInputDTO aiInputDTO) {
+    public Flux<ServerSentEvent<Object>> chat(@RequestBody @Valid AiInputDTO aiInputDTO) {
         return aiService.getChat(aiInputDTO);
     }
 

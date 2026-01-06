@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.ecode.enumeration.AiType;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +12,6 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * <p>
@@ -39,6 +37,12 @@ public class AiChatHistory implements Serializable {
     private String id;
 
     /**
+     * 会话标题
+     */
+    @TableField(value = "title")
+    private String title;
+
+    /**
      * 会话所属用户id
      */
     @TableField("user_id")
@@ -55,12 +59,5 @@ public class AiChatHistory implements Serializable {
      */
     @TableField("create_time")
     private LocalDateTime createTime;
-
-    /**
-     * 会话历史内容(不再创建一个新表，而是序列化为json)
-     */
-    @TableField(value = "history_content", typeHandler = JacksonTypeHandler.class)
-    private List<String> historyContent;
-
 
 }

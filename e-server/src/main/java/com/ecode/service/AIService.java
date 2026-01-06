@@ -3,6 +3,7 @@ package com.ecode.service;
 import com.ecode.dto.AiInputDTO;
 import com.ecode.result.Result;
 import jakarta.validation.Valid;
+import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 
 /**
@@ -18,7 +19,7 @@ public interface AIService {
      * @param aiInputDTO Ai输入
      * @return Flux < result< string>>
      */
-    Flux<Result<String>> getChat(AiInputDTO aiInputDTO);
+    Flux<ServerSentEvent<Object>> getChat(AiInputDTO aiInputDTO);
 
     /**
      * 生成题目

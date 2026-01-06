@@ -1,5 +1,6 @@
 package com.ecode.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.ecode.ai.repository.FileRepository;
 import com.ecode.constant.AiSystemConstant;
 import com.ecode.constant.MessageConstant;
@@ -16,9 +17,16 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -28,6 +36,9 @@ public class AIServiceImpl implements AIService {
 
     @Autowired
     private ChatClient chatClient ;
+
+    @Autowired
+    private ChatClient titleChatClient;
 
     @Autowired
     private ChatClient generateQuestionClient;
@@ -51,7 +62,7 @@ public class AIServiceImpl implements AIService {
      * @throws AiException 当提供的聊天ID未找到时抛出异常
      */
     @Override
-    public Flux<Result<String>> getChat(AiInputDTO aiInputDTO) {
+    public Flux<ServerSentEvent<Object>> getChat(AiInputDTO aiInputDTO) {
         AiChatHistory ach = aiChatHistoryMapper.selectById(aiInputDTO.getChatId());
         if (ach == null) {
             throw new AiException(MessageConstant.AI_CHAT_ID_NOT_FOUND);
@@ -65,14 +76,46 @@ public class AIServiceImpl implements AIService {
         }
 
 
-        return chatClient.prompt()
+        Flux<ServerSentEvent<Object>> contentStream = chatClient.prompt()
                 .user(aiInputDTO.getPrompt())
                 .system(systemPrompt)
                 .advisors()
                 .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                 .stream()
                 .content()
-                .map(Result::success);
+                .map(content -> ServerSentEvent.builder()
+                        .data(Result.success(content))
+                        .build()
+                );
+
+        Mono<ServerSentEvent<Object>> titleMono;
+        List<Message> messages = chatMemory.get(aiInputDTO.getChatId());
+        if (!messages.isEmpty() && messages.size() > 4) {
+            titleMono = Mono.empty();
+        }else {
+            titleMono = Mono.fromCallable(() -> {
+                    messages.add(new UserMessage(aiInputDTO.getPrompt()));
+                    String title = titleChatClient.prompt()
+                            .user(JSON.toJSONString(messages))
+                            .call()
+                            .content();
+
+                    AiChatHistory aiChatHistory = AiChatHistory.builder()
+                            .id(aiInputDTO.getChatId())
+                            .title(title)
+                            .build();
+                    aiChatHistoryMapper.updateById(aiChatHistory);
+                    return Result.success(title);
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(t -> ServerSentEvent.builder()
+                        .event("title")
+                        .data(t)
+                        .build()
+                );
+        }
+
+        return Flux.merge(contentStream, titleMono);
     }
 
     @Override

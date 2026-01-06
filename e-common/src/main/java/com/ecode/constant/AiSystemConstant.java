@@ -178,6 +178,10 @@ public class AiSystemConstant {
            
            必须告诉你的是,当前用户ID为:""";
 
+    public static final String TITLE_GENERATION = """
+            我将给你一个json格式的对话内容,请根据对话生成一个简短有吸引力的标题,标题不能超过8个字,不要有多余的解释说明,不要有标点符号,不要有引号,不要有任何格式,直接给出标题内容即可
+            """;
+
     /**
      * 获取带有动态URL的题目智能推荐提示词
      *

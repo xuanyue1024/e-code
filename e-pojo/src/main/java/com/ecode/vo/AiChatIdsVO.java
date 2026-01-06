@@ -24,6 +24,9 @@ public class AiChatIdsVO {
     @Schema(description = "聊天ID")
     private String chgatId;
 
+    @Schema(description = "会话标题")
+    private String title;
+
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 }

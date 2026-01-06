@@ -35,6 +35,7 @@ public class AiChatHistoryServiceImpl extends ServiceImpl<AiChatHistoryMapper, A
         AiChatHistory ach = AiChatHistory.builder()
                 .type(type)
                 .userId(userId)
+                .title("用户与AI初次对话")
                 .createTime(LocalDateTime.now())
                 .build();
         aiChatHistoryMapper.insert(ach);
@@ -53,6 +54,7 @@ public class AiChatHistoryServiceImpl extends ServiceImpl<AiChatHistoryMapper, A
         ).forEach(ach -> {
              AiChatIdsVO acv = AiChatIdsVO.builder()
                      .chgatId(ach.getId())
+                     .title(ach.getTitle())
                      .createTime(ach.getCreateTime())
                      .build();
              list.add(acv);
