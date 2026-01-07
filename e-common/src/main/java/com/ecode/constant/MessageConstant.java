@@ -65,6 +65,7 @@ public class MessageConstant {
     //AI
     public static final String AI_CHAT_ID_NOT_FOUND = "没有发现会话id";
     public static final String AI_CHAT_TYPE_NOT_FOUND = "没有发现会话类型";
+    public static final String AI_CHAT_ID_NOT_STANDARD = "ChatId 不符合格式";
 
     //其它
     public static final String TYPE_NOT_FOUND = "类型不存在";
@@ -72,4 +73,6 @@ public class MessageConstant {
     public static final String WEBAUTHN_ORIGIN_ERROR = "WebAuthn网址异常,请联系网站管理员";
 
     public static final String FILE_UPLOAD_FAIL = "文件上传失败,请联系管理员";
+
+    public static final String ERROR = "操作出现错误,,请联系管理员";
 }

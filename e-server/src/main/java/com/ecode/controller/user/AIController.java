@@ -1,5 +1,6 @@
 package com.ecode.controller.user;
 
+import com.ecode.annotation.AIChatIdCheck;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
 import com.ecode.enumeration.AiType;
@@ -12,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +44,14 @@ public class AIController {
      */
     @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "聊天")
+    @AIChatIdCheck
     public Flux<ServerSentEvent<Object>> chat(@RequestBody @Valid AiInputDTO aiInputDTO) {
         return aiService.getChat(aiInputDTO);
     }
 
     @PostMapping(value = "/questionAnswer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "题目解答")
+    @AIChatIdCheck
     public Flux<Result<String>> questionAnswer(@RequestBody @Valid AiInputDTO aiInputDTO) {
         return aiService.questionAnswer(aiInputDTO);
     }
@@ -65,20 +67,6 @@ public class AIController {
     public Flux<Result<String>> generate(@NotBlank String require) {
         return aiService.generateQuestion(require);
     }
-
-    /**
-     * 创建聊天ID。
-     *
-     * @param type 指定创建聊天ID的类型，必须是"pdf"或"chat"
-     * @return 返回创建聊天ID的结果，包含字符串类型的聊天ID
-     */
-    @GetMapping("/creat")
-    @Operation(summary = "创建聊天ID")
-    public Result<String> createChatId(@RequestParam @NotNull AiType type){
-        String chatId = aiChatHistoryService.createChatId(BaseContext.getCurrentId(), type);
-        return Result.success(chatId);
-    }
-
 
     /**
      * 查询会话历史列表

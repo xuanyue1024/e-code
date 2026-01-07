@@ -19,11 +19,12 @@ public interface AiChatHistoryService extends IService<AiChatHistory> {
     /**
      * 生成会话ID的方法。
      *
+     * @param uuid 表id
      * @param userId 用户ID
      * @param type   业务类型，例如"chat"、"service"、"pdf"等
      * @return 返回生成的会话ID字符串
      */
-    String createChatId(Integer userId, AiType type);
+    AiChatHistory createChatId(String uuid, Integer userId, AiType type);
 
     /**
      * 根据用户ID和业务类型获取会话ID列表。

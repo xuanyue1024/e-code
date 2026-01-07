@@ -33,7 +33,7 @@ public class AiChatHistory implements Serializable {
     /**
      * 会话历史主键id
      */
-    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    @TableId(value = "id", type = IdType.INPUT)
     private String id;
 
     /**

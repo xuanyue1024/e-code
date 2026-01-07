@@ -31,15 +31,16 @@ public class AiChatHistoryServiceImpl extends ServiceImpl<AiChatHistoryMapper, A
     private AiChatHistoryMapper aiChatHistoryMapper;
 
     @Override
-    public String createChatId(Integer userId, AiType type) {
+    public AiChatHistory createChatId(String uuid, Integer userId, AiType type) {
         AiChatHistory ach = AiChatHistory.builder()
+                .id(uuid)
                 .type(type)
                 .userId(userId)
                 .title("用户与AI初次对话")
                 .createTime(LocalDateTime.now())
                 .build();
         aiChatHistoryMapper.insert(ach);
-        return ach.getId();
+        return ach;
     }
 
     @Override
