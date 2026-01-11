@@ -104,3 +104,9 @@ ecode:
       resident-key: preferred
       # 用户验证
       user-verification: preferred
+
+  sa-token:
+    # jwt秘钥
+    jwt-secret-key: aabbccddee
+    # token 有效期（单位：秒） 默认30天，-1 代表永久有效
+    timeout: 2592000

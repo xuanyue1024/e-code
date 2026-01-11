@@ -1,11 +1,11 @@
 package com.ecode.config;
 
-import com.ecode.interceptor.JwtTokenStudentInterceptor;
-import com.ecode.interceptor.JwtTokenTeacherInterceptor;
-import com.ecode.interceptor.JwtTokenUserInterceptor;
+import cn.dev33.satoken.interceptor.SaInterceptor;
+import cn.dev33.satoken.router.SaRouter;
+import cn.dev33.satoken.stp.StpUtil;
+import com.ecode.enumeration.UserRole;
 import com.ecode.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -21,35 +21,30 @@ import java.util.List;
 @Configuration
 @Slf4j
 public class WebMvcConfiguration implements WebMvcConfigurer {
-    @Autowired
-    private JwtTokenUserInterceptor jwtTokenUserInterceptor;
-    @Autowired
-    private JwtTokenTeacherInterceptor jwtTokenTeacherInterceptor;
-    @Autowired
-    private JwtTokenStudentInterceptor jwtTokenStudentInterceptor;
-
 
     /**
      * 注册自定义拦截器
      *
      * @param registry
      */
+    @Override
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("开始注册自定义拦截器...");
-        //登录要求拦截
-        registry.addInterceptor(jwtTokenUserInterceptor)
-                .addPathPatterns("/user/**","/auth/**")
-                .excludePathPatterns(
-                        "/user/register","/user/login",
-                        "/auth/passkey/assertion"
-                        );
-        //教师请求拦截
-        registry.addInterceptor(jwtTokenTeacherInterceptor)
-                .addPathPatterns("/teacher/**");
-        //学生请求拦截
-        registry.addInterceptor(jwtTokenStudentInterceptor)
-                .addPathPatterns("/student/**")
-                .excludePathPatterns("/student/problem/*");//排除获取题目信息
+        //sa-token拦截
+        // 注册 Sa-Token 拦截器，定义详细认证规则
+        registry.addInterceptor(new SaInterceptor(handler -> {
+            // 指定一条 match 规则
+            SaRouter
+                    .match("/user/**","/auth/**")    // 拦截的 path 列表，可以写多个 */
+                    .notMatch("/user/register",
+                            "/user/login",
+                            "/auth/passkey/assertion")        // 排除掉的 path 列表，可以写多个
+                    .check(r -> StpUtil.checkLogin());        // 要执行的校验动作，可以写完整的 lambda 表达式
+
+            // 根据路由划分模块，不同模块不同鉴权
+            SaRouter.match("/teacher/**", r -> StpUtil.checkRole(UserRole.TEACHER.name()));
+            SaRouter.match("/student/**").notMatch("/student/problem/*").check(r -> StpUtil.checkRole(UserRole.STUDENT.name()));
+        })).addPathPatterns("/**");
     }
 
     /**

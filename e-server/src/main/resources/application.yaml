@@ -80,14 +80,6 @@ mybatis-plus:
     mapper-locations: "classpath*:/mapper/**/*.xml" # Mapper.xml\u6587\u4EF6\u5730\u5740\uFF0C\u5F53\u524D\u8FD9\u4E2A\u662F\u9ED8\u8BA4\u503C\u3002
 
 ecode:
-    jwt:
-        # \u8BBE\u7F6Ejwt\u7B7E\u540D\u52A0\u5BC6\u65F6\u4F7F\u7528\u7684\u79D8\u94A5
-        user-secret-key: test34274279472346239432
-        # \u8BBE\u7F6Ejwt\u8FC7\u671F\u65F6\u95F4ms
-        user-ttl: 172800000000
-        # \u8BBE\u7F6E\u524D\u7AEF\u4F20\u9012\u8FC7\u6765\u7684\u4EE4\u724C\u540D\u79F0
-        user-token-name: token
-
     docker:
         url: ${ecode.docker.url}
         timeout: ${ecode.docker.timeout}
@@ -177,4 +169,23 @@ captcha:
         expire: 120000
         # 二次验证缓存key前缀，默认是 captcha:secondary
         keyPrefix: "captcha:secondary"
+
+sa-token:
+    # jwt秘钥
+    jwt-secret-key: ${ecode.sa-token.jwt-secret-key}
+    # token 名称（同时也是 cookie 名称）
+    token-name: token
+    # token 有效期（单位：秒） 默认30天，-1 代表永久有效
+    timeout: ${ecode.sa-token.timeout}
+    # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
+    active-timeout: -1
+    # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+    is-concurrent: true
+    # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
+    is-share: false
+    # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
+    token-style: uuid
+    # 是否输出操作日志
+    is-log: true
+
 

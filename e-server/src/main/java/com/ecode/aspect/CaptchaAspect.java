@@ -4,7 +4,6 @@ import cloud.tianai.captcha.application.ImageCaptchaApplication;
 import cloud.tianai.captcha.spring.plugins.secondary.SecondaryVerificationApplication;
 import com.ecode.constant.MessageConstant;
 import com.ecode.exception.BaseException;
-import com.ecode.result.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +41,7 @@ public class CaptchaAspect {
         String captchaToken = request.getHeader("Captcha-Token");
 
         if (captchaToken == null || captchaToken.isEmpty()) {
-            return Result.success(6000, null, "接口需要验证码校验");
+            throw new BaseException("接口需要验证码校验", 6000);
         }else {
             if (imageCaptchaApplication instanceof SecondaryVerificationApplication) {
                 // 参数1为具体的验证码类型， 默认支持 SLIDER、ROTATE、WORD_IMAGE_CLICK、CONCAT 等验证码类型，详见： `CaptchaTypeConstant`类

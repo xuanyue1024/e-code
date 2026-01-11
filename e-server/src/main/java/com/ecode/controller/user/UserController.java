@@ -1,6 +1,7 @@
 package com.ecode.controller.user;
 
-import com.ecode.annotation.Captcha;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
@@ -10,12 +11,10 @@ import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.LoginException;
-import com.ecode.properties.JwtProperties;
 import com.ecode.result.Result;
 import com.ecode.service.UserService;
 import com.ecode.service.login.LoginStrategy;
 import com.ecode.service.login.LoginStrategyFactory;
-import com.ecode.utils.JwtUtil;
 import com.ecode.vo.UserLoginVO;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,9 +43,6 @@ public class UserController {
     private LoginStrategyFactory loginStrategyFactory;
 
     @Autowired
-    private JwtProperties jwtProperties;
-
-    @Autowired
     private UserService userService;
 
 
@@ -58,7 +54,6 @@ public class UserController {
      */
     @PostMapping("/login")
     @Operation(summary = "用户登录")
-    @Captcha
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) throws IOException, AssertionFailedException {
         LoginStrategy strategy = loginStrategyFactory.getStrategy(userLoginDTO.getLoginType());
         User user = strategy.login(userLoginDTO);
@@ -72,19 +67,18 @@ public class UserController {
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
         claims.put(JwtClaimsConstant.USERNAME, user.getUsername());
-        claims.put(JwtClaimsConstant.ROLE, user.getRole());
-        String token = JwtUtil.createJWT(
-                jwtProperties.getUserSecretKey(),
-                jwtProperties.getUserTtl(),
-                claims);
+        claims.put(JwtClaimsConstant.ROLE, user.getRole().name());
+
+        StpUtil.login(user.getId(), new SaLoginParameter().setExtraData(claims));
 
         UserLoginVO userLoginVO = UserLoginVO.builder()
                 .id(user.getId())
                 .userName(user.getUsername())
                 .name(user.getName())
                 .role(user.getRole())
-                .token(token)
+                .token(StpUtil.getTokenInfo().tokenValue)
                 .build();
+
         return Result.success(userLoginVO);
     }
 

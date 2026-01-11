@@ -71,6 +71,9 @@ public class PdfController {
     @DataAccessCheck(value = OperationType.TEACHER_TO_CLASS)
     public Result<RepositoryFileVO> download(@PathVariable Integer  classId)  {
         RepositoryFile file = fileRepository.getFile(classId);
+        if (file == null) {
+            return Result.success();
+        }
         RepositoryFileVO rfv = new RepositoryFileVO();
         BeanUtils.copyProperties(file, rfv);
         return Result.success(rfv);

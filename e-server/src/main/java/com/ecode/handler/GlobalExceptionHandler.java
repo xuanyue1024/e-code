@@ -1,6 +1,9 @@
 package com.ecode.handler;
 
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotRoleException;
+import cn.dev33.satoken.jwt.exception.SaJwtException;
 import com.ecode.constant.MessageConstant;
 import com.ecode.exception.BaseException;
 import com.ecode.exception.SSEException;
@@ -10,9 +13,11 @@ import com.yubico.webauthn.exception.AssertionFailedException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -36,7 +41,43 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public Result exceptionHandler(BaseException ex){
         log.error("业务异常:{}", ex.getMessage());
+        if (ex.getCode() != null){
+            return Result.error(ex.getMessage(), ex.getCode());
+        }
         return Result.error(ex.getMessage());
+    }
+
+    /**
+     * sa-token 登录失败处理
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(NotLoginException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result handlerException(NotLoginException e) {
+        return Result.error(MessageConstant.AUTH_FAILS);
+    }
+
+    /**
+     * sa-token jwt验证失败处理
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(SaJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result handlerException(SaJwtException e) {
+        return Result.error(MessageConstant.AUTH_FAILS);
+    }
+
+    /**
+     * sa-token 角色校验失败处理
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(NotRoleException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result handlerException(NotRoleException  e) {
+        return Result.error(MessageConstant.ACCESS_DENIED);
     }
 
     /**

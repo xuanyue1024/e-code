@@ -1,6 +1,7 @@
 package com.ecode.service.login.type;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ecode.annotation.Captcha;
 import com.ecode.constant.MessageConstant;
 import com.ecode.dto.UserLoginDTO;
 import com.ecode.entity.User;
@@ -23,6 +24,7 @@ public class UserLoginByPassword implements LoginStrategy {
     private UserMapper userMapper;
 
     @Override
+    @Captcha
     public User login(UserLoginDTO userLoginDTO) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
