@@ -150,15 +150,12 @@
             <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
 
-
-
+        <dependency>
+            <groupId>cloud.tianai.captcha</groupId>
+            <artifactId>tianai-captcha-springboot-starter</artifactId>
+        </dependency>
 
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>

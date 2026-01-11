@@ -39,6 +39,7 @@
         <java-diff-utils>4.12</java-diff-utils>
         <lombok>1.18.24</lombok>
         <s3.version>2.25.27</s3.version>
+        <tianai-captcha.version>1.5.3</tianai-captcha.version>
     </properties>
 
     <dependencies>
@@ -179,6 +180,12 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>s3</artifactId>
                 <version>${s3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cloud.tianai.captcha</groupId>
+                <artifactId>tianai-captcha-springboot-starter</artifactId>
+                <version>${tianai-captcha.version}</version>
             </dependency>
 
         </dependencies>

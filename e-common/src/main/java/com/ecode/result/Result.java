@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * 后端统一返回结果
@@ -35,6 +36,14 @@ public class Result<T> implements Serializable {
         result.data = object;
         result.code = 200;
         result.msg = "成功";
+        return result;
+    }
+
+    public static <T> Result<T> success(Integer code, T object, String msg) {
+        Result<T> result = new Result<T>();
+        result.data = object;
+        result.code = code;
+        result.msg = Objects.requireNonNullElse(msg, "成功");
         return result;
     }
 

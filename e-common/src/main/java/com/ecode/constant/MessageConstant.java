@@ -37,6 +37,8 @@ public class MessageConstant {
     public static final String CAPTCHA_TRY_AGAIN_WITHIN_Null_S = "验证码发送过于频繁,请在%s秒后重试";
     public static final String CAPTCHA_ERROR = "验证码发送出现错误,请联系管理员";
 
+    public static final String CAPTCHA_VERIFICATION_FAILED = "验证码验证失败";
+
     //注册
     public static final String REGISTRATION_FAILED_CAPTCHA = "注册失败,验证码不正确";
 

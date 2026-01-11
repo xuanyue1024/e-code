@@ -1,5 +1,6 @@
 package com.ecode.controller.user;
 
+import com.ecode.annotation.Captcha;
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
@@ -57,6 +58,7 @@ public class UserController {
      */
     @PostMapping("/login")
     @Operation(summary = "用户登录")
+    @Captcha
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) throws IOException, AssertionFailedException {
         LoginStrategy strategy = loginStrategyFactory.getStrategy(userLoginDTO.getLoginType());
         User user = strategy.login(userLoginDTO);
