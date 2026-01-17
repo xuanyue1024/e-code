@@ -38,7 +38,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                     .match("/user/**","/auth/**")    // 拦截的 path 列表，可以写多个 */
                     .notMatch("/user/register",
                             "/user/login",
-                            "/auth/passkey/assertion")        // 排除掉的 path 列表，可以写多个
+                            "/auth/passkey/assertion",
+                            "/user/callback",
+                            "/user/oauth2")        // 排除掉的 path 列表，可以写多个
                     .check(r -> StpUtil.checkLogin());        // 要执行的校验动作，可以写完整的 lambda 表达式
 
             // 根据路由划分模块，不同模块不同鉴权

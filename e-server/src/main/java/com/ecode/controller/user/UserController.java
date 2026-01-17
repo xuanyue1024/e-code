@@ -2,6 +2,8 @@ package com.ecode.controller.user;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ecode.annotation.Captcha;
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
@@ -9,23 +11,28 @@ import com.ecode.dto.UserLoginDTO;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
+import com.ecode.enumeration.Redis;
+import com.ecode.enumeration.ResponseCode;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.LoginException;
 import com.ecode.result.Result;
 import com.ecode.service.UserService;
 import com.ecode.service.login.LoginStrategy;
 import com.ecode.service.login.LoginStrategyFactory;
+import com.ecode.vo.OAuthRegisterVO;
 import com.ecode.vo.UserLoginVO;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 用户管理
@@ -44,6 +51,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     /**
@@ -58,26 +68,7 @@ public class UserController {
         LoginStrategy strategy = loginStrategyFactory.getStrategy(userLoginDTO.getLoginType());
         User user = strategy.login(userLoginDTO);
 
-        //判断账号是否被锁定
-        if (user.getStatus() == UserStatus.DISABLE){
-            throw new LoginException(MessageConstant.ACCOUNT_LOCKED);
-        }
-
-        //登录成功后，生成jwt令牌
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(JwtClaimsConstant.USER_ID, user.getId());
-        claims.put(JwtClaimsConstant.USERNAME, user.getUsername());
-        claims.put(JwtClaimsConstant.ROLE, user.getRole().name());
-
-        StpUtil.login(user.getId(), new SaLoginParameter().setExtraData(claims));
-
-        UserLoginVO userLoginVO = UserLoginVO.builder()
-                .id(user.getId())
-                .userName(user.getUsername())
-                .name(user.getName())
-                .role(user.getRole())
-                .token(StpUtil.getTokenInfo().tokenValue)
-                .build();
+        UserLoginVO userLoginVO = getLoginData(user);
 
         return Result.success(userLoginVO);
     }
@@ -90,11 +81,50 @@ public class UserController {
      */
     @PostMapping("/register")
     @Operation(summary = "用户注册")
+    @Captcha
     public Result register(@RequestBody UserRegisterDTO userRegisterDTO){
 
         userService.save(userRegisterDTO);
 
         return Result.success();
+    }
+
+    @GetMapping("/callback")
+    @Operation(summary = "OAuth2 回调接口")
+    public Result callback(@RequestParam String code, @RequestParam String state) throws IOException, AssertionFailedException {
+        //这里先获取一遍,用来查找登录类型,后面还会再获取
+        String oAuth2Type  = String.valueOf(redisTemplate.opsForValue().get(Redis.OAUTH2_STATE + state));
+        UserLoginDTO userLoginDTO = UserLoginDTO.builder()
+                .loginType(oAuth2Type)
+                .state(state)
+                .authCode(code).build();
+
+        LoginStrategy strategy = loginStrategyFactory.getStrategy(userLoginDTO.getLoginType());
+        User user = strategy.login(userLoginDTO);
+        User u = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, user.getEmail()));
+        if (u == null){
+            OAuthRegisterVO ov = new OAuthRegisterVO();
+            ov.setUser(user);
+            ov.setRegisterCode(UUID.randomUUID().toString());
+            Redis oauth2RegisterCode = Redis.OAUTH2_REGISTER_CODE;
+            redisTemplate.opsForValue().set(
+                    oauth2RegisterCode + ov.getRegisterCode(),
+                    ov, oauth2RegisterCode.getTimeout(),
+                    oauth2RegisterCode.getTimeUnit()
+            );
+            
+            return Result.success(ResponseCode.PLEASE_REGISTER.getValue(),
+                    ov, ResponseCode.PLEASE_REGISTER.getDesc());
+        }
+        return Result.success(getLoginData(u));
+    }
+
+    @GetMapping("/oauth2")
+    @Operation(summary = "OAuth2 获取授权URL接口")
+    public Result oauth(@RequestParam String oauth2Type){
+        LoginStrategy strategy = loginStrategyFactory.getStrategy(oauth2Type);
+        String url = strategy.prepare();
+        return Result.success(Map.of("oauth2Url", url));
     }
 
     @PutMapping()
@@ -109,5 +139,33 @@ public class UserController {
     public Result<User> get(){
         User u = userService.getUserInfo(BaseContext.getCurrentId());
         return Result.success(u);
+    }
+
+    /**
+     * 根据登录User类获取登录数据
+     * @param user 登录成功查询用户数据
+     * @return
+     */
+    private UserLoginVO getLoginData(User user) {
+        //判断账号是否被锁定
+        if (user.getStatus() == UserStatus.DISABLE){
+            throw new LoginException(MessageConstant.ACCOUNT_LOCKED);
+        }
+
+        //登录成功后，生成jwt令牌
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(JwtClaimsConstant.USER_ID, user.getId());
+        claims.put(JwtClaimsConstant.USERNAME, user.getUsername());
+        claims.put(JwtClaimsConstant.ROLE, user.getRole().name());
+
+        StpUtil.login(user.getId(), new SaLoginParameter().setExtraData(claims));
+
+        return UserLoginVO.builder()
+                .id(user.getId())
+                .userName(user.getUsername())
+                .name(user.getName())
+                .role(user.getRole())
+                .token(StpUtil.getTokenInfo().tokenValue)
+                .build();
     }
 }

@@ -31,6 +31,9 @@ public class MessageConstant {
 
     public static final String INVALID_LOGIN_TYPE = "无效的登录类型";
     public static final String UPDATE_FAILED = "修改失败";
+    public static final String PARAMETER_ERROR = "参数值不正确";
+    public static final String ACCESS_TOKEN_GET_FAILED = "accessToken 值获取出现问题";
+    public static final String FINGERPRINT_IS_NULL = "指纹信息不能为空";
 
     //验证码
     public static final String CAPTCHA_TRY_AGAIN_WITHIN24_HOURS = "验证码发送过于频繁,请24小时后再试";
@@ -77,4 +80,7 @@ public class MessageConstant {
     public static final String FILE_UPLOAD_FAIL = "文件上传失败,请联系管理员";
 
     public static final String ERROR = "操作出现错误,,请联系管理员";
+
+    //接口调用
+    public static final String INTERFACE_INVOKE_ERROR = "接口调用出现错误,请联系管理员";
 }

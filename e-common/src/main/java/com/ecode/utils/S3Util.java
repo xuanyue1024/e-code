@@ -3,6 +3,7 @@ package com.ecode.utils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -14,7 +15,6 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.StringJoiner;
 
 @Data
 @Slf4j
@@ -103,11 +103,17 @@ public class S3Util {
     /**
      * 获取公开文件完整链接
      *
-     * @param objectName
+     * @param objectName 文件名或完整URL
      * @return url
      */
-    public String getPublicUrl(String objectName){
-        StringJoiner sj = new StringJoiner("/");
-        return sj.add(endpoint).add(bucketName).add(objectName).toString();
+    public String getPublicUrl(String objectName) {
+        // 如果 objectName 本身就是完整 URL，直接返回
+        if (StringUtils.isNotBlank(objectName) &&
+                (objectName.startsWith("http://") || objectName.startsWith("https://"))) {
+            return objectName;
+        }
+
+        // 否则按规则拼接
+        return String.join("/", endpoint, bucketName, objectName);
     }
 }

@@ -1,7 +1,7 @@
 package com.ecode.service.login;
 
 import com.ecode.constant.MessageConstant;
-import com.ecode.exception.InvalidLoginTypeException;
+import com.ecode.exception.BaseException;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,7 @@ public class LoginStrategyFactory {
     public LoginStrategy getStrategy(String loginType) {
         LoginStrategy strategy = strategyMap.get(loginType);
         if (strategy == null) {
-            throw new InvalidLoginTypeException(MessageConstant.INVALID_LOGIN_TYPE + loginType);
+            throw new BaseException(MessageConstant.INVALID_LOGIN_TYPE + loginType);
         }
         return strategy;
     }

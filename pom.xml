@@ -40,6 +40,7 @@
         <lombok>1.18.24</lombok>
         <s3.version>2.25.27</s3.version>
         <tianai-captcha.version>1.5.3</tianai-captcha.version>
+        <okhttp3.version>4.12.0</okhttp3.version>
     </properties>
 
     <dependencies>
@@ -186,6 +187,18 @@
                 <groupId>cloud.tianai.captcha</groupId>
                 <artifactId>tianai-captcha-springboot-starter</artifactId>
                 <version>${tianai-captcha.version}</version>
+            </dependency>
+
+            <!--OkHttp 及其日志拦截器（用于调试）-->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>logging-interceptor</artifactId>
+                <version>${okhttp3.version}</version>
             </dependency>
 
         </dependencies>

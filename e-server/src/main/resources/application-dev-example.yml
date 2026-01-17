@@ -110,3 +110,14 @@ ecode:
     jwt-secret-key: aabbccddee
     # token 有效期（单位：秒） 默认30天，-1 代表永久有效
     timeout: 2592000
+
+  # OAuth2 登录配置
+  oauth:
+    configs:
+      github:
+        authorize-url: https://github.com
+        access-token-url: https://github.com/login/oauth/access_token
+        user-info-url: https://api.github.com/user
+        client-id: aabbcc
+        client_secret: aabbcc
+        redirect-uri: http://localhost:5173/login

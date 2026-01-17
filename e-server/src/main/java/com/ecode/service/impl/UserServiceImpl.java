@@ -7,12 +7,17 @@ import com.ecode.context.BaseContext;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
+import com.ecode.enumeration.Redis;
 import com.ecode.enumeration.UserStatus;
+import com.ecode.exception.BaseException;
 import com.ecode.exception.RegisterException;
 import com.ecode.mapper.UserMapper;
 import com.ecode.service.UserService;
+import com.ecode.utils.EUtil;
+import com.ecode.vo.OAuthRegisterVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -38,27 +43,56 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void save(UserRegisterDTO userRegisterDTO) {
-        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps("email:captcha:" + userRegisterDTO.getEmail());
-        String captcha = hashOps.get("captcha");
-        if (captcha == null || userRegisterDTO.getEmailCode() == null){
-            throw new RegisterException(MessageConstant.REGISTRATION_FAILED);
-        }
-        if (!userRegisterDTO.getEmailCode().equals(captcha)){
-            throw new RegisterException(MessageConstant.REGISTRATION_FAILED_CAPTCHA);
-        }
-        redisTemplate.delete("email:captcha:" + userRegisterDTO.getEmail());
-        User user = User.builder()
-                .status(UserStatus.ENABLE)
-                .role(userRegisterDTO.getRole())
-                .name("默认用户")
-                .profilePicture("https://sky-take-out-xuanyue.oss-cn-chengdu.aliyuncs.com/0bf3e49e-0de6-4c9a-b6f2-e2c28beeff33.jpg")
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
-                .score(0L)
-                .build();
+        if (userRegisterDTO.getEmailCode() != null) {
+            BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps("email:captcha:" + userRegisterDTO.getEmail());
+            String captcha = hashOps.get("captcha");
+            if (captcha == null || userRegisterDTO.getEmailCode() == null){
+                throw new RegisterException(MessageConstant.REGISTRATION_FAILED);
+            }
+            if (!userRegisterDTO.getEmailCode().equals(captcha)){
+                throw new RegisterException(MessageConstant.REGISTRATION_FAILED_CAPTCHA);
+            }
+            redisTemplate.delete("email:captcha:" + userRegisterDTO.getEmail());
+            User user = User.builder()
+                    .status(UserStatus.ENABLE)
+                    .role(userRegisterDTO.getRole())
+                    .name("默认用户")
+                    .profilePicture("default-profile-pic.jpg")
+                    .createTime(LocalDateTime.now())
+                    .updateTime(LocalDateTime.now())
+                    .score(0L)
+                    .build();
 
-        BeanUtils.copyProperties(userRegisterDTO, user);
-        userMapper.insert(user);
+            BeanUtils.copyProperties(userRegisterDTO, user);
+            userMapper.insert(user);
+        } else {
+            // 通过OAuth2 注册码注册
+            OAuthRegisterVO ov = (OAuthRegisterVO) redisTemplate.opsForValue().get(Redis.OAUTH2_REGISTER_CODE + userRegisterDTO.getRegisterCode());
+            if (ov == null || !ov.getRegisterCode().equals(userRegisterDTO.getRegisterCode())){
+                throw new RegisterException(MessageConstant.REGISTRATION_FAILED);
+            }
+            User user = ov.getUser();
+            User build = User.builder()
+                    .username(userRegisterDTO.getUsername())
+                    .password(userRegisterDTO.getPassword())
+                    .role(userRegisterDTO.getRole())
+                    .email(user.getEmail())
+                    .address(user.getAddress())
+                    .profilePicture(user.getProfilePicture())
+                    .name(user.getName())
+                    .status(UserStatus.ENABLE)
+                    .createTime(LocalDateTime.now())
+                    .updateTime(LocalDateTime.now())
+                    .score(0L)
+                    .build();
+            try {
+                userMapper.insert(build);
+                redisTemplate.delete(Redis.OAUTH2_REGISTER_CODE + userRegisterDTO.getRegisterCode());
+            }catch (DuplicateKeyException e){
+                throw new BaseException(EUtil.duplicateKeyException(e));
+            }
+        }
+
 
     }
 
