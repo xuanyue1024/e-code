@@ -10,42 +10,42 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-@Service(GiteeOAuth2.LOGIN_TYPE)
+@Service(FeishuOAuth2.LOGIN_TYPE)
 @Slf4j
-public class GiteeOAuth2 extends UserLoginByOAuth2 {
+public class FeishuOAuth2 extends UserLoginByOAuth2 {
 
-    public static final String LOGIN_TYPE = "gitee";
+    public static final String LOGIN_TYPE = "feishu";
 
 
-    public GiteeOAuth2(OAuthProperties properties, RedisTemplate redisTemplate) {
+    public FeishuOAuth2(OAuthProperties properties, RedisTemplate redisTemplate) {
         super(properties, redisTemplate);
     }
 
     @Override
     protected UserOauthVO parseUserInfo(JSONObject rawUserInfo) {
-        String id = rawUserInfo.getString("id");
+        rawUserInfo = rawUserInfo.getJSONObject("data");
+
+        String id = rawUserInfo.getString("user_id");
         String email = rawUserInfo.getString("email");
         String login = rawUserInfo.getString("login");
         String name = rawUserInfo.getString("name");
         String avatarUrl = rawUserInfo.getString("avatar_url");
 
         User user = User.builder()
-                        .username(login)
-                        .email(email)
-                        .name(name)
-                        .profilePicture(avatarUrl)
-                        .build();
+                .email(email)
+                .name(name)
+                .profilePicture(avatarUrl)
+                .build();
 
+        //字段有一些与user相同,方便未注册直接插入
         OauthIdentities oauthIdentities = OauthIdentities.builder()
-                        .provider(LOGIN_TYPE)
-                        .providerEmail(email)
-                        .providerId(id)
-                        .providerUsername(login)
-                        .build();
+                .provider(LOGIN_TYPE)
+                .providerEmail(email)
+                .providerId(id)
+                .build();
 
         return new UserOauthVO(user, oauthIdentities);
     }
-
 
     @Override
     protected String getOAuth2Type() {

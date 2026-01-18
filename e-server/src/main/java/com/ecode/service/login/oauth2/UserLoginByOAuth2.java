@@ -55,7 +55,7 @@ public abstract class UserLoginByOAuth2 implements OAuth2Strategy {
         String type = getOAuth2Type().toLowerCase();
 
         String url = String.format("%s?client_id=%s&redirect_uri=%s&scope=read:user&state=%s",
-                getConfig().getAuthorizeUrl(), getConfig().getClientId(), getConfig().getRedirectUri(), state);
+                getConfig().getAuthorizeUrl(), getConfig().getClientId(), properties.getRedirectUri(), state);
 
         redisTemplate.opsForValue().set(Redis.OAUTH2_STATE + state, type,
                 Redis.OAUTH2_STATE.getTimeout(), Redis.OAUTH2_STATE.getTimeUnit());
@@ -84,7 +84,9 @@ public abstract class UserLoginByOAuth2 implements OAuth2Strategy {
             userOauthVO.getOauthIdentities().setProviderEmail(email);
             userOauthVO.getUser().setEmail(email);
         }
-
+        if (userOauthVO.getUser().getEmail() == null || userOauthVO.getUser().getEmail().isEmpty()) {
+            throw new BaseException(MessageConstant.EMAIL_IS_NULL);
+        }
         return userOauthVO;
     }
 
@@ -145,7 +147,7 @@ public abstract class UserLoginByOAuth2 implements OAuth2Strategy {
                 .addParam("client_id", config.getClientId())
                 .addParam("client_secret", config.getClientSecret())
                 .addParam("state", state)
-                .addParam("redirect_uri", config.getRedirectUri())
+                .addParam("redirect_uri", properties.getRedirectUri())
                 .addParam("code", authCode)
                 .addHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
                 .addHeader("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)

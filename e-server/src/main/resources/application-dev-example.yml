@@ -115,9 +115,22 @@ ecode:
   oauth:
     configs:
       github:
-        authorize-url: https://github.com
+        authorize-url: https://github.com/login/oauth/authorize?client_id=${ecode.oauth.configs.github.client-id}&redirect_uri=${ecode.oauth.redirect-uri}&scope=user
         access-token-url: https://github.com/login/oauth/access_token
         user-info-url: https://api.github.com/user
+        email-url: https://api.github.com/user/emails
         client-id: aabbcc
         client_secret: aabbcc
-        redirect-uri: http://localhost:5173/login
+      gitee:
+        authorize-url: https://gitee.com/oauth/authorize?client_id=${ecode.oauth.configs.gitee.client-id}&redirect_uri=${ecode.oauth.redirect-uri}&response_type=code&scope=user_info%20emails
+        access-token-url: https://gitee.com/oauth/token
+        user-info-url: https://gitee.com/api/v5/user
+        email-url: https://gitee.com/api/v5/emails
+        client-id: aabbcc
+        client_secret: aabbcc
+      feishu:
+        authorize-url: https://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=${ecode.oauth.configs.feishu.client-id}&redirect_uri=${ecode.oauth.redirect-uri}&response_type=code&scope=contact:user.email:readonly%20contact:user.employee_id:readonly
+        access-token-url: https://open.feishu.cn/open-apis/authen/v2/oauth/token
+        user-info-url: https://open.feishu.cn/open-apis/authen/v1/user_info
+        client-id: aabbcc
+        client_secret: aabbcc

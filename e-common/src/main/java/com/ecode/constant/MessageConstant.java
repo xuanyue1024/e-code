@@ -35,6 +35,7 @@ public class MessageConstant {
     public static final String ACCESS_TOKEN_GET_FAILED = "accessToken 值获取出现问题";
     public static final String FINGERPRINT_IS_NULL = "指纹信息不能为空";
     public static final String CALLBACK_FAIL = "回调失败";
+    public static final String EMAIL_IS_NULL = "邮箱不能为空,请先在平台配置邮箱";
 
     //验证码
     public static final String CAPTCHA_TRY_AGAIN_WITHIN24_HOURS = "验证码发送过于频繁,请24小时后再试";

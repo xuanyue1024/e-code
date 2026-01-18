@@ -17,20 +17,46 @@ public class OAuthProperties {
      */
     private Map<String, AuthSourceConfig> configs;
 
+    /**
+     * 回调URL
+     */
+    private String redirectUri;
+
+    /**
+     * 单个认证平台的配置项
+     * 包含授权地址、获取 access token、获取用户信息等相关地址和凭证
+     */
     @Data
     public static class AuthSourceConfig {
+        /**
+         * 授权地址，用于跳转到第三方授权页面
+         */
         private String authorizeUrl;
+
+        /**
+         * 用于通过授权码换取 access token 的接口地址
+         */
         private String accessTokenUrl;
+
+        /**
+         * 获取用户信息的接口地址（通常返回用户基本信息）
+         */
         private String userInfoUrl;
 
-        //针对一些平台如github邮箱需要单独获取,为空则从userInfoUrl获取
+        /**
+         * 获取用户邮箱的接口地址。
+         * 部分平台（如 GitHub）需要单独请求邮箱接口，若为空则尝试从 userInfoUrl 的返回中获取邮箱
+         */
         private String emailUrl;
 
+        /**
+         * 第三方应用的客户端 ID
+         */
         private String clientId;
+
+        /**
+         * 第三方应用的客户端密钥，注意不要在日志或前端泄露
+         */
         private String clientSecret;
-        private String redirectUri;
-        
-        // 如果某些平台有特殊参数（比如微软的 tenantId），也可以加在这里
-        private String tenantId; 
     }
 }
