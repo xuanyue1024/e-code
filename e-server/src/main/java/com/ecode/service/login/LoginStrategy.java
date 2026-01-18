@@ -9,13 +9,6 @@ import java.io.IOException;
 public interface LoginStrategy {
 
     /**
-     * 准备阶段：获取跳转地址 (仅 OAuth2 需要)
-     * 对于密码和短信登录，返回空
-     */
-    default String prepare() {
-        return null;
-    }
-    /**
      * 登录方法
      * @param userLoginDTO 登录请求参数
      * @return 登录结果

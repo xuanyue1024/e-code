@@ -23,6 +23,9 @@ public class OAuthProperties {
         private String accessTokenUrl;
         private String userInfoUrl;
 
+        //针对一些平台如github邮箱需要单独获取,为空则从userInfoUrl获取
+        private String emailUrl;
+
         private String clientId;
         private String clientSecret;
         private String redirectUri;

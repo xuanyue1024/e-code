@@ -34,6 +34,7 @@ public class MessageConstant {
     public static final String PARAMETER_ERROR = "参数值不正确";
     public static final String ACCESS_TOKEN_GET_FAILED = "accessToken 值获取出现问题";
     public static final String FINGERPRINT_IS_NULL = "指纹信息不能为空";
+    public static final String CALLBACK_FAIL = "回调失败";
 
     //验证码
     public static final String CAPTCHA_TRY_AGAIN_WITHIN24_HOURS = "验证码发送过于频繁,请24小时后再试";

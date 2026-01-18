@@ -43,6 +43,6 @@ public interface UserService extends IService<User> {
      * @param email 邮箱
      * @return 用户名和姓名
      */
-    User getUsernameAndNameByEmail(String email);
+    User getUserByEmail(String email);
 
 }

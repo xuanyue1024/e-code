@@ -6,12 +6,14 @@ import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
+import com.ecode.entity.OauthIdentities;
 import com.ecode.entity.User;
 import com.ecode.enumeration.Redis;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.BaseException;
 import com.ecode.exception.RegisterException;
 import com.ecode.mapper.UserMapper;
+import com.ecode.service.OauthIdentitiesService;
 import com.ecode.service.UserService;
 import com.ecode.utils.EUtil;
 import com.ecode.vo.OAuthRegisterVO;
@@ -21,6 +23,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -41,7 +44,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private OauthIdentitiesService oauthIdentitiesService;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void save(UserRegisterDTO userRegisterDTO) {
         if (userRegisterDTO.getEmailCode() != null) {
             BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps("email:captcha:" + userRegisterDTO.getEmail());
@@ -71,7 +78,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             if (ov == null || !ov.getRegisterCode().equals(userRegisterDTO.getRegisterCode())){
                 throw new RegisterException(MessageConstant.REGISTRATION_FAILED);
             }
-            User user = ov.getUser();
+            User user = ov.getUserOauthVO().getUser();
+            OauthIdentities oauthIdentities = ov.getUserOauthVO().getOauthIdentities();
             User build = User.builder()
                     .username(userRegisterDTO.getUsername())
                     .password(userRegisterDTO.getPassword())
@@ -87,6 +95,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .build();
             try {
                 userMapper.insert(build);
+                oauthIdentities.setUserId(build.getId());
+                oauthIdentitiesService.insertOauthIdentities(oauthIdentities);
                 redisTemplate.delete(Redis.OAUTH2_REGISTER_CODE + userRegisterDTO.getRegisterCode());
             }catch (DuplicateKeyException e){
                 throw new BaseException(EUtil.duplicateKeyException(e));
@@ -111,9 +121,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public User getUsernameAndNameByEmail(String email) {
+    public User getUserByEmail(String email) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .select(User::getUsername, User::getName)
                 .eq(User::getEmail, email));
     }
 }

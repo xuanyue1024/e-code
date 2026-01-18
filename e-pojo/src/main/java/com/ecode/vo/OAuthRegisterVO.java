@@ -1,6 +1,5 @@
 package com.ecode.vo;
 
-import com.ecode.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +18,8 @@ public class OAuthRegisterVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 4893178211774804239L;
 
-    @Schema(description = "用户信息")
-    private User user;
+    @Schema(description = "用户-OAuth信息")
+    private UserOauthVO userOauthVO;
 
     @Schema(description = "注册码,验证邮箱是否伪造")
     private String registerCode;

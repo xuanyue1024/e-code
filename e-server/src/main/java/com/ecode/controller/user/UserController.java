@@ -2,7 +2,6 @@ package com.ecode.controller.user;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ecode.annotation.Captcha;
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.constant.MessageConstant;
@@ -10,17 +9,23 @@ import com.ecode.context.BaseContext;
 import com.ecode.dto.UserLoginDTO;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
+import com.ecode.entity.OauthIdentities;
 import com.ecode.entity.User;
 import com.ecode.enumeration.Redis;
 import com.ecode.enumeration.ResponseCode;
 import com.ecode.enumeration.UserStatus;
+import com.ecode.exception.BaseException;
 import com.ecode.exception.LoginException;
 import com.ecode.result.Result;
+import com.ecode.service.OauthIdentitiesService;
 import com.ecode.service.UserService;
 import com.ecode.service.login.LoginStrategy;
 import com.ecode.service.login.LoginStrategyFactory;
+import com.ecode.service.login.OAuth2Strategy;
+import com.ecode.service.login.OAuth2StrategyFactory;
 import com.ecode.vo.OAuthRegisterVO;
 import com.ecode.vo.UserLoginVO;
+import com.ecode.vo.UserOauthVO;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,7 +55,13 @@ public class UserController {
     private LoginStrategyFactory loginStrategyFactory;
 
     @Autowired
+    private OAuth2StrategyFactory oAuth2StrategyFactory;
+
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private OauthIdentitiesService oauthIdentitiesService;
     
     @Autowired
     private RedisTemplate redisTemplate;
@@ -94,17 +105,41 @@ public class UserController {
     public Result callback(@RequestParam String code, @RequestParam String state) throws IOException, AssertionFailedException {
         //这里先获取一遍,用来查找登录类型,后面还会再获取
         String oAuth2Type  = String.valueOf(redisTemplate.opsForValue().get(Redis.OAUTH2_STATE + state));
+
+        if (oAuth2Type == null) {
+            throw new BaseException(MessageConstant.CALLBACK_FAIL);
+        }
+
         UserLoginDTO userLoginDTO = UserLoginDTO.builder()
                 .loginType(oAuth2Type)
                 .state(state)
                 .authCode(code).build();
+        OAuth2Strategy strategy = oAuth2StrategyFactory.getStrategy(userLoginDTO.getLoginType());
+        UserOauthVO uoVO = strategy.callback(userLoginDTO);//里面没有密码或者id信息
+        OauthIdentities oauthIdentities = uoVO.getOauthIdentities();
 
-        LoginStrategy strategy = loginStrategyFactory.getStrategy(userLoginDTO.getLoginType());
-        User user = strategy.login(userLoginDTO);
-        User u = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, user.getEmail()));
-        if (u == null){
+        // 查找用户
+        OauthIdentities oi = oauthIdentitiesService.getByProviderId(oauthIdentities.getProvider(),
+                oauthIdentities.getProviderId());
+        if (oi == null) {
+            if (oauthIdentities.getProviderEmail() == null){
+                log.error(MessageConstant.CALLBACK_FAIL + ",邮箱不能为空");
+                throw new BaseException(MessageConstant.CALLBACK_FAIL);
+            }
+
+            //根据邮箱查找用户
+            User userByEmail = userService.getUserByEmail(oauthIdentities.getProviderEmail());
+
+            //存在用户,直接关联权限表登录
+            if (userByEmail != null) {
+                oauthIdentities.setUserId(userByEmail.getId());
+                oauthIdentitiesService.insertOauthIdentities(oauthIdentities);
+                return Result.success(getLoginData(userByEmail));
+            }
+
+            //不存在用户,启动注册流程
             OAuthRegisterVO ov = new OAuthRegisterVO();
-            ov.setUser(user);
+            ov.setUserOauthVO(uoVO);
             ov.setRegisterCode(UUID.randomUUID().toString());
             Redis oauth2RegisterCode = Redis.OAUTH2_REGISTER_CODE;
             redisTemplate.opsForValue().set(
@@ -112,17 +147,19 @@ public class UserController {
                     ov, oauth2RegisterCode.getTimeout(),
                     oauth2RegisterCode.getTimeUnit()
             );
-            
             return Result.success(ResponseCode.PLEASE_REGISTER.getValue(),
                     ov, ResponseCode.PLEASE_REGISTER.getDesc());
+
+        }else {
+            //代表原来已经注册过三方,直接登录
+            return Result.success(getLoginData(userService.getById(oi.getUserId())));
         }
-        return Result.success(getLoginData(u));
     }
 
     @GetMapping("/oauth2")
     @Operation(summary = "OAuth2 获取授权URL接口")
     public Result oauth(@RequestParam String oauth2Type){
-        LoginStrategy strategy = loginStrategyFactory.getStrategy(oauth2Type);
+        OAuth2Strategy strategy = oAuth2StrategyFactory.getStrategy(oauth2Type);
         String url = strategy.prepare();
         return Result.success(Map.of("oauth2Url", url));
     }

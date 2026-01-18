@@ -13,12 +13,12 @@ import java.util.Map;
  * @date 2024/09/22
  */
 @Component
-public class LoginStrategyFactory {
+public class OAuth2StrategyFactory {
 
-    private final Map<String, LoginStrategy> strategyMap;
+    private final Map<String, OAuth2Strategy> strategyMap;
 
     // 通过构造方法注入策略
-    public LoginStrategyFactory(Map<String, LoginStrategy> strategyMap) {
+    public OAuth2StrategyFactory(Map<String, OAuth2Strategy> strategyMap) {
         this.strategyMap = strategyMap;
     }
 
@@ -27,10 +27,10 @@ public class LoginStrategyFactory {
      * @param loginType 登录类型
      * @return LoginStrategy 登录策略
      */
-    public LoginStrategy getStrategy(String loginType) {
-        LoginStrategy strategy = strategyMap.get(loginType);
+    public OAuth2Strategy getStrategy(String oAuth2Type) {
+        OAuth2Strategy strategy = strategyMap.get(oAuth2Type);
         if (strategy == null) {
-            throw new BaseException(MessageConstant.INVALID_LOGIN_TYPE + loginType);
+            throw new BaseException(MessageConstant.INVALID_LOGIN_TYPE + oAuth2Type);
         }
         return strategy;
     }
