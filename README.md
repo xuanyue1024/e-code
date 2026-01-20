@@ -3,6 +3,8 @@
   <h1>Ecode 编程实践平台</h1>
 </div>
 
+Web 前端: [ecode-vue3](https://github.com/xuanyue1024/ecode-vue3)   [ecode-vue2](https://github.com/xuanyue1024/ecode-vue)
+
 ## 一、 操作说明
 
 ### 1.1 如何安装
@@ -18,7 +20,8 @@
 ```txt
 ecode
 ├── config
-│   └── application-dev.yml # 后端配置文件
+│   │── application-dev.yml # 后端配置文件
+│   └── nginx.conf # Nginx 配置
 ├── data # 容器数据持久化
 ├── sql
 │   └── ecode.sql # 初始化数据库文件

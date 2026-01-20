@@ -1,4 +1,4 @@
-name: Build Combined Jar & Push & Deploy
+name: Build Separated Frontend & Backend
 
 on:
   push:
@@ -15,24 +15,17 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-combined-image:
+  # 1. 前端打包与镜像构建
+  build-frontend:
     runs-on: ubuntu-latest
     steps:
-      # 1. 检出后端代码 (当前仓库)
-      - name: Checkout Backend
-        uses: actions/checkout@v4
-        with:
-          path: backend-repo  # 检出到子目录，防止混乱
-
-      # 2. 检出前端代码 (从 xuanyue1024/ecode-vue3)
+      # 检出前端代码 (从 xuanyue1024/ecode-vue3)
       - name: Checkout Frontend
         uses: actions/checkout@v4
         with:
           repository: xuanyue1024/ecode-vue3
-          path: frontend-repo # 检出到另一个子目录
-          # token: ${{ secrets.MY_PAT_TOKEN }}
+          path: frontend-repo # 检出到子目录
 
-      # 3. 构建前端 (生成 dist)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -40,79 +33,126 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend-repo/package-lock.json
 
+      - name: Set Version
+        id: vars
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=debug" >> $GITHUB_OUTPUT
+          fi
+
+      # 构建前端 (生成 dist)
       - name: Build Frontend
         run: |
           cd frontend-repo
-
           # 注入环境变量
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            BUILD_NUMBER="${{ github.ref_name }}"
-            # 如果是 Tag，使用后端仓库的默认分支名 (main)
-            BRANCH_NAME="${{ github.event.repository.default_branch }}"
-          else
-            BUILD_NUMBER="debug"
-            # 如果是分支推送，直接使用当前分支名
-            BRANCH_NAME="${{ github.ref_name }}"
-          fi
-
-          echo "VITE_BRANCH_NAME=$BRANCH_NAME" >> .env
-          echo "VITE_BUILD_NUMBER=$BUILD_NUMBER" >> .env
+          echo "VITE_BRANCH_NAME=${{ github.ref_name }}" >> .env
+          echo "VITE_BUILD_NUMBER=${{ steps.vars.outputs.version }}" >> .env
           echo "VITE_BUILD_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> .env
-          echo "VITE_BUILD_NUMBER_URL=${{ github.server_url }}/${{ github.repository }}/releases/tag/$BUILD_NUMBER" >> .env
+          echo "VITE_BUILD_NUMBER_URL=${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.vars.outputs.version }}" >> .env
           echo "VITE_COMMIT_SHA=${{ github.sha }}" >> .env
           echo "VITE_BUILD_DATE=$(TZ='Asia/Shanghai' date +'%Y-%m-%d')" >> .env
-
-          echo "=== Generated .env ==="
-          cat .env
-
+          
           npm ci
           npm run build
           # 构建结果在 frontend-repo/dist
 
-      # 4. 移动前端文件到后端资源目录
-      # 目标路径: backend-repo/e-server/src/main/resources/static
-      - name: Move Frontend to Backend Static
+      # 产生前端工件: ecode-ui-版本号.zip
+      - name: Package Frontend Artifact
         run: |
-          # 确保目标目录存在
-          mkdir -p backend-repo/e-server/src/main/resources/static
-          
-          # 复制 dist 下的所有文件到 static 目录
-          # -r 递归, -v 显示过程
-          cp -rv frontend-repo/dist/* backend-repo/e-server/src/main/resources/static/
-          
-          # 验证一下是否复制成功
-          ls -R backend-repo/e-server/src/main/resources/static
+          VERSION=${{ steps.vars.outputs.version }}
+          cd frontend-repo/dist
+          zip -r ../../ecode-ui-${VERSION}.zip .
 
-      # 5. 构建后端 (此时static有前端文件)
+      - name: Upload Frontend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-zip
+          path: ecode-ui-*.zip
+          retention-days: 1
+
+      # 初始化 Buildx 环境
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Docker 登录、打标签、推送
+      - name: Log in to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-ui
+          tags: |
+            # 规则1：如果是 Tag 推送 (如 v1.0.0)，则使用该 Tag 名称作为镜像标签
+            type=ref,event=tag
+            # 规则2：如果是 Tag 推送，额外增加一个 'latest' 标签
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+            # 规则3：如果是 Branch 推送 (推送到 main)，则使用 'debug' 标签
+            type=raw,value=debug,enable=${{ github.ref_type == 'branch' }}
+          # 将 GitHub 仓库信息转换为小写，避免 Docker 镜像名称大小写问题
+          flavor: |
+            latest=false
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: frontend-repo
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # 2. 后端打包与镜像构建
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Backend
+        uses: actions/checkout@v4
+
+      - name: Set Version
+        id: vars
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=debug" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-          # 指定 maven 缓存路径基于后端 pom.xml
-          cache-dependency-path: backend-repo/pom.xml
 
+      # 构建后端 (不再包含静态文件)
       - name: Build Backend with Maven
         run: |
-          cd backend-repo
-          mvn clean package
-          # 重命名 Jar 包为 ecode-<version>.jar
-          mv e-server/target/e-server-*.jar e-server/target/ecode-${{ github.ref_name }}.jar
+          mvn clean package -DskipTests
+          VERSION=${{ steps.vars.outputs.version }}
+          # 重命名 Jar 包为 ecode-版本号.jar
+          mv e-server/target/e-server-*.jar e-server/target/ecode-${VERSION}.jar
 
-      # 将jar上传为GitHub Actions Artifact
-      - name: Upload Backend Jar
+      # 将 Jar 上传为 GitHub Actions Artifact
+      - name: Upload Backend Artifact
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path: backend-repo/e-server/target/*.jar
+          path: e-server/target/ecode-*.jar
           retention-days: 1
 
-      # 6. 【新增】初始化 Buildx 环境
+      # 初始化 Buildx 环境
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 7. Docker 登录、打标签、推送
       - name: Log in to Registry
         uses: docker/login-action@v3
         with:
@@ -126,43 +166,43 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            #规则1：如果是 Tag 推送 (如 v1.0.0)，则使用该 Tag 名称作为镜像标签
+            # 规则1：如果是 Tag 推送 (如 v1.0.0)，则使用该 Tag 名称作为镜像标签
             type=ref,event=tag
             # 规则2：如果是 Tag 推送，额外增加一个 'latest' 标签
             type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
             # 规则3：如果是 Branch 推送 (推送到 main)，则使用 'debug' 标签
             type=raw,value=debug,enable=${{ github.ref_type == 'branch' }}
-          # 将 GitHub 仓库信息转换为小写，避免 Docker 镜像名称大小写问题
           flavor: |
             latest=false
 
-      - name: Build and Push Docker Image
+      - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
-          # context 变成了后端代码目录 backend-repo，因为 Dockerfile 在里面
-          context: backend-repo
+          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # cache-from: 读取缓存。type=gha 表示使用 GitHub Actions 内部缓存
           cache-from: type=gha
-          # cache-to: 写入缓存。mode=max 表示尽可能缓存所有层
           cache-to: type=gha,mode=max
 
-  # 自动发布 Release
+  # 3. 创建 GitHub Release 并发布工件
   create-release:
-    needs: build-combined-image
+    needs: [build-frontend, build-backend]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    permissions:
-      contents: write
     steps:
-      - name: Checkout
+      - name: Checkout Backend
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Download Backend Jar
+      - name: Download Frontend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-zip
+          path: ./
+
+      - name: Download Backend Artifact
         uses: actions/download-artifact@v4
         with:
           name: backend-jar
@@ -171,18 +211,13 @@ jobs:
       - name: Generate Changelog
         id: changelog
         run: |
-          # 获取上一个 Tag
+          # 获取上一个 Tag 以生成提交日志
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          
           if [ -z "$PREVIOUS_TAG" ]; then
-            echo "No previous tag found. Listing all commits."
             CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
           else
-            echo "Previous tag: $PREVIOUS_TAG"
             CHANGELOG=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
           fi
-          
-          # 处理多行输出
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -191,15 +226,17 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.changelog.outputs.body }}
-          files: ./*.jar
+          files: |
+            ./ecode-*.jar
+            ./ecode-ui-*.zip
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # 服务器部署
+  # 4. 服务器部署
   deploy:
-    needs: build-combined-image
+    needs: [build-frontend, build-backend]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
@@ -209,9 +246,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          # 使用密码登录，使用 password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd ${{ secrets.ECODE_PATH }}
+            # 停止并清理旧镜像，拉取新镜像并启动
             docker compose down
             docker compose pull
             docker compose up -d
