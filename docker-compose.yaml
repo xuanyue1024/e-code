@@ -4,12 +4,15 @@ services:
   # -------------------------------------------------------------------
   # 1. Spring Boot 应用
   # -------------------------------------------------------------------
-  app:
+  ecode:
     container_name: ecode
     image: ghcr.io/xuanyue1024/e-code:latest
     ports:
-      - "8088:8088"
+      - "127.0.0.1:8088:8088"
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 114.114.114.114
     depends_on:
       # - mariadb
       redis:
@@ -21,7 +24,21 @@ services:
       - ./logs:/app/logs
 
   # -------------------------------------------------------------------
-  # 2. MariaDB
+  # 2. ecode-ui + nginx
+  # -------------------------------------------------------------------
+  ecode-ui:
+    container_name: ecode-nginx
+    image: ghcr.io/xuanyue1024/e-code-ui:latest
+    restart: unless-stopped
+    ports:
+      - "8089:8088"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - ecode
+
+  # -------------------------------------------------------------------
+  # 3. MariaDB
   # -------------------------------------------------------------------
   mariadb:
     image: mariadb:10.11
@@ -30,8 +47,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: XW%1lk1vKu*W
       MYSQL_DATABASE: ecode
-      # ports:
-      # - "3306:3306"
+    ports:
+      - "127.0.0.1:3306:3306"
     volumes:
       - ./data/mariadb:/var/lib/mysql
       # sql初始化
@@ -48,14 +65,14 @@ services:
       --max-connections=50
 
   # -------------------------------------------------------------------
-  # 3. Redis
+  # 4. Redis
   # -------------------------------------------------------------------
   redis:
     image: redis/redis-stack:7.2.0-v20
     container_name: redis-service
     restart: unless-stopped
-#    ports:
-#      - "6379:6379"
+    ports:
+      - "127.0.0.1:6379:6379"
     environment:
       REDIS_ARGS: "--appendonly yes --requirepass XW%1lk1vKu*W"
     volumes:
