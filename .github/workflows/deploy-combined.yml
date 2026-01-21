@@ -132,6 +132,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+          # cache-dependency-path: pom.xml
+          
+      # 缓存 Maven 本地仓库（支持多模块项目，包含根父 pom）
+      - name: Cache Maven local repo
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
 
       # 构建后端 (不再包含静态文件)
       - name: Build Backend with Maven
