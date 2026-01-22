@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # -------------------------------------------------------------------
   # 1. Spring Boot 应用
@@ -9,7 +7,7 @@ services:
     image: ghcr.io/xuanyue1024/e-code:latest
     ports:
       - "127.0.0.1:8088:8088"
-    restart: unless-stopped
+    restart: on-failure:3
     dns:
       - 8.8.8.8
       - 114.114.114.114
@@ -29,7 +27,7 @@ services:
   ecode-ui:
     container_name: ecode-nginx
     image: ghcr.io/xuanyue1024/e-code-ui:latest
-    restart: unless-stopped
+    restart: on-failure:3
     ports:
       - "8089:8088"
     volumes:
@@ -43,7 +41,7 @@ services:
   mariadb:
     image: mariadb:10.11
     container_name: mariadb-service
-    restart: unless-stopped
+    restart: on-failure:3
     environment:
       MYSQL_ROOT_PASSWORD: XW%1lk1vKu*W
       MYSQL_DATABASE: ecode
@@ -70,7 +68,7 @@ services:
   redis:
     image: redis/redis-stack:7.2.0-v20
     container_name: redis-service
-    restart: unless-stopped
+    restart: on-failure:3
     ports:
       - "127.0.0.1:6379:6379"
     environment:
