@@ -9,14 +9,17 @@ import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.OauthIdentities;
 import com.ecode.entity.User;
 import com.ecode.enumeration.Redis;
+import com.ecode.enumeration.ScanStatus;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.BaseException;
 import com.ecode.exception.RegisterException;
+import com.ecode.json.ScanData;
 import com.ecode.mapper.UserMapper;
 import com.ecode.service.OauthIdentitiesService;
 import com.ecode.service.UserService;
 import com.ecode.utils.EUtil;
 import com.ecode.vo.OAuthRegisterVO;
+import com.ecode.vo.ScanVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -124,5 +127,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getUserByEmail(String email) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getEmail, email));
+    }
+
+    @Override
+    public ScanVO scanGenerate() {
+        String sceneId = EUtil.generateUUIDWithoutHyphens();
+
+        ScanData sd = ScanData.builder().status(ScanStatus.WAITING).build();
+
+        redisTemplate.opsForValue().set(Redis.LOGIN_SCAN + sceneId,
+                sd,
+                Redis.LOGIN_SCAN.getTimeout(),
+                Redis.LOGIN_SCAN.getTimeUnit()
+        );
+
+        return ScanVO.builder()
+                .sceneId(sceneId)
+                .timeout(Redis.LOGIN_SCAN.getTimeout())
+                .build();
     }
 }

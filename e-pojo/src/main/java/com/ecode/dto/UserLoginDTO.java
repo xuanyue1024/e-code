@@ -51,4 +51,8 @@ public class UserLoginDTO implements Serializable {
     private String authCode; // 第三方返回的 code
     @Schema(description = "oauth2 state")
     private String state;
+
+    //扫码登录
+    @Schema(description = "扫码登录UUID")
+    private String sceneId;
 }

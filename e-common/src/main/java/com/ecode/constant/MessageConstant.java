@@ -85,4 +85,10 @@ public class MessageConstant {
 
     //接口调用
     public static final String INTERFACE_INVOKE_ERROR = "接口调用出现错误,请联系管理员";
+
+
+    //二维码登录
+    public static final String SCAN_EXPIRED = "二维码已过期";
+    public static final String SCAN_INVALID = "二维码无效";
+    public static final String SCAN_STATUS_ERROR = "扫码状态不符";
 }
