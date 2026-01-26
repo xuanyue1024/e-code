@@ -43,7 +43,8 @@ docker compose up -d
 
 使用需要通过账号密码登录后注册 webauthn)，无需密码，保障账号安全，也可使用账号密码进行登录操作。
 
-![login](./assets/login.jpg)  
+![login](./assets/login.jpg) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxuanyue1024%2Fe-code.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxuanyue1024%2Fe-code?ref=badge_shield)
+ 
 <p align="center">图1 学生用户登录界面</p>
 
 ![captcha](./assets/captcha.jpg)
@@ -262,3 +263,7 @@ docker compose up -d
 ![](assets/a6b6d87796fecd911735ecef107885a4eefb63c3a5abe9335b005b877c83b45a.jpg)
 
 <p align="center">图27 系统功能模块图</p>
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxuanyue1024%2Fe-code.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxuanyue1024%2Fe-code?ref=badge_large)
