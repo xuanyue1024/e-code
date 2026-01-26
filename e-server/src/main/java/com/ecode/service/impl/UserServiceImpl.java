@@ -124,6 +124,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public String getProfilePictureById(Integer id) {
+        User u = this.getOne(new LambdaQueryWrapper<User>().select(User::getProfilePicture).eq(User::getId, id));
+        if (u == null){
+            throw new BaseException(MessageConstant.USER_NOT_FOUND);
+        }
+
+        return u.getProfilePicture();
+    }
+
+    @Override
     public User getUserByEmail(String email) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getEmail, email));

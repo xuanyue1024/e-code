@@ -26,10 +26,7 @@ import com.ecode.service.login.LoginStrategy;
 import com.ecode.service.login.LoginStrategyFactory;
 import com.ecode.service.login.OAuth2Strategy;
 import com.ecode.service.login.OAuth2StrategyFactory;
-import com.ecode.vo.OAuthRegisterVO;
-import com.ecode.vo.ScanVO;
-import com.ecode.vo.UserLoginVO;
-import com.ecode.vo.UserOauthVO;
+import com.ecode.vo.*;
 import com.ecode.websocket.ScanWebSocket;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -208,7 +205,12 @@ public class UserController {
         redisTemplate.opsForValue().set(key, scanData, Duration.ofMinutes(2)); // 再给2分钟确认
 
         // 通知Web端：“已被扫码，请等待确认”
-        ScanWebSocket.send(sceneId, Map.of("event", ScanStatus.SCANNED, "userId", userId));
+        ScanWebSocket.send(sceneId, WsScanVO.builder()
+                .status(ScanStatus.SCANNED)
+                .metaData(userService.getProfilePictureById(userId))
+                .msg(MessageConstant.SCAN_SCANNED)
+                .build()
+        );
 
         return Result.success();
     }
@@ -242,14 +244,24 @@ public class UserController {
             //设置为已经确认
             scanData.setStatus(ScanStatus.CONFIRMED);
             // 通知ws
-            ScanWebSocket.send(scanDTO.getSceneId(), Map.of("event", ScanStatus.CONFIRMED, "userId", userId));
+            ScanWebSocket.send(scanDTO.getSceneId(), WsScanVO.builder()
+                    .status(ScanStatus.CONFIRMED)
+                    .userId(userId)
+                    .msg(MessageConstant.SCAN_CONFIRMED)
+                    .build()
+            );
             //存入数据
             redisTemplate.opsForValue().set(key, scanData, Duration.ofMinutes(1));
         }else {
             //取消登录
             redisTemplate.delete(key);
 
-            ScanWebSocket.send(scanDTO.getSceneId(), Map.of("event", ScanStatus.CANCELLED, "userId", userId));
+            ScanWebSocket.send(scanDTO.getSceneId(), WsScanVO.builder()
+                    .status(ScanStatus.CANCELLED)
+                    .userId(userId)
+                    .msg(MessageConstant.SCAN_CANCELLED)
+                    .build()
+            );
         }
 
         return Result.success();

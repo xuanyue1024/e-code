@@ -29,6 +29,7 @@ public class MessageConstant {
     public static final String PASSKEY_VERIFY_FAILED = "通行秘钥验证失败";
     public static final String VERIFICATION_TIMEOUT = "验证超时";
 
+    public static final String USER_NOT_FOUND = "用户没有发现";
     public static final String INVALID_LOGIN_TYPE = "无效的登录类型";
     public static final String UPDATE_FAILED = "修改失败";
     public static final String PARAMETER_ERROR = "参数值不正确";
@@ -91,4 +92,8 @@ public class MessageConstant {
     public static final String SCAN_EXPIRED = "二维码已过期";
     public static final String SCAN_INVALID = "二维码无效";
     public static final String SCAN_STATUS_ERROR = "扫码状态不符";
+    //扫码状态
+    public static final String SCAN_SCANNED = "扫码成功,请继续在手机上操作";
+    public static final String SCAN_CONFIRMED = "扫码登录成功";
+    public static final String SCAN_CANCELLED = "用户取消登录";
 }
