@@ -212,7 +212,7 @@ public class UserController {
                 .build()
         );
 
-        return Result.success();
+        return Result.success(scanData);
     }
 
     /**

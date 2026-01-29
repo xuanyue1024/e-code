@@ -18,8 +18,11 @@ import com.ecode.mapper.UserMapper;
 import com.ecode.service.OauthIdentitiesService;
 import com.ecode.service.UserService;
 import com.ecode.utils.EUtil;
+import com.ecode.utils.IpUtil;
+import com.ecode.utils.S3Util;
 import com.ecode.vo.OAuthRegisterVO;
 import com.ecode.vo.ScanVO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -27,8 +30,12 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * <p>
@@ -49,6 +56,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private OauthIdentitiesService oauthIdentitiesService;
+
+    @Autowired
+    private S3Util s3Util;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -130,7 +140,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BaseException(MessageConstant.USER_NOT_FOUND);
         }
 
-        return u.getProfilePicture();
+        return s3Util.getPublicUrl(u.getProfilePicture());
     }
 
     @Override
@@ -141,9 +151,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public ScanVO scanGenerate() {
-        String sceneId = EUtil.generateUUIDWithoutHyphens();
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) requireNonNull(RequestContextHolder
+                .getRequestAttributes());
+        HttpServletRequest request = requestAttributes.getRequest();
 
-        ScanData sd = ScanData.builder().status(ScanStatus.WAITING).build();
+        String sceneId = EUtil.generateUUIDWithoutHyphens();
+        String ipAddr = IpUtil.getIpAddr(request);
+
+        ScanData sd = ScanData.builder()
+                .status(ScanStatus.WAITING)
+                .ip(ipAddr)
+                .build();
 
         redisTemplate.opsForValue().set(Redis.LOGIN_SCAN + sceneId,
                 sd,

@@ -15,7 +15,7 @@ public enum Redis {
     OAUTH2_STATE("oauth2:state:", 10L, TimeUnit.MINUTES),
 
     //扫码登录,此处单位仅能使用s,适配前端倒计时
-    LOGIN_SCAN("auth:scan:", 5000L, TimeUnit.SECONDS);
+    LOGIN_SCAN("auth:scan:", 180L, TimeUnit.SECONDS);
 
     private final String prefix;
     private final Long timeout;
