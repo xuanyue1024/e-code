@@ -12,7 +12,11 @@ public enum Redis {
     OAUTH2_REGISTER_CODE("oauth2:registerCode:", 10L, TimeUnit.MINUTES),
 
     //OAuth2存储state
-    OAUTH2_STATE("oauth2:state:", 10L, TimeUnit.MINUTES);
+    OAUTH2_STATE("oauth2:state:", 10L, TimeUnit.MINUTES),
+
+    //扫码登录,此处单位仅能使用s,适配前端倒计时
+    LOGIN_SCAN("auth:scan:", 180L, TimeUnit.SECONDS);
+
     private final String prefix;
     private final Long timeout;
     private final TimeUnit timeUnit;

@@ -4,6 +4,7 @@ import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ecode.vo.ScanVO;
 
 /**
  * <p>
@@ -39,10 +40,22 @@ public interface UserService extends IService<User> {
     User getUserInfo(Integer currentId);
 
     /**
+     * 根据用户id获取图像
+     * @param id
+     * @return
+     */
+    String getProfilePictureById(Integer id);
+
+    /**
      * 通过邮箱获取用户名和姓名
      * @param email 邮箱
      * @return 用户名和姓名
      */
     User getUserByEmail(String email);
 
+    /**
+     * 生成登录二维码
+     * @return 二维码信息
+     */
+    ScanVO scanGenerate();
 }

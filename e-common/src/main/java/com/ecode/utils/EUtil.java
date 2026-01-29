@@ -97,4 +97,13 @@ public class EUtil {
 
         return fingerprint;
     }
+
+    /**
+     * 生成一个不带连字符（-）的 UUID 字符串
+     *
+     * @return 不带 - 的 UUID 字符串，例如：550e8400e29b41d4a716446655440000
+     */
+    public static String generateUUIDWithoutHyphens() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
 }

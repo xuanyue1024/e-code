@@ -6,6 +6,7 @@ import com.ecode.annotation.Captcha;
 import com.ecode.constant.JwtClaimsConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
+import com.ecode.dto.ScanDTO;
 import com.ecode.dto.UserLoginDTO;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
@@ -13,9 +14,11 @@ import com.ecode.entity.OauthIdentities;
 import com.ecode.entity.User;
 import com.ecode.enumeration.Redis;
 import com.ecode.enumeration.ResponseCode;
+import com.ecode.enumeration.ScanStatus;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.BaseException;
 import com.ecode.exception.LoginException;
+import com.ecode.json.ScanData;
 import com.ecode.result.Result;
 import com.ecode.service.OauthIdentitiesService;
 import com.ecode.service.UserService;
@@ -23,9 +26,8 @@ import com.ecode.service.login.LoginStrategy;
 import com.ecode.service.login.LoginStrategyFactory;
 import com.ecode.service.login.OAuth2Strategy;
 import com.ecode.service.login.OAuth2StrategyFactory;
-import com.ecode.vo.OAuthRegisterVO;
-import com.ecode.vo.UserLoginVO;
-import com.ecode.vo.UserOauthVO;
+import com.ecode.vo.*;
+import com.ecode.websocket.ScanWebSocket;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +37,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -162,6 +166,105 @@ public class UserController {
         OAuth2Strategy strategy = oAuth2StrategyFactory.getStrategy(oauth2Type);
         String url = strategy.prepare();
         return Result.success(Map.of("oauth2Url", url));
+    }
+
+    /**
+     * 扫码登录-二维码数据生成
+     * @return 二维码数据
+     */
+    @GetMapping("/scan/generate")
+    @Operation(summary = "扫码登录-1.二维码数据生成")
+    public Result<ScanVO> scanGenerate(){
+        ScanVO sv = userService.scanGenerate();
+        return Result.success(sv);
+    }
+
+    /**
+     * 扫码登录-已扫码待确认
+     * @param sceneId
+     * @return
+     */
+    @PostMapping("/scan/scanned")
+    @Operation(summary = "扫码登录-2.已扫码待确认")
+    public Result scanned(@RequestParam String sceneId) {
+        String key = Redis.LOGIN_SCAN + sceneId;
+        ScanData scanData = (ScanData) redisTemplate.opsForValue().get(key);
+
+        if (scanData == null) {
+            return Result.error(MessageConstant.SCAN_EXPIRED);
+        }
+
+        if (scanData.getStatus() != ScanStatus.WAITING) {
+            return Result.error(MessageConstant.SCAN_INVALID);
+        }
+
+        // 更新为“已扫码”，等待确认
+        Integer userId = BaseContext.getCurrentId();
+        scanData.setStatus(ScanStatus.SCANNED);
+        scanData.setUserId(userId);
+        redisTemplate.opsForValue().set(key, scanData, Duration.ofMinutes(2)); // 再给2分钟确认
+
+        // 通知Web端：“已被扫码，请等待确认”
+        ScanWebSocket.send(sceneId, WsScanVO.builder()
+                .status(ScanStatus.SCANNED)
+                .metaData(userService.getProfilePictureById(userId))
+                .msg(MessageConstant.SCAN_SCANNED)
+                .build()
+        );
+
+        return Result.success(scanData);
+    }
+
+    /**
+     * 扫码登录-确认登录
+     * @param scanDTO
+     * @return
+     */
+    @PostMapping("/scan/confirm")
+    @Operation(summary = "扫码登录-3.确认或取消登录")
+    public Result scanConfirm(@RequestBody ScanDTO scanDTO) {
+        Integer userId = BaseContext.getCurrentId();
+        String key = Redis.LOGIN_SCAN + scanDTO.getSceneId();
+        ScanData scanData = (ScanData) redisTemplate.opsForValue().get(key);
+
+        if (scanData == null) {
+            throw new BaseException(MessageConstant.SCAN_EXPIRED);
+        }
+        //状态是否符合
+        if (scanData.getStatus() != ScanStatus.SCANNED) {
+            throw new BaseException(MessageConstant.SCAN_STATUS_ERROR);
+        }
+        //用户是否符合
+        if (!Objects.equals(scanData.getUserId(), userId)) {
+            throw new BaseException(MessageConstant.DATA_ACCESS_DENIED);
+        }
+
+        if (scanDTO.getIsConfirm()){
+            //确认登录
+            //设置为已经确认
+            scanData.setStatus(ScanStatus.CONFIRMED);
+            // 通知ws
+            ScanWebSocket.send(scanDTO.getSceneId(), WsScanVO.builder()
+                    .status(ScanStatus.CONFIRMED)
+                    .userId(userId)
+                    .msg(MessageConstant.SCAN_CONFIRMED)
+                    .build()
+            );
+            //存入数据
+            redisTemplate.opsForValue().set(key, scanData, Duration.ofMinutes(1));
+        }else {
+            //取消登录
+            redisTemplate.delete(key);
+
+            ScanWebSocket.send(scanDTO.getSceneId(), WsScanVO.builder()
+                    .status(ScanStatus.CANCELLED)
+                    .userId(userId)
+                    .msg(MessageConstant.SCAN_CANCELLED)
+                    .build()
+            );
+        }
+
+        return Result.success();
     }
 
     @PutMapping()
