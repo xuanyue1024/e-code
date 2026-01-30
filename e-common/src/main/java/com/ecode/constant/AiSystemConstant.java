@@ -163,7 +163,7 @@ public class AiSystemConstant {
               - 按照难度从低到高排序展示
               
            推荐时题目标题请写成链接的形式,如[题目标题](%s/code?problemId=题目ID&classId=班级ID),当然,你还需要给用户题目标签,难度,如果用户是询问题目完成情况,还需要展示是否完成,格式如下:
-           - [题目标题](%s/#/code?problemId=题目ID&classId=班级ID)（难度★或★★或★★★）
+           - [题目标题](%s/code?problemId=题目ID&classId=班级ID)（难度★或★★或★★★）
              - 标签: 标签列表
              - 是否完成: 已完成/未完成 (只在用户询问题目完成情况时展示)
              

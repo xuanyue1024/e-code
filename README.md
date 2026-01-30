@@ -1,9 +1,20 @@
 <div align="center">
-  <img src="assets/logo.ico" alt="Ecode Logo" width="120" />
+  <img src="assets/logo.ico" alt="Ecode Logo" width="100" />
   <h1>Ecode 编程实践平台</h1>
+  <p>高校编程教学与在线评测平台，集成 AI 助手、WebAuthn、Docker 沙箱化运行与 RAG 知识库。</p>
+  <p>
+    <a href="https://github.com/xuanyue1024/ecode-vue3"><img src="https://img.shields.io/badge/Frontend-ecode--vue3-4FC08D?logo=vue.js" alt="frontend" /></a>
+    <a href="https://img.shields.io/badge/Java-17-blue?logo=java"><img src="https://img.shields.io/badge/Java-17-blue?logo=java" alt="java" /></a>
+    <a href="https://img.shields.io/badge/Spring%20Boot-2.x-brightgreen?logo=spring"><img src="https://img.shields.io/badge/Spring%20Boot-3.4.4-brightgreen?logo=spring" alt="spring" /></a>
+    <a href="https://img.shields.io/badge/Maven-Yes-blue?logo=apachemaven"><img src="https://img.shields.io/badge/Maven-Yes-blue?logo=apachemaven" alt="maven" /></a>
+    <a href="https://img.shields.io/badge/Docker-Yes-blue?logo=docker"><img src="https://img.shields.io/badge/Docker-Yes-blue?logo=docker" alt="docker" /></a>
+    <a href="https://img.shields.io/badge/AI-RAG-orange"><img src="https://img.shields.io/badge/AI-RAG-orange" alt="ai" /></a>
+    <a href="https://img.shields.io/badge/License-MIT-yellow"><img src="https://img.shields.io/badge/License-MIT-yellow" alt="license" /></a>
+  </p>
 </div>
 
-Web 前端: [ecode-vue3](https://github.com/xuanyue1024/ecode-vue3)   [ecode-vue2](https://github.com/xuanyue1024/ecode-vue)
+前端仓库见 [ecode-vue3](https://github.com/xuanyue1024/ecode-vue3), [ecode-vue2](https://github.com/xuanyue1024/ecode-vue)；手机客户端仓库见 [EcodeForAndroid](https://github.com/xuanyue1024/EcodeForAndroid)
+
 
 ## 一、 操作说明
 
@@ -11,7 +22,7 @@ Web 前端: [ecode-vue3](https://github.com/xuanyue1024/ecode-vue3)   [ecode-vue
 
 推荐使用Docker Compose一键部署
 
-下载[docker-compose.yaml](./docker-compose.yaml)文件到你的服务器
+下载[docker-compose.yaml](./docker-compose.yaml) 和 [nginx.conf](./nginx.conf)文件到你的服务器
 
 把文件[application-dev-example.yml](./e-server/src/main/resources/application-dev-example.yml)改为`application-dev.yml`
 
@@ -46,8 +57,8 @@ docker compose up -d
 ![login](./assets/login.jpg)  
 <p align="center">图1 学生用户登录界面</p>
 
-![captcha](./assets/captcha.jpg)
-<p align="center">图2 验证码界面</p>
+![captcha](./assets/scan.jpg)
+<p align="center">图2 扫码登录界面</p>
 
   ![PixPin_2025-12-09_00-28-04](./assets/PixPin_2025-12-09_00-28-04.jpg)
 <p align="center">图3 学生用户注册页面</p>
