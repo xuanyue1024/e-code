@@ -74,6 +74,7 @@ public class CommonController {
     }
 
     @PostMapping("/captcha/check")
+    @CrossOrigin(origins = "https://appassets.androidplatform.net")
     public ApiResponse<?> checkCaptcha(@RequestBody Data data) {
         ApiResponse<?> response = imageCaptchaApplication.matching(data.getId(), data.getData());
         if (response.isSuccess()) {
@@ -84,6 +85,7 @@ public class CommonController {
     }
 
     @RequestMapping("/captcha/gen")
+    @CrossOrigin(origins = "https://appassets.androidplatform.net")
     public ApiResponse<ImageCaptchaVO> genCaptcha() {
         // 1.生成验证码(该数据返回给前端用于展示验证码数据)
         // 参数1为具体的验证码类型， 默认支持 SLIDER、ROTATE、WORD_IMAGE_CLICK、CONCAT 等验证码类型，详见： `CaptchaTypeConstant`类
