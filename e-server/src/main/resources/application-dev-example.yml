@@ -80,6 +80,13 @@ ecode:
         # 维度
         dimensions: 1024
 
+  # 开发文档安全性
+  knife4j:
+      # Basic认证用户名
+      username: test
+      # Basic认证密码
+      password: 123321bbcc
+
   # WebAuthn配置
   webauthn:
     # 允许的来源，表示允许的来源 URL 集合
