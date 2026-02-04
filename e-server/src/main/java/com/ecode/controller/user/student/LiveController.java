@@ -1,4 +1,4 @@
-package com.ecode.controller.user.teacher;
+package com.ecode.controller.user.student;
 
 
 import cn.dev33.satoken.stp.StpUtil;
@@ -29,13 +29,13 @@ import java.util.Optional;
  *
  * @author 竹林听雨
  * @version 1.0
- * @since 2026-02-01  14:50
+ * @since 2026-02-05  00:45
  */
 
 @Tag(name = "直播管理")
 @RestController
-@RequestMapping("/teacher/live")
-@Component("teacherLiveController")
+@RequestMapping("/student/live")
+@Component("studentLiveController")
 @RequiredArgsConstructor
 public class LiveController {
 
@@ -48,8 +48,8 @@ public class LiveController {
      * @param classId 班级ID
      * @param sdpOffer 客户端生成的 SDP
      */
-    @PostMapping("/whip/{classId}")
-    @Operation(summary = "直播推流")
+    /*@PostMapping("/whip/{classId}")
+    @Operation(description = "直播推流")
     @DataAccessCheck(value = OperationType.TEACHER_TO_CLASS, paramIndex = 0)
     public Object proxyWhip(@PathVariable String classId,
                             @RequestBody String sdpOffer) {
@@ -60,13 +60,14 @@ public class LiveController {
                 .status(HttpStatus.CREATED) // WHIP 要求 201
                 .contentType(MediaType.valueOf("application/sdp")) // 关键！
                 .body(sdpAnswer);
-    }
+    }*/
 
     /**
      * 转发 WHEP 拉流请求
      */
-    /*@PostMapping("/whep/{classId}")
-    @Operation(description = "直播拉流")
+    @PostMapping("/whep/{classId}")
+    @Operation(summary = "直播拉流")
+    @DataAccessCheck(value = OperationType.STUDENT_TO_CLASS, paramIndex = 0)
     public ResponseEntity<String> proxyWhep(@PathVariable String classId, @RequestBody String sdpOffer) {
 
         String sdpAnswer = webRTCUtil.start(WebRTCUtil.Status.WHEP, classId, sdpOffer);
@@ -75,7 +76,7 @@ public class LiveController {
                 .status(HttpStatus.CREATED) // WHIP 要求 201
                 .contentType(MediaType.valueOf("application/sdp"))
                 .body(sdpAnswer);
-    }*/
+    }
 
     @PostMapping("/danmaku/send")
     @Operation(summary = "发送弹幕")
@@ -86,7 +87,6 @@ public class LiveController {
                 .msg(danmakuDTO.getMsg())
                 .color(Optional.ofNullable(danmakuDTO.getColor()).orElse("#ffffff"))
                 .ts(System.currentTimeMillis())
-                .role(0)
                 .build();
 
         liveService.sendDanmaku(danmakuDTO.getClassId(), danmakuMessage);
