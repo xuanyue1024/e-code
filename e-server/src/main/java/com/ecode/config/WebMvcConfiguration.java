@@ -1,6 +1,7 @@
 package com.ecode.config;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
+import cn.dev33.satoken.router.SaHttpMethod;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import com.ecode.enumeration.UserRole;
@@ -42,6 +43,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                             "/user/callback",
                             "/user/oauth2",
                             "/user/scan/generate")        // 排除掉的 path 列表，可以写多个
+                    .notMatch(SaHttpMethod.OPTIONS)
                     .check(r -> StpUtil.checkLogin());        // 要执行的校验动作，可以写完整的 lambda 表达式
 
             // 根据路由划分模块，不同模块不同鉴权
