@@ -16,6 +16,11 @@ public enum OperationType {
         /**
          * 学生对于班级的访问
          */
-        STUDENT_TO_CLASS
+        STUDENT_TO_CLASS,
+
+        /**
+         * 所有人对于班级的访问(根据角色判断)
+         */
+        ALL_TO_CLASS
 
 }

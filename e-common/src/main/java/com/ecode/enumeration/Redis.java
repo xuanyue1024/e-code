@@ -15,7 +15,13 @@ public enum Redis {
     OAUTH2_STATE("oauth2:state:", 10L, TimeUnit.MINUTES),
 
     //扫码登录,此处单位仅能使用s,适配前端倒计时
-    LOGIN_SCAN("auth:scan:", 180L, TimeUnit.SECONDS);
+    LOGIN_SCAN("auth:scan:", 180L, TimeUnit.SECONDS),
+
+    //直播
+    //弹幕存储
+    DANMAKU_STORE("live:danmaku:store:classId:", null, TimeUnit.DAYS),
+    //直播状态0或删除-关闭,1-开启
+    LIVE_STATUS("live:status:classId:", null, TimeUnit.HOURS);
 
     private final String prefix;
     private final Long timeout;

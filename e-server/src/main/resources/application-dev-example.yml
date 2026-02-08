@@ -141,3 +141,7 @@ ecode:
         user-info-url: https://open.feishu.cn/open-apis/authen/v1/user_info
         client-id: aabbcc
         client_secret: aabbcc
+
+  webrtc:
+    base-url: https://live.aabbcc.dev/rtc/v1
+    app-name: ecode

@@ -159,6 +159,20 @@ public class OkHttpUtils {
     }
 
     /**
+     * 初始化 POST 请求，使用原始字符串作为请求体
+     *
+     * @param body      原始请求体内容
+     * @param mediaType 内容类型，如 "application/sdp"
+     * @return
+     */
+    public OkHttpUtils postRaw(String body, String mediaType) {
+        MediaType contentType = MediaType.parse(mediaType);
+        RequestBody requestBody = RequestBody.create(body, contentType);
+        request = new Request.Builder().post(requestBody).url(url);
+        return this;
+    }
+
+    /**
      * 同步请求
      *
      * @return

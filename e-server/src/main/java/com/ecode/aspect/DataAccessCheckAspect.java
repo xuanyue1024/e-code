@@ -5,9 +5,12 @@ import com.ecode.annotation.DataAccessCheck;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.entity.Class;
+import com.ecode.entity.StudentClass;
 import com.ecode.enumeration.OperationType;
+import com.ecode.enumeration.UserRole;
 import com.ecode.exception.PermissionException;
 import com.ecode.mapper.ClassMapper;
+import com.ecode.mapper.StudentClassMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -34,13 +37,16 @@ public class DataAccessCheckAspect {
     @Autowired
     private ClassMapper classMapper;
 
+    @Autowired
+    StudentClassMapper studentClassMapper;;
+
     /**
      * 在方法执行前进行数据访问权限校验的切面方法。
      *
      * @param joinPoint 切入点，用于获取方法执行的相关信息
      */
     @Before("@annotation(com.ecode.annotation.DataAccessCheck)")
-    public void DataAccessCheck(JoinPoint joinPoint){
+    public void dataAccessCheck(JoinPoint joinPoint){
         //获取到当前被拦截的方法上的数据库操作类型
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();//方法签名对象
         DataAccessCheck dataAccessCheck = signature.getMethod().getAnnotation(DataAccessCheck.class);//获得方法上的注解对象
@@ -55,7 +61,9 @@ public class DataAccessCheckAspect {
 
         Object entity = args[index];
         switch (operationType){
-            case TEACHER_TO_CLASS -> TeacherToClass(entity);
+            case TEACHER_TO_CLASS -> teacherToClass(entity);
+            case ALL_TO_CLASS -> allToClass(entity);
+            case STUDENT_TO_CLASS -> studentToClass(entity);
             default -> throw new PermissionException(MessageConstant.TYPE_NOT_FOUND);
         }
     }
@@ -64,7 +72,7 @@ public class DataAccessCheckAspect {
      * 老师对于班级的权限检查
      * @param classIdObj 班级id
      */
-    private void TeacherToClass(Object classIdObj){
+    private void teacherToClass(Object classIdObj){
        log.info("开始老师对于班级的权限检查");
        try {
            Integer classId = (Integer) classIdObj;
@@ -76,5 +84,38 @@ public class DataAccessCheckAspect {
        } catch (Exception e){
            throw new PermissionException(MessageConstant.DATA_ACCESS_DENIED);
        }
+    }
+
+    /**
+     * 学生对于班级的权限检查
+     * @param classIdObj 班级id
+     */
+    private void studentToClass(Object classIdObj){
+        log.info("开始学生对于班级的权限检查");
+        try {
+            Integer classId = (Integer) classIdObj;
+            Integer studentId = BaseContext.getCurrentId();
+            Optional.ofNullable(studentClassMapper.selectOne(new LambdaQueryWrapper<StudentClass>()
+                    .eq(StudentClass::getClassId, classId)
+                    .eq(StudentClass::getStudentId, studentId)
+            )).orElseThrow(() -> new PermissionException(MessageConstant.DATA_ACCESS_DENIED));
+        } catch (Exception e){
+            throw new PermissionException(MessageConstant.DATA_ACCESS_DENIED);
+        }
+    }
+
+    /**
+     * 所有人对于班级权限的检查
+     * @param classIdObj 班级id
+     */
+    private void allToClass(Object classIdObj){
+        UserRole role = BaseContext.getCurrentRole();
+        if (role == UserRole.STUDENT) {
+            studentToClass(classIdObj);
+        } else if (role == UserRole.TEACHER) {
+            teacherToClass(classIdObj);
+        }else  {
+            throw new PermissionException(MessageConstant.DATA_ACCESS_DENIED);
+        }
     }
 }
