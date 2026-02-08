@@ -19,7 +19,9 @@ public enum Redis {
 
     //直播
     //弹幕存储
-    DANMAKU_STORE("live:danmaku:store:classId:", null, TimeUnit.DAYS);
+    DANMAKU_STORE("live:danmaku:store:classId:", null, TimeUnit.DAYS),
+    //直播状态0或删除-关闭,1-开启
+    LIVE_STATUS("live:status:classId:", null, TimeUnit.HOURS);
 
     private final String prefix;
     private final Long timeout;

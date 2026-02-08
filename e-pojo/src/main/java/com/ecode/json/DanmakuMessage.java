@@ -28,6 +28,9 @@ public class DanmakuMessage {
     @Schema(description = "弹幕颜色")
     private String color = "#ffffff";
 
+    @Schema(description = "弹幕大小")
+    private Integer size;
+
     @Schema(description = "时间戳")
     private Long ts;
 

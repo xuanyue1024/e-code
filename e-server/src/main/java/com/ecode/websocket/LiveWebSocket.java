@@ -16,13 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * WebSocket 直播弹幕 服务端点
+ * WebSocket 直播 服务端点
  *
  */
 @Component
 @Slf4j
-@ServerEndpoint(value = "/ws/live/danmaku/{classId}", encoders = {MessageEncoder.class})
-public class DanmakuWebSocket {
+@ServerEndpoint(value = "/ws/live/{classId}", encoders = {MessageEncoder.class})
+public class LiveWebSocket {
 
     // 用 ConcurrentHashMap 存储：房间ID → 所有连接到该房间的 WebSocket 会话
     // CopyOnWriteArraySet 是线程安全的 Set，适合读多写少（观众进/出房间不频繁）

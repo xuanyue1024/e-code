@@ -63,6 +63,7 @@ public class DataAccessCheckAspect {
         switch (operationType){
             case TEACHER_TO_CLASS -> teacherToClass(entity);
             case ALL_TO_CLASS -> allToClass(entity);
+            case STUDENT_TO_CLASS -> studentToClass(entity);
             default -> throw new PermissionException(MessageConstant.TYPE_NOT_FOUND);
         }
     }

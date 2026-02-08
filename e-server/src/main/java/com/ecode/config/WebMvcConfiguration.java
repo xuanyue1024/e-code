@@ -41,11 +41,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                             "/auth/passkey/assertion",
                             "/user/callback",
                             "/user/oauth2",
-                            "/user/scan/generate")        // 排除掉的 path 列表，可以写多个
+                            "/user/scan/generate",
+                            "/user/live/callback")        // 排除掉的 path 列表，可以写多个
                     .check(r -> StpUtil.checkLogin());        // 要执行的校验动作，可以写完整的 lambda 表达式
 
             // 根据路由划分模块，不同模块不同鉴权
-            SaRouter.match("/teacher/**", r -> StpUtil.checkRole(UserRole.TEACHER.name()));
+            SaRouter.match("/teacher/**").check(r -> StpUtil.checkRole(UserRole.TEACHER.name()));
             SaRouter.match("/student/**").notMatch("/student/problem/*").check(r -> StpUtil.checkRole(UserRole.STUDENT.name()));
         })).addPathPatterns("/**");
     }

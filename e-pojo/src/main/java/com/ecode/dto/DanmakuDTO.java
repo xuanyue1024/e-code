@@ -2,8 +2,7 @@ package com.ecode.dto;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 /**
@@ -22,9 +21,14 @@ public class DanmakuDTO {
     private Integer classId;
 
     @Schema(description = "弹幕内容")
-    @NotBlank(message = "弹幕内容不能为空")
+    @Size(min = 1, max = 20, message ="弹幕内容必须在1到20个字符之间")
     private String msg;
 
     @Schema(description = "弹幕颜色")
     private String color;
+
+    @Schema(description = "弹幕大小")
+    @Min(value = 10, message = "弹幕大小必须大于10")
+    @Max(value = 60, message = "弹幕大小必须小于等于60")
+    private Integer size;
 }

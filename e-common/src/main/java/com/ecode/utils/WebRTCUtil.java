@@ -35,7 +35,7 @@ public class WebRTCUtil {
         return OkHttpUtils.builder()
                 .url(url)
                 .postRaw(sdpOffer, "application/sdp")
-                .async();
+                .sync();
     }
 
     public String start(Status status, String streamKey, String sdpOffer) {
