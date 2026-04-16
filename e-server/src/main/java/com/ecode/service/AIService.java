@@ -25,15 +25,15 @@ public interface AIService {
      * 生成题目
      *
      * @param require 题目要求
-     * @return Flux < result< string>>
+     * @return Flux < ServerSentEvent< Object >>
      */
-    Flux<Result<String>> generateQuestion(String require);
+    Flux<ServerSentEvent<Object>> generateQuestion(String require);
 
     /**
      * questionAnswer方法，处理AI输入数据并返回结果流
      *
      * @param aiInputDTO 有效验证的AI输入数据传输对象
-     * @return 包含字符串结果的Flux流
+     * @return 包含结果的Flux流
      */
-    Flux<Result<String>> questionAnswer(@Valid AiInputDTO aiInputDTO);
+    Flux<ServerSentEvent<Object>> questionAnswer(@Valid AiInputDTO aiInputDTO);
 }

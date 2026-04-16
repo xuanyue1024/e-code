@@ -52,7 +52,7 @@ public class AIController {
     @PostMapping(value = "/questionAnswer", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "题目解答")
     @AIChatIdCheck
-    public Flux<Result<String>> questionAnswer(@RequestBody @Valid AiInputDTO aiInputDTO) {
+    public Flux<ServerSentEvent<Object>> questionAnswer(@RequestBody @Valid AiInputDTO aiInputDTO) {
         return aiService.questionAnswer(aiInputDTO);
     }
 
@@ -60,11 +60,11 @@ public class AIController {
      * 生成题目的接口
      *
      * @param require 题目要求
-     * @return Flux<Result < String>>返回生成的题目
+     * @return Flux<ServerSentEvent < Object>>返回生成的题目
      */
     @GetMapping(value = "/generate", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "生成题目")
-    public Flux<Result<String>> generate(@NotBlank String require) {
+    public Flux<ServerSentEvent<Object>> generate(@NotBlank String require) {
         return aiService.generateQuestion(require);
     }
 

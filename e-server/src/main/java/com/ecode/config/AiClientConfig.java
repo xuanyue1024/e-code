@@ -58,7 +58,7 @@ public class AiClientConfig {
         return ChatClient
                 .builder(model)
                 .defaultOptions(ChatOptions.builder()
-                        .model("qwen1.5-110b-chat")
+                        .model("qwq-32b-preview")
                         .build())
                 .defaultSystem(AiSystemConstant.TITLE_GENERATION)
                 .defaultAdvisors(SimpleLoggerAdvisor.builder().build())

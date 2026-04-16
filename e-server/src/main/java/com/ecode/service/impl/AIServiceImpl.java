@@ -115,15 +115,25 @@ public class AIServiceImpl implements AIService {
                 );
         }
 
-        return Flux.merge(contentStream, titleMono);
+        Mono<ServerSentEvent<Object>> endEvent = Mono.just(ServerSentEvent.builder()
+                .event("end")
+                .data(Result.success("stream_end"))
+                .build());
+
+        return Flux.merge(contentStream, titleMono).concatWith(endEvent);
     }
 
     @Override
-    public Flux<Result<String>> questionAnswer(AiInputDTO aiInputDTO) {
+    public Flux<ServerSentEvent<Object>> questionAnswer(AiInputDTO aiInputDTO) {
         AiChatHistory ach = aiChatHistoryMapper.selectById(aiInputDTO.getChatId());
         if (ach == null) {
             throw new AiException(MessageConstant.AI_CHAT_ID_NOT_FOUND);
         }
+
+        Mono<ServerSentEvent<Object>> endEvent = Mono.just(ServerSentEvent.builder()
+                .event("end")
+                .data(Result.success("stream_end"))
+                .build());
 
         RepositoryFile file = fileRepository.getFile(aiInputDTO.getClassId());
         log.info("文件路径: {}", file == null ? "null" :file.getName());
@@ -135,7 +145,11 @@ public class AIServiceImpl implements AIService {
                     .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                     .stream()
                     .content()
-                    .map(Result::success);
+                    .map(content -> ServerSentEvent.builder()
+                            .data(Result.success(content))
+                            .build()
+                    )
+                    .concatWith(endEvent);
         }
         log.info("AI解答走知识库答案通道");
         return questionAnswerClientVec.prompt()
@@ -145,7 +159,11 @@ public class AIServiceImpl implements AIService {
                 .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "file_name == '" + file.getName() + "' && classId == " + aiInputDTO.getClassId()))
                 .stream()
                 .content()
-                .map(Result::success);
+                .map(content -> ServerSentEvent.builder()
+                        .data(Result.success(content))
+                        .build()
+                )
+                .concatWith(endEvent);
     }
 
     /**
@@ -155,12 +173,21 @@ public class AIServiceImpl implements AIService {
      * @return 返回包含生成题目的数据流
      */
     @Override
-    public Flux<Result<String>> generateQuestion(String require) {
+    public Flux<ServerSentEvent<Object>> generateQuestion(String require) {
+        Mono<ServerSentEvent<Object>> endEvent = Mono.just(ServerSentEvent.builder()
+                .event("end")
+                .data(Result.success("stream_end"))
+                .build());
+
         return generateQuestionClient.prompt()
                 .user(require)
                 .stream()
                 .content()
-                .map(Result::success);
+                .map(content -> ServerSentEvent.builder()
+                        .data(Result.success(content))
+                        .build()
+                )
+                .concatWith(endEvent);
     }
 
 }
