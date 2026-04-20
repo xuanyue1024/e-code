@@ -1,6 +1,8 @@
 package com.ecode.service;
 
 import com.ecode.dto.AiInputDTO;
+import com.ecode.dto.EvaluateAnswerDTO;
+import com.ecode.vo.EvaluateResultVO;
 import com.ecode.result.Result;
 import jakarta.validation.Valid;
 import org.springframework.http.codec.ServerSentEvent;
@@ -36,4 +38,12 @@ public interface AIService {
      * @return 包含结果的Flux流
      */
     Flux<ServerSentEvent<Object>> questionAnswer(@Valid AiInputDTO aiInputDTO);
+
+    /**
+     * evaluateAnswer方法，根据答案和相关信息要求进行评测
+     *
+     * @param dto 评测答案所需参数
+     * @return 返回评测结果VO
+     */
+    EvaluateResultVO evaluateAnswer(@Valid EvaluateAnswerDTO dto);
 }

@@ -3,6 +3,8 @@ package com.ecode.controller.user;
 import com.ecode.annotation.AIChatIdCheck;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
+import com.ecode.dto.EvaluateAnswerDTO;
+import com.ecode.vo.EvaluateResultVO;
 import com.ecode.enumeration.AiType;
 import com.ecode.result.Result;
 import com.ecode.service.AIService;
@@ -66,6 +68,13 @@ public class AIController {
     @Operation(summary = "生成题目")
     public Flux<ServerSentEvent<Object>> generate(@NotBlank String require) {
         return aiService.generateQuestion(require);
+    }
+
+    @PostMapping("/evaluate")
+    @Operation(summary = "代码评测")
+    public Result<EvaluateResultVO> evaluateAnswer(@RequestBody @Valid EvaluateAnswerDTO dto) {
+        EvaluateResultVO result = aiService.evaluateAnswer(dto);
+        return Result.success(result);
     }
 
     /**

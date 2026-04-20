@@ -27,4 +27,13 @@ public class ProblemSolutionTools {
         }
         return "未发现解答过程";
     }
+
+    @Tool(description = "获取题目的内容")
+    public String getContent(@ToolParam(description = "题目id") Integer problemId) {
+        Problem problem = problemMapper.selectById(problemId);
+        if (problem != null && problem.getContent() != null){
+            return problem.getContent();
+        }
+        return "未发现题目内容";
+    }
 }

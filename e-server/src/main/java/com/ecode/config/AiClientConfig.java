@@ -66,6 +66,18 @@ public class AiClientConfig {
     }
 
     @Bean
+    public ChatClient evaluateAnswerClient(DashScopeChatModel model){
+        return ChatClient
+                .builder(model)
+                .defaultSystem(AiSystemConstant.EVALUATE_ANSWER_SYSTEM_PROMPT)
+                .defaultAdvisors(
+                        new SimpleLoggerAdvisor()
+                )
+                .defaultTools(problemSolutionTools)
+                .build();
+    }
+
+    @Bean
     public ChatClient questionAnswerClient(DashScopeChatModel model){
         return ChatClient
                 .builder(model)

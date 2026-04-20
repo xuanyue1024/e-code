@@ -6,6 +6,8 @@ import com.ecode.constant.AiSystemConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
+import com.ecode.dto.EvaluateAnswerDTO;
+import com.ecode.vo.EvaluateResultVO;
 import com.ecode.entity.AiChatHistory;
 import com.ecode.entity.po.RepositoryFile;
 import com.ecode.exception.AiException;
@@ -39,6 +41,9 @@ public class AIServiceImpl implements AIService {
 
     @Autowired
     private ChatClient titleChatClient;
+
+    @Autowired
+    private ChatClient evaluateAnswerClient;
 
     @Autowired
     private ChatClient generateQuestionClient;
@@ -188,6 +193,15 @@ public class AIServiceImpl implements AIService {
                         .build()
                 )
                 .concatWith(endEvent);
+    }
+
+    @Override
+    public EvaluateResultVO evaluateAnswer(EvaluateAnswerDTO dto) {
+        String prompt = "请帮我评测这道题的代码：\n题目ID：" + dto.getProblemId() + "\n代码内容如下：\n" + dto.getCode() + "\n请根据标准答案（通过工具获取）对以上代码进行评测评分，并给出markdown格式的点评。";
+        return evaluateAnswerClient.prompt()
+                .user(prompt)
+                .call()
+                .entity(EvaluateResultVO.class);
     }
 
 }
