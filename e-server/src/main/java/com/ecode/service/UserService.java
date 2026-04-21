@@ -1,10 +1,18 @@
 package com.ecode.service;
 
+import com.ecode.dto.AdminUserCreateDTO;
+import com.ecode.dto.AdminUserPageQueryDTO;
+import com.ecode.dto.AdminUserUpdateDTO;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ecode.enumeration.UserStatus;
+import com.ecode.vo.AdminUserVO;
+import com.ecode.vo.PageVO;
 import com.ecode.vo.ScanVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -58,4 +66,49 @@ public interface UserService extends IService<User> {
      * @return 二维码信息
      */
     ScanVO scanGenerate();
+
+    /**
+     * 管理员分页查询用户。
+     *
+     * @param queryDTO 查询条件
+     * @return 用户分页结果
+     */
+    PageVO<AdminUserVO> adminPage(AdminUserPageQueryDTO queryDTO);
+
+    /**
+     * 管理员查询用户详情。
+     *
+     * @param id 用户id
+     * @return 用户详情
+     */
+    AdminUserVO adminGetById(Integer id);
+
+    /**
+     * 管理员创建用户。
+     *
+     * @param createDTO 创建参数
+     */
+    void adminCreate(AdminUserCreateDTO createDTO);
+
+    /**
+     * 管理员更新用户。
+     *
+     * @param updateDTO 更新参数
+     */
+    void adminUpdate(AdminUserUpdateDTO updateDTO);
+
+    /**
+     * 管理员修改用户状态。
+     *
+     * @param id 用户id
+     * @param status 账号状态
+     */
+    void adminUpdateStatus(Integer id, UserStatus status);
+
+    /**
+     * 管理员批量删除用户。
+     *
+     * @param ids 用户id集合
+     */
+    void adminDeleteBatch(List<Integer> ids);
 }

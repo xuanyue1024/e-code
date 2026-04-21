@@ -1,9 +1,14 @@
 package com.ecode.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
+import com.ecode.dto.AdminUserCreateDTO;
+import com.ecode.dto.AdminUserPageQueryDTO;
+import com.ecode.dto.AdminUserUpdateDTO;
 import com.ecode.dto.UserRegisterDTO;
 import com.ecode.dto.UserUpdateDTO;
 import com.ecode.entity.OauthIdentities;
@@ -20,7 +25,9 @@ import com.ecode.service.UserService;
 import com.ecode.utils.EUtil;
 import com.ecode.utils.IpUtil;
 import com.ecode.utils.S3Util;
+import com.ecode.vo.AdminUserVO;
 import com.ecode.vo.OAuthRegisterVO;
+import com.ecode.vo.PageVO;
 import com.ecode.vo.ScanVO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
@@ -30,10 +37,14 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -173,5 +184,104 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .sceneId(sceneId)
                 .timeout(Redis.LOGIN_SCAN.getTimeout())
                 .build();
+    }
+
+    @Override
+    public PageVO<AdminUserVO> adminPage(AdminUserPageQueryDTO queryDTO) {
+        Page<User> page = queryDTO.toMpPage(OrderItem.desc("update_time"));
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.hasText(queryDTO.getKeyword())) {
+            wrapper.and(w -> w
+                    .like(User::getName, queryDTO.getKeyword())
+                    .or()
+                    .like(User::getUsername, queryDTO.getKeyword())
+                    .or()
+                    .like(User::getEmail, queryDTO.getKeyword()));
+        }
+        wrapper.eq(queryDTO.getRole() != null, User::getRole, queryDTO.getRole());
+        wrapper.eq(queryDTO.getStatus() != null, User::getStatus, queryDTO.getStatus());
+
+        Page<User> userPage = userMapper.selectPage(page, wrapper);
+        List<User> records = userPage.getRecords();
+        if (records == null || records.isEmpty()) {
+            return new PageVO<>(userPage.getTotal(), userPage.getPages(), Collections.emptyList());
+        }
+
+        List<AdminUserVO> list = records.stream().map(this::toAdminUserVO).collect(Collectors.toList());
+        return new PageVO<>(userPage.getTotal(), userPage.getPages(), list);
+    }
+
+    @Override
+    public AdminUserVO adminGetById(Integer id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw new BaseException(MessageConstant.USER_NOT_FOUND);
+        }
+        return toAdminUserVO(user);
+    }
+
+    @Override
+    public void adminCreate(AdminUserCreateDTO createDTO) {
+        User user = new User();
+        BeanUtils.copyProperties(createDTO, user);
+        user.setStatus(createDTO.getStatus() == null ? UserStatus.ENABLE : createDTO.getStatus());
+        user.setName(StringUtils.hasText(createDTO.getName()) ? createDTO.getName() : "默认用户");
+        user.setProfilePicture(StringUtils.hasText(createDTO.getProfilePicture()) ? createDTO.getProfilePicture() : "default-profile-pic.jpg");
+        user.setScore(createDTO.getScore() == null ? 0L : createDTO.getScore());
+        user.setCreateTime(LocalDateTime.now());
+        user.setUpdateTime(LocalDateTime.now());
+        try {
+            userMapper.insert(user);
+        } catch (DuplicateKeyException e) {
+            throw new BaseException(EUtil.duplicateKeyException(e));
+        }
+    }
+
+    @Override
+    public void adminUpdate(AdminUserUpdateDTO updateDTO) {
+        if (userMapper.selectById(updateDTO.getId()) == null) {
+            throw new BaseException(MessageConstant.USER_NOT_FOUND);
+        }
+        User user = new User();
+        BeanUtils.copyProperties(updateDTO, user);
+        if (!StringUtils.hasText(updateDTO.getPassword())) {
+            user.setPassword(null);
+        }
+        user.setUpdateTime(LocalDateTime.now());
+        try {
+            int rows = userMapper.updateById(user);
+            if (rows <= 0) {
+                throw new BaseException(MessageConstant.UPDATE_FAILED);
+            }
+        } catch (DuplicateKeyException e) {
+            throw new BaseException(EUtil.duplicateKeyException(e));
+        }
+    }
+
+    @Override
+    public void adminUpdateStatus(Integer id, UserStatus status) {
+        User user = User.builder()
+                .id(id)
+                .status(status)
+                .updateTime(LocalDateTime.now())
+                .build();
+        int rows = userMapper.updateById(user);
+        if (rows <= 0) {
+            throw new BaseException(MessageConstant.USER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void adminDeleteBatch(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new BaseException(MessageConstant.PARAMETER_ERROR);
+        }
+        userMapper.deleteBatchIds(ids);
+    }
+
+    private AdminUserVO toAdminUserVO(User user) {
+        AdminUserVO vo = new AdminUserVO();
+        BeanUtils.copyProperties(user, vo);
+        return vo;
     }
 }
