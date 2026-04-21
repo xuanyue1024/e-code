@@ -48,6 +48,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                     .check(r -> StpUtil.checkLogin());        // 要执行的校验动作，可以写完整的 lambda 表达式
 
             // 根据路由划分模块，不同模块不同鉴权
+            SaRouter.match("/admin/**").check(r -> StpUtil.checkRole(UserRole.ADMIN.name()));
             SaRouter.match("/teacher/**").check(r -> StpUtil.checkRole(UserRole.TEACHER.name()));
             SaRouter.match("/student/**").notMatch("/student/problem/*").check(r -> StpUtil.checkRole(UserRole.STUDENT.name()));
         })).addPathPatterns("/**");
