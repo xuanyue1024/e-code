@@ -9,8 +9,10 @@ import com.ecode.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.vo.AdminUserVO;
+import com.ecode.vo.ImportResultVO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ScanVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -111,4 +113,26 @@ public interface UserService extends IService<User> {
      * @param ids 用户id集合
      */
     void adminDeleteBatch(List<Integer> ids);
+
+    /**
+     * 导出用户 Excel。
+     *
+     * @return Excel 字节
+     */
+    byte[] exportUsers();
+
+    /**
+     * 导出用户导入模板。
+     *
+     * @return Excel 字节
+     */
+    byte[] exportUserTemplate();
+
+    /**
+     * 导入用户 Excel。
+     *
+     * @param file Excel 文件
+     * @return 导入结果
+     */
+    ImportResultVO importUsers(MultipartFile file);
 }

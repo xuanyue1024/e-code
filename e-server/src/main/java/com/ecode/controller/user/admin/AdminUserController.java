@@ -9,6 +9,7 @@ import com.ecode.result.Result;
 import com.ecode.service.AdminSessionService;
 import com.ecode.service.UserService;
 import com.ecode.vo.AdminUserVO;
+import com.ecode.vo.ImportResultVO;
 import com.ecode.vo.PageVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +24,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +38,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -161,5 +168,41 @@ public class AdminUserController {
             @RequestBody @Valid AdminTokenLogoutDTO tokenLogoutDTO) {
         adminSessionService.logoutToken(tokenLogoutDTO.getToken());
         return Result.success();
+    }
+
+    @GetMapping("/export")
+    @Operation(summary = "导出用户", description = "导出用户 Excel，密码列为空")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "导出成功",
+            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    schema = @Schema(type = "string", format = "binary"))))
+    public ResponseEntity<byte[]> exportUsers() {
+        return excelResponse("用户导出.xlsx", userService.exportUsers());
+    }
+
+    @GetMapping("/import/template")
+    @Operation(summary = "下载用户导入模板", description = "下载用户 Excel 导入模板")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "下载成功",
+            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    schema = @Schema(type = "string", format = "binary"))))
+    public ResponseEntity<byte[]> exportUserTemplate() {
+        return excelResponse("用户导入模板.xlsx", userService.exportUserTemplate());
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "导入用户", description = "导入用户 Excel，已存在的 username 或 email 会跳过并报告")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "导入完成",
+            content = @Content(schema = @Schema(implementation = Result.class))))
+    public Result<ImportResultVO> importUsers(
+            @Parameter(name = "file", description = "用户 Excel 文件，仅支持 .xlsx", required = true)
+            @RequestParam("file") MultipartFile file) {
+        return Result.success(userService.importUsers(file));
+    }
+
+    private ResponseEntity<byte[]> excelResponse(String fileName, byte[] data) {
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
+                .body(data);
     }
 }

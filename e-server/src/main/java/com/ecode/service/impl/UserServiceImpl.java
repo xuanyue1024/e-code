@@ -15,6 +15,8 @@ import com.ecode.entity.OauthIdentities;
 import com.ecode.entity.User;
 import com.ecode.enumeration.Redis;
 import com.ecode.enumeration.ScanStatus;
+import com.ecode.enumeration.UserRole;
+import com.ecode.enumeration.UserSex;
 import com.ecode.enumeration.UserStatus;
 import com.ecode.exception.BaseException;
 import com.ecode.exception.RegisterException;
@@ -24,9 +26,11 @@ import com.ecode.service.AdminSessionService;
 import com.ecode.service.OauthIdentitiesService;
 import com.ecode.service.UserService;
 import com.ecode.utils.EUtil;
+import com.ecode.utils.ExcelUtil;
 import com.ecode.utils.IpUtil;
 import com.ecode.utils.S3Util;
 import com.ecode.vo.AdminUserVO;
+import com.ecode.vo.ImportResultVO;
 import com.ecode.vo.OAuthRegisterVO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ScanVO;
@@ -39,12 +43,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.HashSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -59,6 +69,10 @@ import static java.util.Objects.requireNonNull;
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    private static final List<String> USER_EXCEL_HEADERS = List.of(
+            "id", "username", "password", "role", "email", "status", "name",
+            "profilePicture", "phone", "sex", "address", "score", "birthDate");
 
     @Autowired
     private UserMapper userMapper;
@@ -287,9 +301,110 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         ids.forEach(adminSessionService::logoutUser);
     }
 
+    @Override
+    public byte[] exportUsers() {
+        List<User> users = userMapper.selectList(new LambdaQueryWrapper<User>().orderByDesc(User::getUpdateTime));
+        List<List<Object>> rows = users.stream()
+                .map(user -> List.<Object>of(
+                        valueOrBlank(user.getId()),
+                        valueOrBlank(user.getUsername()),
+                        "",
+                        valueOrBlank(user.getRole()),
+                        valueOrBlank(user.getEmail()),
+                        valueOrBlank(user.getStatus()),
+                        valueOrBlank(user.getName()),
+                        valueOrBlank(user.getProfilePicture()),
+                        valueOrBlank(user.getPhone()),
+                        valueOrBlank(user.getSex()),
+                        valueOrBlank(user.getAddress()),
+                        valueOrBlank(user.getScore()),
+                        valueOrBlank(user.getBirthDate())))
+                .toList();
+        return ExcelUtil.write("用户", USER_EXCEL_HEADERS, rows);
+    }
+
+    @Override
+    public byte[] exportUserTemplate() {
+        return ExcelUtil.write("用户导入模板", USER_EXCEL_HEADERS, List.of(List.of(
+                "", "student001", "123456", "STUDENT", "student001@example.com", "ENABLE",
+                "学生一", "default-profile-pic.jpg", "", "MALE", "", "0", "2000-01-01"
+        )));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ImportResultVO importUsers(MultipartFile file) {
+        List<Map<String, String>> rows = ExcelUtil.read(file, List.of("username", "password", "role", "email"));
+        ImportResultVO result = new ImportResultVO();
+        result.setTotal(rows.size());
+        Set<String> seenUsernames = new HashSet<>();
+        Set<String> seenEmails = new HashSet<>();
+
+        for (Map<String, String> row : rows) {
+            int rowNumber = Integer.parseInt(row.get("__rowNumber"));
+            try {
+                String username = row.get("username");
+                String email = row.get("email");
+                if (!StringUtils.hasText(username) || !StringUtils.hasText(email)
+                        || !StringUtils.hasText(row.get("password")) || !StringUtils.hasText(row.get("role"))) {
+                    result.addFailed(rowNumber, "用户名、密码、角色、邮箱不能为空");
+                    continue;
+                }
+                if (!seenUsernames.add(username) || !seenEmails.add(email)) {
+                    result.addSkipped(rowNumber, "文件内用户名或邮箱重复");
+                    continue;
+                }
+                if (userExists(username, email)) {
+                    result.addSkipped(rowNumber, "用户名或邮箱已存在");
+                    continue;
+                }
+
+                User user = User.builder()
+                        .username(username)
+                        .password(row.get("password"))
+                        .role(UserRole.valueOf(row.get("role")))
+                        .email(email)
+                        .status(StringUtils.hasText(row.get("status")) ? UserStatus.valueOf(row.get("status")) : UserStatus.ENABLE)
+                        .name(StringUtils.hasText(row.get("name")) ? row.get("name") : "默认用户")
+                        .profilePicture(StringUtils.hasText(row.get("profilePicture")) ? row.get("profilePicture") : "default-profile-pic.jpg")
+                        .phone(blankToNull(row.get("phone")))
+                        .sex(StringUtils.hasText(row.get("sex")) ? UserSex.valueOf(row.get("sex")) : null)
+                        .address(blankToNull(row.get("address")))
+                        .score(StringUtils.hasText(row.get("score")) ? Long.valueOf(row.get("score")) : 0L)
+                        .birthDate(StringUtils.hasText(row.get("birthDate")) ? LocalDate.parse(row.get("birthDate")) : null)
+                        .createTime(LocalDateTime.now())
+                        .updateTime(LocalDateTime.now())
+                        .build();
+                userMapper.insert(user);
+                result.addCreated(rowNumber, "新增用户：" + username);
+            } catch (IllegalArgumentException | DateTimeParseException e) {
+                result.addFailed(rowNumber, "枚举、日期或数字格式错误");
+            } catch (Exception e) {
+                result.addFailed(rowNumber, e.getMessage());
+            }
+        }
+        return result;
+    }
+
     private AdminUserVO toAdminUserVO(User user) {
         AdminUserVO vo = new AdminUserVO();
         BeanUtils.copyProperties(user, vo);
         return vo;
+    }
+
+    private boolean userExists(String username, String email) {
+        Long count = userMapper.selectCount(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, username)
+                .or()
+                .eq(User::getEmail, email));
+        return count != null && count > 0;
+    }
+
+    private Object valueOrBlank(Object value) {
+        return value == null ? "" : value;
+    }
+
+    private String blankToNull(String value) {
+        return StringUtils.hasText(value) ? value : null;
     }
 }
