@@ -8,6 +8,7 @@ import com.ecode.result.Result;
 import com.ecode.service.ProblemService;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemEditVO;
+import com.ecode.vo.ImportResultVO;
 import com.ecode.vo.ProblemPageVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,6 +23,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +36,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -109,5 +116,41 @@ public class AdminProblemController {
             @RequestBody @Valid SetTagsDTO setTagsDTO) {
         problemService.setTags(setTagsDTO);
         return Result.success();
+    }
+
+    @GetMapping("/export")
+    @Operation(summary = "导出题目", description = "导出题目 Excel，包含逗号分隔的标签名称")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "导出成功",
+            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    schema = @Schema(type = "string", format = "binary"))))
+    public ResponseEntity<byte[]> exportProblems() {
+        return excelResponse("题目导出.xlsx", problemService.exportProblems());
+    }
+
+    @GetMapping("/import/template")
+    @Operation(summary = "下载题目导入模板", description = "下载题目 Excel 导入模板")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "下载成功",
+            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    schema = @Schema(type = "string", format = "binary"))))
+    public ResponseEntity<byte[]> exportProblemTemplate() {
+        return excelResponse("题目导入模板.xlsx", problemService.exportProblemTemplate());
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "导入题目", description = "导入题目 Excel，id 或标题已存在时跳过并报告")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "导入完成",
+            content = @Content(schema = @Schema(implementation = Result.class))))
+    public Result<ImportResultVO> importProblems(
+            @Parameter(name = "file", description = "题目 Excel 文件，仅支持 .xlsx", required = true)
+            @RequestParam("file") MultipartFile file) {
+        return Result.success(problemService.importProblems(file));
+    }
+
+    private ResponseEntity<byte[]> excelResponse(String fileName, byte[] data) {
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
+                .body(data);
     }
 }

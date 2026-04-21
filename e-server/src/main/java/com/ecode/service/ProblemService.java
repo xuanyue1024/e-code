@@ -4,8 +4,10 @@ import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.dto.ProblemAddDTO;
 import com.ecode.dto.ProblemUpdateDTO;
 import com.ecode.dto.SetTagsDTO;
+import com.ecode.vo.ImportResultVO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -62,4 +64,26 @@ public interface ProblemService {
      * @param setTagsDTO 设置标签dto
      */
     void setTags(SetTagsDTO setTagsDTO);
+
+    /**
+     * 导出题目 Excel。
+     *
+     * @return Excel 字节
+     */
+    byte[] exportProblems();
+
+    /**
+     * 导出题目导入模板。
+     *
+     * @return Excel 字节
+     */
+    byte[] exportProblemTemplate();
+
+    /**
+     * 导入题目 Excel。
+     *
+     * @param file Excel 文件
+     * @return 导入结果
+     */
+    ImportResultVO importProblems(MultipartFile file);
 }
