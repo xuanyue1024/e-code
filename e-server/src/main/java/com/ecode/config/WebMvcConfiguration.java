@@ -6,8 +6,6 @@ import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import com.ecode.enumeration.UserRole;
 import com.ecode.json.JacksonObjectMapper;
-import com.ecode.service.AdminSessionService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -23,10 +21,7 @@ import java.util.List;
  */
 @Configuration
 @Slf4j
-@RequiredArgsConstructor
 public class WebMvcConfiguration implements WebMvcConfigurer {
-
-    private final AdminSessionService adminSessionService;
 
     /**
      * 注册自定义拦截器
@@ -50,24 +45,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                             "/user/scan/generate",
                             "/user/live/callback")        // 排除掉的 path 列表，可以写多个
                     .notMatch(SaHttpMethod.OPTIONS)
-                    .check(r -> {
-                        StpUtil.checkLogin();
-                        adminSessionService.checkCurrentToken();
-                    });        // 要执行的校验动作，可以写完整的 lambda 表达式
+                    .check(r -> StpUtil.checkLogin());        // 要执行的校验动作，可以写完整的 lambda 表达式
 
             // 根据路由划分模块，不同模块不同鉴权
-            SaRouter.match("/admin/**").check(r -> {
-                StpUtil.checkRole(UserRole.ADMIN.name());
-                adminSessionService.checkCurrentToken();
-            });
-            SaRouter.match("/teacher/**").check(r -> {
-                StpUtil.checkRole(UserRole.TEACHER.name());
-                adminSessionService.checkCurrentToken();
-            });
-            SaRouter.match("/student/**").notMatch("/student/problem/*").check(r -> {
-                StpUtil.checkRole(UserRole.STUDENT.name());
-                adminSessionService.checkCurrentToken();
-            });
+            SaRouter.match("/admin/**").check(r -> StpUtil.checkRole(UserRole.ADMIN.name()));
+            SaRouter.match("/teacher/**").check(r -> StpUtil.checkRole(UserRole.TEACHER.name()));
+            SaRouter.match("/student/**").notMatch("/student/problem/*").check(r -> StpUtil.checkRole(UserRole.STUDENT.name()));
         })).addPathPatterns("/**");
     }
 

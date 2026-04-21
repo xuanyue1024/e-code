@@ -21,9 +21,4 @@ public interface AdminSessionService {
      * @param token JWT token
      */
     void logoutToken(String token);
-
-    /**
-     * 校验当前请求 token 是否已被管理员失效。
-     */
-    void checkCurrentToken();
 }
