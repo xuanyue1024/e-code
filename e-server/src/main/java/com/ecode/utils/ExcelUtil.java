@@ -37,9 +37,11 @@ public final class ExcelUtil {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet(sheetName);
             Row headerRow = sheet.createRow(0);
+            // 第一行固定为业务表头，导入时也按这些中文/英文表头做字段映射。
             for (int i = 0; i < headers.size(); i++) {
                 headerRow.createCell(i).setCellValue(headers.get(i));
             }
+            // 所有业务值统一转字符串写入，降低 Excel 数字格式对枚举、id、日期的干扰。
             for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
                 Row row = sheet.createRow(rowIndex + 1);
                 List<Object> values = rows.get(rowIndex);
@@ -68,6 +70,7 @@ public final class ExcelUtil {
                 throw new BaseException("Excel 文件为空");
             }
             List<String> headers = readHeaders(sheet.getRow(0));
+            // 表头缺失属于模板错误，直接失败；行级数据错误则交给业务导入逻辑逐行报告。
             for (String requiredHeader : requiredHeaders) {
                 if (!headers.contains(requiredHeader)) {
                     throw new BaseException("缺少表头：" + requiredHeader);
@@ -81,6 +84,7 @@ public final class ExcelUtil {
                     continue;
                 }
                 Map<String, String> rowMap = new LinkedHashMap<>();
+                // 保留 Excel 展示行号，导入结果可以直接提示管理员修正哪一行。
                 rowMap.put("__rowNumber", String.valueOf(i + 1));
                 for (int columnIndex = 0; columnIndex < headers.size(); columnIndex++) {
                     rowMap.put(headers.get(columnIndex), readCell(row.getCell(columnIndex)));

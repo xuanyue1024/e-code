@@ -208,6 +208,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public PageVO<AdminUserVO> adminPage(AdminUserPageQueryDTO queryDTO) {
         Page<User> page = queryDTO.toMpPage(OrderItem.desc("update_time"));
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        // 管理端关键字同时匹配昵称、用户名和邮箱，便于后台快速定位账号。
         if (StringUtils.hasText(queryDTO.getKeyword())) {
             wrapper.and(w -> w
                     .like(User::getName, queryDTO.getKeyword())
@@ -221,10 +222,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         Page<User> userPage = userMapper.selectPage(page, wrapper);
         List<User> records = userPage.getRecords();
+        // 统一返回空分页结构，避免前端额外判断 data.list 是否为 null。
         if (records == null || records.isEmpty()) {
             return new PageVO<>(userPage.getTotal(), userPage.getPages(), Collections.emptyList());
         }
 
+        // 管理员响应对象不包含 password，避免直接返回 Entity 泄露敏感字段。
         List<AdminUserVO> list = records.stream().map(this::toAdminUserVO).collect(Collectors.toList());
         return new PageVO<>(userPage.getTotal(), userPage.getPages(), list);
     }
@@ -242,6 +245,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void adminCreate(AdminUserCreateDTO createDTO) {
         User user = new User();
         BeanUtils.copyProperties(createDTO, user);
+        // 管理员创建账号不走邮箱验证码流程，这里补齐注册流程里原本设置的默认业务字段。
         user.setStatus(createDTO.getStatus() == null ? UserStatus.ENABLE : createDTO.getStatus());
         user.setName(StringUtils.hasText(createDTO.getName()) ? createDTO.getName() : "默认用户");
         user.setProfilePicture(StringUtils.hasText(createDTO.getProfilePicture()) ? createDTO.getProfilePicture() : "default-profile-pic.jpg");
@@ -262,6 +266,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         User user = new User();
         BeanUtils.copyProperties(updateDTO, user);
+        // 密码为空表示本次不修改密码，防止空字符串覆盖已有登录凭证。
         if (!StringUtils.hasText(updateDTO.getPassword())) {
             user.setPassword(null);
         }
@@ -287,6 +292,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (rows <= 0) {
             throw new BaseException(MessageConstant.USER_NOT_FOUND);
         }
+        // 禁用账号后立即踢出已有登录态，避免被禁用用户继续持有有效 token。
         if (status == UserStatus.DISABLE) {
             adminSessionService.logoutUser(id);
         }
@@ -298,12 +304,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BaseException(MessageConstant.PARAMETER_ERROR);
         }
         userMapper.deleteBatchIds(ids);
+        // 删除账号后同步注销 Sa-Token 会话，防止旧 token 访问依赖数据库之外的接口。
         ids.forEach(adminSessionService::logoutUser);
     }
 
     @Override
     public byte[] exportUsers() {
         List<User> users = userMapper.selectList(new LambdaQueryWrapper<User>().orderByDesc(User::getUpdateTime));
+        // 导出时保留 password 表头但不输出密码值，兼容导入模板同时避免泄露密码。
         List<List<Object>> rows = users.stream()
                 .map(user -> List.<Object>of(
                         valueOrBlank(user.getId()),
@@ -337,19 +345,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         List<Map<String, String>> rows = ExcelUtil.read(file, List.of("username", "password", "role", "email"));
         ImportResultVO result = new ImportResultVO();
         result.setTotal(rows.size());
+        // 先记录文件内唯一键，文件内重复行也按“跳过并报告”处理，不写入数据库。
         Set<String> seenUsernames = new HashSet<>();
         Set<String> seenEmails = new HashSet<>();
 
         for (Map<String, String> row : rows) {
+            // ExcelUtil 保留原始行号，导入失败时前端可以直接定位到表格行。
             int rowNumber = Integer.parseInt(row.get("__rowNumber"));
             try {
                 String username = row.get("username");
                 String email = row.get("email");
+                // 必填字段不足属于数据质量问题，记录失败但不中断后续行处理。
                 if (!StringUtils.hasText(username) || !StringUtils.hasText(email)
                         || !StringUtils.hasText(row.get("password")) || !StringUtils.hasText(row.get("role"))) {
                     result.addFailed(rowNumber, "用户名、密码、角色、邮箱不能为空");
                     continue;
                 }
+                // 导入策略是“已存在跳过”，因此重复数据不会覆盖已有账号。
                 if (!seenUsernames.add(username) || !seenEmails.add(email)) {
                     result.addSkipped(rowNumber, "文件内用户名或邮箱重复");
                     continue;
@@ -359,6 +371,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     continue;
                 }
 
+                // 逐字段解析枚举、日期和数字，格式错误由外层捕获并写入行级失败原因。
                 User user = User.builder()
                         .username(username)
                         .password(row.get("password"))

@@ -169,6 +169,7 @@ public class ProblemServiceImpl implements ProblemService {
     @Override
     public byte[] exportProblems() {
         List<Problem> problems = problemMapper.selectList(new LambdaQueryWrapper<Problem>().orderByDesc(Problem::getUpdateTime));
+        // 题目导出把多对多标签压成逗号分隔文本，方便 Excel 人工编辑后再导入。
         List<List<Object>> rows = problems.stream().map(problem -> List.<Object>of(
                 valueOrBlank(problem.getId()),
                 valueOrBlank(problem.getTitle()),
@@ -204,12 +205,15 @@ public class ProblemServiceImpl implements ProblemService {
         List<Map<String, String>> rows = ExcelUtil.read(file, List.of("title", "grade"));
         ImportResultVO result = new ImportResultVO();
         result.setTotal(rows.size());
+        // 标题是题库中最容易人工识别的唯一键，文件内重复标题直接跳过。
         Set<String> seenTitles = new HashSet<>();
 
         for (Map<String, String> row : rows) {
+            // 保留 Excel 原始行号，便于管理员按导入结果回到表格修正。
             int rowNumber = Integer.parseInt(row.get("__rowNumber"));
             try {
                 String title = row.get("title");
+                // 标题和难度是题目能被列表展示、筛选和评测分组的最低必填项。
                 if (!StringUtils.hasText(title) || !StringUtils.hasText(row.get("grade"))) {
                     result.addFailed(rowNumber, "标题和难度不能为空");
                     continue;
@@ -219,15 +223,18 @@ public class ProblemServiceImpl implements ProblemService {
                     continue;
                 }
                 Integer id = parseInteger(row.get("id"));
+                // 有 id 时先按主键判断，避免导入误覆盖数据库已有题目。
                 if (id != null && problemMapper.selectById(id) != null) {
                     result.addSkipped(rowNumber, "题目id已存在");
                     continue;
                 }
+                // 无 id 或 id 不存在时再按标题精确匹配，符合“已存在跳过”的导入策略。
                 if (problemMapper.selectCount(new LambdaQueryWrapper<Problem>().eq(Problem::getTitle, title)) > 0) {
                     result.addSkipped(rowNumber, "题目标题已存在");
                     continue;
                 }
 
+                // Entity 没有 Lombok Builder，这里显式赋值以保持字段映射清晰。
                 Problem problem = new Problem();
                 problem.setId(id);
                 problem.setTitle(title);
@@ -247,6 +254,7 @@ public class ProblemServiceImpl implements ProblemService {
                 problem.setCreateTime(LocalDateTime.now());
                 problem.setUpdateTime(LocalDateTime.now());
                 problemMapper.insert(problem);
+                // 题目插入成功后再绑定标签，确保 problemId 已由数据库回填。
                 bindTags(problem.getId(), row.get("tags"));
                 result.addCreated(rowNumber, "新增题目：" + title);
             } catch (IllegalArgumentException e) {
@@ -262,6 +270,7 @@ public class ProblemServiceImpl implements ProblemService {
         if (!StringUtils.hasText(tagNames)) {
             return;
         }
+        // 标签列允许人工用英文逗号维护多个标签，缺失标签会自动创建后再建立关联。
         Arrays.stream(tagNames.split(","))
                 .map(String::trim)
                 .filter(StringUtils::hasText)

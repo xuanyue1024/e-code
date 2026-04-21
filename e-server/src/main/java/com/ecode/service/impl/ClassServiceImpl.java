@@ -308,6 +308,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
 
     @Override
     public void adminAddClass(AdminClassCreateDTO createDTO) {
+        // 管理员可跨教师创建班级，但 teacherId 必须指向真实教师账号。
         verifyTeacher(createDTO.getTeacherId());
         Class c = Class.builder()
                 .name(createDTO.getName())
@@ -368,12 +369,14 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
 
         studentClassMapper.delete(new LambdaQueryWrapper<StudentClass>().in(StudentClass::getClassId, ids));
         classProblemMapper.delete(new LambdaQueryWrapper<ClassProblem>().in(ClassProblem::getClassId, ids));
+        // 依赖数据清理完成后再删班级主表，避免留下孤立的班级成员或题目数据。
         classMapper.deleteBatchIds(ids);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void adminAddStudents(AdminClassStudentDTO dto) {
+        // 先确认班级存在，再逐个校验学生角色，避免把教师或管理员加入学生关系表。
         getAdminClassById(dto.getClassId());
         for (Integer studentId : dto.getStudentIds()) {
             verifyStudent(studentId);
@@ -383,6 +386,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
             if (existing != null) {
                 throw new ClassException(MessageConstant.ALREADY_EXISTS);
             }
+            // student_class 是班级成员的权威关系表，后续成绩统计依赖它的主键 sc_id。
             studentClassMapper.insert(StudentClass.builder()
                     .classId(dto.getClassId())
                     .studentId(studentId)
@@ -390,6 +394,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
                     .build());
         }
 
+        // 成员关系写入成功后统一累加人数，保证 join_number 与实际新增数量一致。
         classMapper.update(null, new UpdateWrapper<Class>().lambda()
                 .setSql("join_number = join_number + " + dto.getStudentIds().size())
                 .eq(Class::getId, dto.getClassId()));
@@ -406,6 +411,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         }
 
         List<Integer> scIds = studentClasses.stream().map(StudentClass::getId).toList();
+        // 先删除学生在该班级内的成绩记录，再删除成员关系，避免 class_score 残留无效 sc_id。
         classScoreMapper.delete(new LambdaQueryWrapper<ClassScore>().in(ClassScore::getScId, scIds));
         studentClassMapper.deleteBatchIds(scIds);
         classMapper.update(null, new UpdateWrapper<Class>().lambda()
@@ -416,6 +422,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
     @Override
     public byte[] exportClasses() {
         List<Class> classes = classMapper.selectList(new LambdaQueryWrapper<Class>().orderByDesc(Class::getUpdateTime));
+        // 班级导出只包含主表字段；成员和题目关系由单独接口维护，避免一个模板承担多种语义。
         List<List<Object>> rows = classes.stream().map(c -> List.<Object>of(
                 valueOrBlank(c.getId()),
                 valueOrBlank(c.getTeacherId()),
@@ -439,10 +446,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         List<Map<String, String>> rows = ExcelUtil.read(file, List.of("teacherId", "name"));
         ImportResultVO result = new ImportResultVO();
         result.setTotal(rows.size());
+        // 文件内先按 teacherId+name 和邀请码去重，避免同一批导入自己制造冲突。
         Set<String> seenClassKeys = new HashSet<>();
         Set<String> seenInvitationCodes = new HashSet<>();
 
         for (Map<String, String> row : rows) {
+            // 行号来自 Excel 原始位置，返回给前端用于定位导入失败或跳过的具体行。
             int rowNumber = Integer.parseInt(row.get("__rowNumber"));
             try {
                 Integer id = parseInteger(row.get("id"));
@@ -453,6 +462,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
                     result.addFailed(rowNumber, "教师id和班级名称不能为空");
                     continue;
                 }
+                // 班级必须挂到教师账号下，教师不存在或角色错误时该行失败。
                 verifyTeacher(teacherId);
                 String classKey = teacherId + ":" + name;
                 if (!seenClassKeys.add(classKey)) {
@@ -463,6 +473,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
                     result.addSkipped(rowNumber, "文件内邀请码重复");
                     continue;
                 }
+                // 已存在判断按 id、邀请码、teacherId+name 依次执行，命中任一条件都跳过不覆盖。
                 if (id != null && classMapper.selectById(id) != null) {
                     result.addSkipped(rowNumber, "班级id已存在");
                     continue;
@@ -491,6 +502,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
                         .build();
                 classMapper.insert(c);
                 if (!StringUtils.hasText(c.getInvitationCode())) {
+                    // 模板允许不填邀请码，空值时使用项目既有规则生成稳定邀请码。
                     c.setInvitationCode(InvitationCodeUtil.inviCodeGenerator(c.getId()));
                     classMapper.updateById(c);
                 }
