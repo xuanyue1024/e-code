@@ -297,6 +297,7 @@ public class UserController {
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
         claims.put(JwtClaimsConstant.USERNAME, user.getUsername());
         claims.put(JwtClaimsConstant.ROLE, user.getRole().name());
+        claims.put(JwtClaimsConstant.LOGIN_TIME, System.currentTimeMillis());
 
         StpUtil.login(user.getId(), new SaLoginParameter().setExtraData(claims));
 

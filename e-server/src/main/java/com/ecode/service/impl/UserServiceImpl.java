@@ -20,6 +20,7 @@ import com.ecode.exception.BaseException;
 import com.ecode.exception.RegisterException;
 import com.ecode.json.ScanData;
 import com.ecode.mapper.UserMapper;
+import com.ecode.service.AdminSessionService;
 import com.ecode.service.OauthIdentitiesService;
 import com.ecode.service.UserService;
 import com.ecode.utils.EUtil;
@@ -70,6 +71,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private S3Util s3Util;
+
+    @Autowired
+    private AdminSessionService adminSessionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -269,6 +273,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (rows <= 0) {
             throw new BaseException(MessageConstant.USER_NOT_FOUND);
         }
+        if (status == UserStatus.DISABLE) {
+            adminSessionService.logoutUser(id);
+        }
     }
 
     @Override
@@ -277,6 +284,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BaseException(MessageConstant.PARAMETER_ERROR);
         }
         userMapper.deleteBatchIds(ids);
+        ids.forEach(adminSessionService::logoutUser);
     }
 
     private AdminUserVO toAdminUserVO(User user) {

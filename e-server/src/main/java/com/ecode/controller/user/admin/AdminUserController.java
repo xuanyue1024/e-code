@@ -3,8 +3,10 @@ package com.ecode.controller.user.admin;
 import com.ecode.dto.AdminUserCreateDTO;
 import com.ecode.dto.AdminUserPageQueryDTO;
 import com.ecode.dto.AdminUserStatusDTO;
+import com.ecode.dto.AdminTokenLogoutDTO;
 import com.ecode.dto.AdminUserUpdateDTO;
 import com.ecode.result.Result;
+import com.ecode.service.AdminSessionService;
 import com.ecode.service.UserService;
 import com.ecode.vo.AdminUserVO;
 import com.ecode.vo.PageVO;
@@ -49,6 +51,7 @@ import java.util.List;
 public class AdminUserController {
 
     private final UserService userService;
+    private final AdminSessionService adminSessionService;
 
     @GetMapping("/page")
     @Operation(summary = "分页查询用户", description = "按名称、用户名、邮箱、角色和状态分页查询用户，响应不包含密码")
@@ -129,6 +132,34 @@ public class AdminUserController {
             @Parameter(name = "ids", description = "用户id集合", required = true, in = ParameterIn.QUERY)
             @RequestParam @NotEmpty(message = "用户id集合不能为空") List<Integer> ids) {
         userService.adminDeleteBatch(ids);
+        return Result.success();
+    }
+
+    @PostMapping("/{id}/logout")
+    @Operation(summary = "下线用户", description = "让指定用户已签发的全部 token 失效，用户重新登录后可继续使用")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "下线成功",
+                    content = @Content(schema = @Schema(implementation = Result.class))),
+            @ApiResponse(responseCode = "403", description = "无管理员权限", content = @Content)
+    })
+    public Result<Void> logoutUser(
+            @Parameter(name = "id", description = "用户id", required = true, in = ParameterIn.PATH)
+            @PathVariable @NotNull(message = "用户id不能为空") Integer id) {
+        adminSessionService.logoutUser(id);
+        return Result.success();
+    }
+
+    @PostMapping("/logout/token")
+    @Operation(summary = "下线指定 token", description = "让指定 JWT token 失效，不影响同账号其他 token")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "下线成功",
+                    content = @Content(schema = @Schema(implementation = Result.class))),
+            @ApiResponse(responseCode = "403", description = "无管理员权限", content = @Content)
+    })
+    public Result<Void> logoutToken(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "token 下线参数", required = true)
+            @RequestBody @Valid AdminTokenLogoutDTO tokenLogoutDTO) {
+        adminSessionService.logoutToken(tokenLogoutDTO.getToken());
         return Result.success();
     }
 }
