@@ -1,6 +1,9 @@
 package com.ecode.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ecode.dto.AdminClassCreateDTO;
+import com.ecode.dto.AdminClassStudentDTO;
+import com.ecode.dto.AdminClassUpdateDTO;
 import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.ClassProblemPageQueryDTO;
 import com.ecode.dto.ClassStudentDTO;
@@ -151,4 +154,47 @@ public interface ClassService extends IService<Class> {
      * @return List<ClassProblemTagNumVO>
      */
     List<ClassProblemTagNumVO> getClassProblemTagNum(Integer classId);
+
+    /**
+     * 管理员创建班级。
+     *
+     * @param createDTO 创建参数
+     */
+    void adminAddClass(AdminClassCreateDTO createDTO);
+
+    /**
+     * 管理员查询班级详情。
+     *
+     * @param id 班级id
+     * @return 班级详情
+     */
+    Class getAdminClassById(Integer id);
+
+    /**
+     * 管理员更新班级。
+     *
+     * @param updateDTO 更新参数
+     */
+    void adminUpdateClass(AdminClassUpdateDTO updateDTO);
+
+    /**
+     * 管理员批量删除班级。
+     *
+     * @param ids 班级id集合
+     */
+    void adminDeleteBatch(List<Integer> ids);
+
+    /**
+     * 管理员给班级添加学生。
+     *
+     * @param dto 学生维护参数
+     */
+    void adminAddStudents(AdminClassStudentDTO dto);
+
+    /**
+     * 管理员移除班级学生。
+     *
+     * @param dto 学生维护参数
+     */
+    void adminRemoveStudents(AdminClassStudentDTO dto);
 }

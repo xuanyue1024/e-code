@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
+import com.ecode.dto.AdminClassCreateDTO;
+import com.ecode.dto.AdminClassStudentDTO;
+import com.ecode.dto.AdminClassUpdateDTO;
 import com.ecode.dto.ClassProblemDTO;
 import com.ecode.dto.ClassProblemPageQueryDTO;
 import com.ecode.dto.ClassStudentDTO;
@@ -13,6 +16,7 @@ import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.entity.*;
 import com.ecode.enumeration.UserRole;
+import com.ecode.exception.BaseException;
 import com.ecode.exception.ClassException;
 import com.ecode.mapper.*;
 import com.ecode.service.ClassService;
@@ -293,6 +297,113 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         return classMapper.getClassProblemTagNum(classId);
     }
 
+    @Override
+    public void adminAddClass(AdminClassCreateDTO createDTO) {
+        verifyTeacher(createDTO.getTeacherId());
+        Class c = Class.builder()
+                .name(createDTO.getName())
+                .teacherId(createDTO.getTeacherId())
+                .joinNumber(0)
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .build();
+        classMapper.insert(c);
+        c.setInvitationCode(InvitationCodeUtil.inviCodeGenerator(c.getId()));
+        classMapper.updateById(c);
+    }
+
+    @Override
+    public Class getAdminClassById(Integer id) {
+        Class c = classMapper.selectById(id);
+        if (c == null) {
+            throw new ClassException(MessageConstant.DATA_NOT_FOUND);
+        }
+        return c;
+    }
+
+    @Override
+    public void adminUpdateClass(AdminClassUpdateDTO updateDTO) {
+        verifyTeacher(updateDTO.getTeacherId());
+        Class c = Class.builder()
+                .id(updateDTO.getId())
+                .teacherId(updateDTO.getTeacherId())
+                .name(updateDTO.getName())
+                .updateTime(LocalDateTime.now())
+                .build();
+        int rows = classMapper.updateById(c);
+        if (rows <= 0) {
+            throw new ClassException(MessageConstant.UPDATE_FAILED);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void adminDeleteBatch(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new ClassException(MessageConstant.PARAMETER_ERROR);
+        }
+
+        List<StudentClass> studentClasses = studentClassMapper.selectList(new LambdaQueryWrapper<StudentClass>()
+                .in(StudentClass::getClassId, ids));
+        List<Integer> scIds = studentClasses.stream().map(StudentClass::getId).toList();
+        if (!scIds.isEmpty()) {
+            classScoreMapper.delete(new LambdaQueryWrapper<ClassScore>().in(ClassScore::getScId, scIds));
+        }
+
+        List<ClassProblem> classProblems = classProblemMapper.selectList(new LambdaQueryWrapper<ClassProblem>()
+                .in(ClassProblem::getClassId, ids));
+        List<Integer> classProblemIds = classProblems.stream().map(ClassProblem::getId).toList();
+        if (!classProblemIds.isEmpty()) {
+            classScoreMapper.delete(new LambdaQueryWrapper<ClassScore>().in(ClassScore::getClassProblemId, classProblemIds));
+        }
+
+        studentClassMapper.delete(new LambdaQueryWrapper<StudentClass>().in(StudentClass::getClassId, ids));
+        classProblemMapper.delete(new LambdaQueryWrapper<ClassProblem>().in(ClassProblem::getClassId, ids));
+        classMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void adminAddStudents(AdminClassStudentDTO dto) {
+        getAdminClassById(dto.getClassId());
+        for (Integer studentId : dto.getStudentIds()) {
+            verifyStudent(studentId);
+            StudentClass existing = studentClassMapper.selectOne(new LambdaQueryWrapper<StudentClass>()
+                    .eq(StudentClass::getClassId, dto.getClassId())
+                    .eq(StudentClass::getStudentId, studentId));
+            if (existing != null) {
+                throw new ClassException(MessageConstant.ALREADY_EXISTS);
+            }
+            studentClassMapper.insert(StudentClass.builder()
+                    .classId(dto.getClassId())
+                    .studentId(studentId)
+                    .joinTime(LocalDateTime.now())
+                    .build());
+        }
+
+        classMapper.update(null, new UpdateWrapper<Class>().lambda()
+                .setSql("join_number = join_number + " + dto.getStudentIds().size())
+                .eq(Class::getId, dto.getClassId()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void adminRemoveStudents(AdminClassStudentDTO dto) {
+        List<StudentClass> studentClasses = studentClassMapper.selectList(new LambdaQueryWrapper<StudentClass>()
+                .eq(StudentClass::getClassId, dto.getClassId())
+                .in(StudentClass::getStudentId, dto.getStudentIds()));
+        if (studentClasses.isEmpty()) {
+            throw new ClassException(MessageConstant.DATA_NOT_FOUND);
+        }
+
+        List<Integer> scIds = studentClasses.stream().map(StudentClass::getId).toList();
+        classScoreMapper.delete(new LambdaQueryWrapper<ClassScore>().in(ClassScore::getScId, scIds));
+        studentClassMapper.deleteBatchIds(scIds);
+        classMapper.update(null, new UpdateWrapper<Class>().lambda()
+                .setSql("join_number = GREATEST(join_number - " + studentClasses.size() + ", 0)")
+                .eq(Class::getId, dto.getClassId()));
+    }
+
     /**
      * 验证教师是否在指定班级授课
      * 验证学生是否在指定班级
@@ -331,6 +442,20 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
             }
         }
 
+    }
+
+    private void verifyTeacher(Integer teacherId) {
+        User teacher = userMapper.selectById(teacherId);
+        if (teacher == null || teacher.getRole() != UserRole.TEACHER) {
+            throw new BaseException(MessageConstant.USER_NOT_FOUND);
+        }
+    }
+
+    private void verifyStudent(Integer studentId) {
+        User student = userMapper.selectById(studentId);
+        if (student == null || student.getRole() != UserRole.STUDENT) {
+            throw new BaseException(MessageConstant.USER_NOT_FOUND);
+        }
     }
 
 }
