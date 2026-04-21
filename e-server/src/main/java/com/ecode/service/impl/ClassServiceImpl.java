@@ -20,6 +20,7 @@ import com.ecode.exception.BaseException;
 import com.ecode.exception.ClassException;
 import com.ecode.mapper.*;
 import com.ecode.service.ClassService;
+import com.ecode.utils.ExcelUtil;
 import com.ecode.utils.InvitationCodeUtil;
 import com.ecode.vo.*;
 import com.github.pagehelper.Page;
@@ -28,11 +29,16 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +49,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements ClassService {
+
+    private static final List<String> CLASS_EXCEL_HEADERS = List.of(
+            "id", "teacherId", "name", "invitationCode", "joinNumber");
 
     @Autowired
     private ClassMapper classMapper;
@@ -404,6 +413,97 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
                 .eq(Class::getId, dto.getClassId()));
     }
 
+    @Override
+    public byte[] exportClasses() {
+        List<Class> classes = classMapper.selectList(new LambdaQueryWrapper<Class>().orderByDesc(Class::getUpdateTime));
+        List<List<Object>> rows = classes.stream().map(c -> List.<Object>of(
+                valueOrBlank(c.getId()),
+                valueOrBlank(c.getTeacherId()),
+                valueOrBlank(c.getName()),
+                valueOrBlank(c.getInvitationCode()),
+                valueOrBlank(c.getJoinNumber())
+        )).toList();
+        return ExcelUtil.write("班级", CLASS_EXCEL_HEADERS, rows);
+    }
+
+    @Override
+    public byte[] exportClassTemplate() {
+        return ExcelUtil.write("班级导入模板", CLASS_EXCEL_HEADERS, List.of(List.of(
+                "", "1", "Java后端基础班", "", "0"
+        )));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ImportResultVO importClasses(MultipartFile file) {
+        List<Map<String, String>> rows = ExcelUtil.read(file, List.of("teacherId", "name"));
+        ImportResultVO result = new ImportResultVO();
+        result.setTotal(rows.size());
+        Set<String> seenClassKeys = new HashSet<>();
+        Set<String> seenInvitationCodes = new HashSet<>();
+
+        for (Map<String, String> row : rows) {
+            int rowNumber = Integer.parseInt(row.get("__rowNumber"));
+            try {
+                Integer id = parseInteger(row.get("id"));
+                Integer teacherId = parseInteger(row.get("teacherId"));
+                String name = row.get("name");
+                String invitationCode = row.get("invitationCode");
+                if (teacherId == null || !StringUtils.hasText(name)) {
+                    result.addFailed(rowNumber, "教师id和班级名称不能为空");
+                    continue;
+                }
+                verifyTeacher(teacherId);
+                String classKey = teacherId + ":" + name;
+                if (!seenClassKeys.add(classKey)) {
+                    result.addSkipped(rowNumber, "文件内教师和班级名称重复");
+                    continue;
+                }
+                if (StringUtils.hasText(invitationCode) && !seenInvitationCodes.add(invitationCode)) {
+                    result.addSkipped(rowNumber, "文件内邀请码重复");
+                    continue;
+                }
+                if (id != null && classMapper.selectById(id) != null) {
+                    result.addSkipped(rowNumber, "班级id已存在");
+                    continue;
+                }
+                if (StringUtils.hasText(invitationCode)
+                        && classMapper.selectCount(new LambdaQueryWrapper<Class>().eq(Class::getInvitationCode, invitationCode)) > 0) {
+                    result.addSkipped(rowNumber, "邀请码已存在");
+                    continue;
+                }
+                if (classMapper.selectCount(new LambdaQueryWrapper<Class>()
+                        .eq(Class::getTeacherId, teacherId)
+                        .eq(Class::getName, name)) > 0) {
+                    result.addSkipped(rowNumber, "教师名下同名班级已存在");
+                    continue;
+                }
+
+                Integer joinNumber = parseInteger(row.get("joinNumber"));
+                Class c = Class.builder()
+                        .id(id)
+                        .teacherId(teacherId)
+                        .name(name)
+                        .invitationCode(StringUtils.hasText(invitationCode) ? invitationCode : null)
+                        .joinNumber(joinNumber == null ? 0 : joinNumber)
+                        .createTime(LocalDateTime.now())
+                        .updateTime(LocalDateTime.now())
+                        .build();
+                classMapper.insert(c);
+                if (!StringUtils.hasText(c.getInvitationCode())) {
+                    c.setInvitationCode(InvitationCodeUtil.inviCodeGenerator(c.getId()));
+                    classMapper.updateById(c);
+                }
+                result.addCreated(rowNumber, "新增班级：" + name);
+            } catch (NumberFormatException e) {
+                result.addFailed(rowNumber, "数字格式错误");
+            } catch (Exception e) {
+                result.addFailed(rowNumber, e.getMessage());
+            }
+        }
+        return result;
+    }
+
     /**
      * 验证教师是否在指定班级授课
      * 验证学生是否在指定班级
@@ -456,6 +556,14 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements
         if (student == null || student.getRole() != UserRole.STUDENT) {
             throw new BaseException(MessageConstant.USER_NOT_FOUND);
         }
+    }
+
+    private Integer parseInteger(String value) {
+        return StringUtils.hasText(value) ? Integer.valueOf(value) : null;
+    }
+
+    private Object valueOrBlank(Object value) {
+        return value == null ? "" : value;
     }
 
 }

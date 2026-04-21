@@ -11,6 +11,7 @@ import com.ecode.entity.Class;
 import com.ecode.result.Result;
 import com.ecode.service.ClassService;
 import com.ecode.vo.ClassVO;
+import com.ecode.vo.ImportResultVO;
 import com.ecode.vo.PageVO;
 import com.ecode.vo.ProblemPageVO;
 import com.ecode.vo.ProblemStuInfoVO;
@@ -28,6 +29,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +42,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -177,5 +184,41 @@ public class AdminClassController {
             @Parameter(name = "studentId", description = "学生id", required = true, in = ParameterIn.PATH)
             @PathVariable @NotNull(message = "学生id不能为空") Integer studentId) {
         return Result.success(classService.problemStuInfo(studentId, classProblemId));
+    }
+
+    @GetMapping("/export")
+    @Operation(summary = "导出班级", description = "导出班级 Excel")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "导出成功",
+            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    schema = @Schema(type = "string", format = "binary"))))
+    public ResponseEntity<byte[]> exportClasses() {
+        return excelResponse("班级导出.xlsx", classService.exportClasses());
+    }
+
+    @GetMapping("/import/template")
+    @Operation(summary = "下载班级导入模板", description = "下载班级 Excel 导入模板")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "下载成功",
+            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    schema = @Schema(type = "string", format = "binary"))))
+    public ResponseEntity<byte[]> exportClassTemplate() {
+        return excelResponse("班级导入模板.xlsx", classService.exportClassTemplate());
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "导入班级", description = "导入班级 Excel，id、邀请码或 teacherId+name 已存在时跳过并报告")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "导入完成",
+            content = @Content(schema = @Schema(implementation = Result.class))))
+    public Result<ImportResultVO> importClasses(
+            @Parameter(name = "file", description = "班级 Excel 文件，仅支持 .xlsx", required = true)
+            @RequestParam("file") MultipartFile file) {
+        return Result.success(classService.importClasses(file));
+    }
+
+    private ResponseEntity<byte[]> excelResponse(String fileName, byte[] data) {
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
+                .body(data);
     }
 }

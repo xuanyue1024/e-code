@@ -10,6 +10,7 @@ import com.ecode.dto.ClassStudentDTO;
 import com.ecode.dto.GeneralPageQueryDTO;
 import com.ecode.entity.Class;
 import com.ecode.vo.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -197,4 +198,26 @@ public interface ClassService extends IService<Class> {
      * @param dto 学生维护参数
      */
     void adminRemoveStudents(AdminClassStudentDTO dto);
+
+    /**
+     * 导出班级 Excel。
+     *
+     * @return Excel 字节
+     */
+    byte[] exportClasses();
+
+    /**
+     * 导出班级导入模板。
+     *
+     * @return Excel 字节
+     */
+    byte[] exportClassTemplate();
+
+    /**
+     * 导入班级 Excel。
+     *
+     * @param file Excel 文件
+     * @return 导入结果
+     */
+    ImportResultVO importClasses(MultipartFile file);
 }
