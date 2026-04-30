@@ -56,7 +56,7 @@
             SUM(cs.pass_number) AS passed_submissions,
             ROUND(SUM(cs.score) / COUNT(DISTINCT cs.class_problem_id), 2) AS avg_score,
             ROUND(SUM(cs.pass_number) / SUM(cs.submit_number) * 100, 2) AS pass_rate_percentage,
-            MAX(cs.code_submission->>'$.language') AS last_used_language
+            MAX(JSON_VALUE(cs.code_submission, '$.language')) AS last_used_language
         FROM
             user u
         JOIN
