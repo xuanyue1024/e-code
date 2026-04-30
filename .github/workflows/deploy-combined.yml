@@ -76,7 +76,9 @@ jobs:
           echo "VITE_COMMIT_SHA=${{ github.sha }}" >> .env
           echo "VITE_BUILD_DATE=$(TZ='Asia/Shanghai' date +'%Y-%m-%d')" >> .env
           echo "VITE_ICP_NUMBER=${{ secrets.ICP_NUMBER }}" >> .env
-          echo "VITE_CDN_SPONSOR='${{ vars.CDN_SPONSOR }}'" >> .env
+          
+          SPONSOR_HTML=${{ vars.CDN_SPONSOR }}
+          echo "VITE_CDN_SPONSOR='$SPONSOR_HTML'" >> .env
           
 
           npm ci
