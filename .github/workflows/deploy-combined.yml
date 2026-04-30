@@ -59,6 +59,8 @@ jobs:
 
       # 构建用户前端（生成 dist）
       - name: Build Frontend
+        env:
+          SPONSOR_HTML: ${{ vars.CDN_SPONSOR }}
         run: |
           cd frontend-repo
           # 注入环境变量
@@ -76,8 +78,6 @@ jobs:
           echo "VITE_COMMIT_SHA=${{ github.sha }}" >> .env
           echo "VITE_BUILD_DATE=$(TZ='Asia/Shanghai' date +'%Y-%m-%d')" >> .env
           echo "VITE_ICP_NUMBER=${{ secrets.ICP_NUMBER }}" >> .env
-          
-          SPONSOR_HTML=${{ vars.CDN_SPONSOR }}
           echo "VITE_CDN_SPONSOR='$SPONSOR_HTML'" >> .env
           
 
