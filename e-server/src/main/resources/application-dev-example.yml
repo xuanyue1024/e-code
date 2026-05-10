@@ -63,15 +63,17 @@ ecode:
 
   # AI相关配置
   ai:
+    base-url: https://dashscope.aliyuncs.com/compatible-mode
+    api-key: sk-xxxxxxxx
     # 题目推荐链接URL前缀
-    problem-recommendation-url: http://localhost
-    # 百炼API Key
-    bailian-api-key: sk-aabbcc
+    problem-recommendation-url: http://localhost:8000
     # 聊天模型配置
     chat:
       options:
-          # 模型名称
-          model: qwen-max-latest
+        # 模型名称
+        model: qwen3.6-plus
+        # 思考深度
+        reasoning-effort: low
     # 嵌入模型配置
     embedding:
       options:

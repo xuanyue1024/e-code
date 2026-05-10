@@ -43,15 +43,27 @@ spring:
             password: ${ecode.redis.password}
             database: ${ecode.redis.database}
     ai:
-        dashscope:
-            api-key: ${ecode.ai.bailian-api-key}
+        openai:
             chat:
                 options:
                     model: ${ecode.ai.chat.options.model}
+                    reasoning-effort: ${ecode.ai.chat.options.reasoning-effort}
             embedding:
-                options:
-                    model: ${ecode.ai.embedding.options.model}
-                    dimensions: ${ecode.ai.embedding.options.dimensions}
+              options:
+                  model: ${ecode.ai.embedding.options.model}
+                  dimensions: ${ecode.ai.embedding.options.dimensions}
+            base-url: ${ecode.ai.base-url}
+            api-key: ${ecode.ai.api-key}
+
+#        dashscope:
+#            api-key: ${ecode.ai.bailian-api-key}
+#            chat:
+#                options:
+#                    model: ${ecode.ai.chat.options.model}
+#            embedding:
+#                options:
+#                    model: ${ecode.ai.embedding.options.model}
+#                    dimensions: ${ecode.ai.embedding.options.dimensions}
         vectorstore:
             redis:
                 initialize-schema: true

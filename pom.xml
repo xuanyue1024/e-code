@@ -25,8 +25,8 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.4.4</spring-boot.version>
-        <spring-ai-alibaba.version>1.1.0.0-RC2</spring-ai-alibaba.version>
-        <spring-ai.version>1.1.0</spring-ai.version>
+        <spring-ai-alibaba.version>1.1.2.0</spring-ai-alibaba.version>
+        <spring-ai.version>1.1.2</spring-ai.version>
 
 
         <knife4j>4.5.0</knife4j>
@@ -66,11 +66,7 @@
                 <version>${spring-ai-alibaba.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-                <version>${spring-ai-alibaba.version}</version>
-            </dependency>
+
 
 <!--     spring ai版本清单       -->
             <dependency>
