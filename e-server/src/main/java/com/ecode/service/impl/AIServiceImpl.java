@@ -1,19 +1,18 @@
 package com.ecode.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.ecode.ai.repository.FileRepository;
 import com.ecode.constant.AiSystemConstant;
 import com.ecode.constant.MessageConstant;
 import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
 import com.ecode.dto.EvaluateAnswerDTO;
-import com.ecode.vo.EvaluateResultVO;
 import com.ecode.entity.AiChatHistory;
 import com.ecode.entity.po.RepositoryFile;
 import com.ecode.exception.AiException;
 import com.ecode.mapper.AiChatHistoryMapper;
 import com.ecode.result.Result;
 import com.ecode.service.AIService;
+import com.ecode.vo.EvaluateResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -30,6 +29,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -103,7 +103,13 @@ public class AIServiceImpl implements AIService {
                     // 标题生成属于首轮对话的附加能力，不能反向阻塞主聊天流结束事件。
                     messages.add(new UserMessage(aiInputDTO.getPrompt()));
                     String title = titleChatClient.prompt()
-                            .user(JSON.toJSONString(messages))
+                            .user(messages.stream()
+                                    .map(msg -> {
+                                        String type = msg.getMessageType().name();
+                                        String content = msg.getText();
+                                        return type + ":" + content + ";\n";
+                                    }).collect(Collectors.joining())
+                            )
                             .call()
                             .content();
 
