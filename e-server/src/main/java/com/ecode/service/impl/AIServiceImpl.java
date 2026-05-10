@@ -28,6 +28,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -99,6 +100,7 @@ public class AIServiceImpl implements AIService {
             titleMono = Mono.empty();
         }else {
             titleMono = Mono.fromCallable(() -> {
+                    // 标题生成属于首轮对话的附加能力，不能反向阻塞主聊天流结束事件。
                     messages.add(new UserMessage(aiInputDTO.getPrompt()));
                     String title = titleChatClient.prompt()
                             .user(JSON.toJSONString(messages))
@@ -113,11 +115,17 @@ public class AIServiceImpl implements AIService {
                     return Result.success(title);
                 })
                 .subscribeOn(Schedulers.boundedElastic())
+                // 标题生成超时后直接跳过，避免新会话一直等不到 end event。
+                .timeout(Duration.ofSeconds(8))
                 .map(t -> ServerSentEvent.builder()
                         .event("title")
                         .data(t)
                         .build()
-                );
+                )
+                .onErrorResume(ex -> {
+                    log.warn("首轮会话标题生成失败，跳过 title event，chatId={}", aiInputDTO.getChatId(), ex);
+                    return Mono.empty();
+                });
         }
 
         Mono<ServerSentEvent<Object>> endEvent = Mono.just(ServerSentEvent.builder()
