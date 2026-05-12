@@ -96,7 +96,7 @@ public class ProblemRecommendationTools {
             list.add(map);
         });
 
-        log.info("查询到的题目完成情况: {}", list);
+        log.info("传参数:{},{},查询到的题目完成情况: {}", studentId, classId, list);
         return list;
     }
 

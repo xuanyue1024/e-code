@@ -107,7 +107,7 @@ public class AIServiceImpl implements AIService {
                                     .map(msg -> {
                                         String type = msg.getMessageType().name();
                                         String content = msg.getText();
-                                        return type + ":" + content + ";\n";
+                                        return content + ";";
                                     }).collect(Collectors.joining())
                             )
                             .call()
