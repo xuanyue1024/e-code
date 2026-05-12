@@ -43,27 +43,28 @@ spring:
             password: ${ecode.redis.password}
             database: ${ecode.redis.database}
     ai:
-        openai:
-            chat:
-                options:
-                    model: ${ecode.ai.chat.options.model}
-                    reasoning-effort: ${ecode.ai.chat.options.reasoning-effort}
-            embedding:
-              options:
-                  model: ${ecode.ai.embedding.options.model}
-                  dimensions: ${ecode.ai.embedding.options.dimensions}
-            base-url: ${ecode.ai.base-url}
-            api-key: ${ecode.ai.api-key}
-
-#        dashscope:
-#            api-key: ${ecode.ai.bailian-api-key}
+#        openai:
 #            chat:
 #                options:
 #                    model: ${ecode.ai.chat.options.model}
+#                    reasoning-effort: ${ecode.ai.chat.options.reasoning-effort}
 #            embedding:
-#                options:
-#                    model: ${ecode.ai.embedding.options.model}
-#                    dimensions: ${ecode.ai.embedding.options.dimensions}
+#              options:
+#                  model: ${ecode.ai.embedding.options.model}
+#                  dimensions: ${ecode.ai.embedding.options.dimensions}
+#            base-url: ${ecode.ai.base-url}
+#            api-key: ${ecode.ai.api-key}
+
+        dashscope:
+            api-key: ${ecode.ai.bailian-api-key}
+            chat:
+                options:
+                    model: ${ecode.ai.chat.options.model}
+                    enable-thinking: false
+            embedding:
+                options:
+                    model: ${ecode.ai.embedding.options.model}
+                    dimensions: ${ecode.ai.embedding.options.dimensions}
         vectorstore:
             redis:
                 initialize-schema: true
@@ -84,7 +85,7 @@ spring:
 mybatis-plus:
     configuration:
         default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler #配置枚举处理器
-        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启日志输出
+#        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启日志输出
     type-aliases-package: com.ecode.entity
     global-config:
         db-config:

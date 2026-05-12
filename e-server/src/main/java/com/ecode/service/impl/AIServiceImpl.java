@@ -1,5 +1,6 @@
 package com.ecode.service.impl;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.ecode.ai.repository.FileRepository;
 import com.ecode.constant.AiSystemConstant;
 import com.ecode.constant.MessageConstant;
@@ -7,9 +8,11 @@ import com.ecode.context.BaseContext;
 import com.ecode.dto.AiInputDTO;
 import com.ecode.dto.EvaluateAnswerDTO;
 import com.ecode.entity.AiChatHistory;
+import com.ecode.entity.Problem;
 import com.ecode.entity.po.RepositoryFile;
 import com.ecode.exception.AiException;
 import com.ecode.mapper.AiChatHistoryMapper;
+import com.ecode.mapper.ProblemMapper;
 import com.ecode.result.Result;
 import com.ecode.service.AIService;
 import com.ecode.vo.EvaluateResultVO;
@@ -60,6 +63,9 @@ public class AIServiceImpl implements AIService {
 
     @Autowired
     private ChatMemory chatMemory;
+
+    @Autowired
+    private ProblemMapper problemMapper;
     /**
      * 获取聊天内容的方法
      *
@@ -85,6 +91,7 @@ public class AIServiceImpl implements AIService {
         Flux<ServerSentEvent<Object>> contentStream = chatClient.prompt()
                 .user(aiInputDTO.getPrompt())
                 .system(systemPrompt)
+                .options(DashScopeChatOptions.builder().multiModel(true).build())
                 .advisors()
                 .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                 .stream()
@@ -105,11 +112,12 @@ public class AIServiceImpl implements AIService {
                     String title = titleChatClient.prompt()
                             .user(messages.stream()
                                     .map(msg -> {
-                                        String type = msg.getMessageType().name();
+                                        String type = msg.getMessageType().getValue();
                                         String content = msg.getText();
-                                        return content + ";";
+                                        return type + "说:" + content + ";\n";
                                     }).collect(Collectors.joining())
                             )
+                            .options(DashScopeChatOptions.builder().multiModel(true).build()) //todo
                             .call()
                             .content();
 
@@ -160,6 +168,7 @@ public class AIServiceImpl implements AIService {
             log.info("AI解答走数据库答案通道");
             return questionAnswerClient.prompt()
                     .user(aiInputDTO.getPrompt())
+                    .options(DashScopeChatOptions.builder().multiModel(true).build())
                     .system(AiSystemConstant.CODE_SYSTEM_PROMPT + aiInputDTO.getProblemId())
                     .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                     .stream()
@@ -173,6 +182,7 @@ public class AIServiceImpl implements AIService {
         log.info("AI解答走知识库答案通道");
         return questionAnswerClientVec.prompt()
                 .user(aiInputDTO.getPrompt())
+                .options(DashScopeChatOptions.builder().multiModel(true).build())
                 .system("请根据知识库内容回答用户问题")
                 .advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(aiInputDTO.getChatId()).build())
                 .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "file_name == '" + file.getName() + "' && classId == " + aiInputDTO.getClassId()))
@@ -200,6 +210,7 @@ public class AIServiceImpl implements AIService {
 
         return generateQuestionClient.prompt()
                 .user(require)
+                .options(DashScopeChatOptions.builder().multiModel(true).build())
                 .stream()
                 .content()
                 .map(content -> ServerSentEvent.builder()
@@ -211,9 +222,12 @@ public class AIServiceImpl implements AIService {
 
     @Override
     public EvaluateResultVO evaluateAnswer(EvaluateAnswerDTO dto) {
-        String prompt = "请帮我评测这道题的代码：\n题目ID：" + dto.getProblemId() + "\n代码内容如下：\n" + dto.getCode() + "\n请根据标准答案（通过工具获取）对以上代码进行评测评分，并给出markdown格式的点评。";
+        Problem problem = problemMapper.selectById(dto.getProblemId());
+        String content = problem != null ? problem.getContent() : "未找到题目内容";
+        String prompt = "请帮我评测这道题的代码：\n题目ID：" + dto.getProblemId() + "\n题目内容:" + content + "\n学生写的代码内容如下：\n" + dto.getCode() + "\n请根据题目对以上代码进行评测评分，并给出markdown格式的点评。";
         return evaluateAnswerClient.prompt()
                 .user(prompt)
+                .options(DashScopeChatOptions.builder().multiModel(true).build())
                 .call()
                 .entity(EvaluateResultVO.class);
     }

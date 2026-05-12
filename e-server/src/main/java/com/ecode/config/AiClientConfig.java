@@ -1,5 +1,6 @@
 package com.ecode.config;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.ecode.ai.tools.ProblemRecommendationTools;
 import com.ecode.ai.tools.ProblemSolutionTools;
 import com.ecode.constant.AiSystemConstant;
@@ -8,12 +9,12 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -28,6 +29,9 @@ public class AiClientConfig {
     @Autowired
     private ProblemSolutionTools problemSolutionTools;
 
+    @Value("${ecode.ai.title-model}")
+    private String titleModel;
+
 
     /**
      * 创建聊天客户端的方法
@@ -36,7 +40,7 @@ public class AiClientConfig {
      * @return 创建好的聊天客户端
      */
     @Bean
-    public ChatClient chatClient(OpenAiChatModel model) {
+    public ChatClient chatClient(DashScopeChatModel model) {
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.DEFAULT_SYSTEM_PROMPT)
@@ -54,11 +58,11 @@ public class AiClientConfig {
      * @return 创建好的聊天客户端
      */
     @Bean
-    public ChatClient titleChatClient(OpenAiChatModel model){
+    public ChatClient titleChatClient(DashScopeChatModel model){
         return ChatClient
                 .builder(model)
                 .defaultOptions(ChatOptions.builder()
-                        .model("qwq-32b-preview")
+                        .model(titleModel)
                         .build())
                 .defaultSystem(AiSystemConstant.TITLE_GENERATION)
                 .defaultAdvisors(SimpleLoggerAdvisor.builder().build())
@@ -66,19 +70,19 @@ public class AiClientConfig {
     }
 
     @Bean
-    public ChatClient evaluateAnswerClient(OpenAiChatModel model){
+    public ChatClient evaluateAnswerClient(DashScopeChatModel model){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.EVALUATE_ANSWER_SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor()
                 )
-                .defaultTools(problemSolutionTools)
+//                .defaultTools(problemSolutionTools)
                 .build();
     }
 
     @Bean
-    public ChatClient questionAnswerClient(OpenAiChatModel model){
+    public ChatClient questionAnswerClient(DashScopeChatModel model){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.CODE_SYSTEM_PROMPT)
@@ -89,7 +93,7 @@ public class AiClientConfig {
                 .build();
     }
     @Bean
-    public ChatClient questionAnswerClientVec(OpenAiChatModel model, VectorStore vectorStore){
+    public ChatClient questionAnswerClientVec(DashScopeChatModel model, VectorStore vectorStore){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.CODE_SYSTEM_PROMPT)
@@ -112,7 +116,7 @@ public class AiClientConfig {
      * @return 构建的聊天客户端
      */
     @Bean
-    public ChatClient generateQuestionClient(OpenAiChatModel model){
+    public ChatClient generateQuestionClient(DashScopeChatModel model){
         return ChatClient
                 .builder(model)
                 .defaultSystem(AiSystemConstant.GENERATE_QUESTION)
