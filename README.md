@@ -13,7 +13,7 @@
   </p>
 </div>
 
-前端仓库见 [ecode-vue3](https://github.com/xuanyue1024/ecode-vue3), [ecode-vue2](https://github.com/xuanyue1024/ecode-vue)；手机客户端仓库见 [EcodeForAndroid](https://github.com/xuanyue1024/EcodeForAndroid)
+当前仓库是后端及部署文件仓库，前端仓库见 [ecode-vue3](https://github.com/xuanyue1024/ecode-vue3), [ecode-admin](https://github.com/xuanyue1024/ecode-admin-vue3), [ecode-vue2](https://github.com/xuanyue1024/ecode-vue)；手机客户端仓库见 [EcodeForAndroid](https://github.com/xuanyue1024/EcodeForAndroid)
 
 - **低延迟直播**：基于 WHIP/WHEP 协议构建，实现毫秒级延迟的即时教学互动。
 - **实时互动弹幕**：采用 WebSocket 通讯，底层通过 Redis Stream 进行消息存储与分发，保障高并发下的稳定性。
