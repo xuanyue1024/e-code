@@ -20,18 +20,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock #代码运行支持
       - ./config/application-dev.yml:/app/application-dev.yml
       - ./logs:/app/logs
-
+ 
   # -------------------------------------------------------------------
   # 2. ecode-ui + nginx
-  # -------------------------------------------------------------------
+  # ------------------------------------------------------------------- 
   ecode-ui:
     container_name: ecode-nginx
     image: ghcr.io/xuanyue1024/e-code-ui:latest
     restart: on-failure:3
     ports:
       - "127.0.0.1:8089:8088"
-#    volumes:
-#      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
+    # volumes:
+      # - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - ecode
 
@@ -75,6 +75,24 @@ services:
       REDIS_ARGS: "--appendonly yes --requirepass XW%1lk1vKu*W"
     volumes:
       - ./data/redis:/data
+
+  # -------------------------------------------------------------------
+  # 5. SRS媒体服务器
+  # ------------------------------------------------------------------- 
+  srs:
+    image: ossrs/srs:6
+    container_name: srs-server
+    environment:
+      - CANDIDATE=你的服务器IP
+    ports:
+      # - "1935:1935"      # RTMP
+      - "127.0.0.1:1985:1985"      # SRS API 
+      - "127.0.0.1:8080:8080"      # HTTP (HLS, players)
+      - "8000:8000/udp"  # WebRTC
+    volumes:
+      - ./config/rtc.conf:/srs/rtc.conf:ro
+    command: ["./objs/srs", "-c", "/srs/rtc.conf"]
+    restart: on-failure:3
 
 networks:
   default:
